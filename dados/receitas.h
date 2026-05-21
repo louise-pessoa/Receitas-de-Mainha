@@ -1,7 +1,7 @@
 #ifndef RECEITAS_H
 #define RECEITAS_H
 
-#define MAX_PASSOS_JOGAVEIS 8
+#define MAX_PASSOS_JOGAVEIS 16
 
 struct No;
 

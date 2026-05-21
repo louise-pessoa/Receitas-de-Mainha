@@ -201,9 +201,7 @@ void integrar_modulos(void) {
 
     // === ingredientes do Pirão de Carne (desbloqueavel - final do jogo no Marco Zero) ===
     Receita *pirao_carne = buscar_receita(receitas_disponiveis, "Pirão de Carne");
-    inserir_ingrediente(pirao_carne, "Cenoura",           "2 unidades");
-    inserir_ingrediente(pirao_carne, "Cebola",            "2 unidades");
-    inserir_ingrediente(pirao_carne, "Batata",            "3 unidades");
+    inserir_ingrediente(pirao_carne, "Legumes",           "cenoura, cebola, batata");
     inserir_ingrediente(pirao_carne, "Coentro",           "1 maço");
     inserir_ingrediente(pirao_carne, "Carne",             "600g");
     inserir_ingrediente(pirao_carne, "Água",              "2 litros");
@@ -211,39 +209,35 @@ void integrar_modulos(void) {
     inserir_ingrediente(pirao_carne, "Farinha de mandioca", "400g");
 
     // === ETAPA 1: Cortar Ingredientes ===
-    adicionar_passo_jogavel_com_img(pirao_carne, "[ETAPA 1] Corte a cenoura",
-                            "Cenoura", "CCCC", 8, "sprites/pirao_cenoura_cortada.png");
-    adicionar_passo_jogavel_com_img(pirao_carne, "[ETAPA 1] Corte a cebola",
-                            "Cebola", "OOOO", 8, "sprites/pirao_cebola_cortada.png");
-    adicionar_passo_jogavel_com_img(pirao_carne, "[ETAPA 1] Corte a batata",
-                            "Batata", "BBBB", 8, "sprites/pirao_batata_cortada.png");
-    adicionar_passo_jogavel_com_img(pirao_carne, "[ETAPA 1] Pique o coentro",
+    adicionar_passo_jogavel_com_img(pirao_carne, "Corte os legumes",
+                            "Legumes", "CCCC", 8, "sprites/pirao_legumes_cortados.png");
+    adicionar_passo_jogavel_com_img(pirao_carne, "Pique o coentro",
                             "Coentro", "PPPP", 8, "sprites/pirao_coentro_picado.png");
-    adicionar_passo_jogavel_com_img(pirao_carne, "[ETAPA 1] Desfie a carne",
-                            "Carne", "DDDD", 10, "sprites/pirao_carne_desfiada.png");
+    adicionar_passo_jogavel_com_img(pirao_carne, "Corte a carne",
+                            "Carne", "DDDD", 10, "sprites/pirao_carne_cortada.png");
 
     // === ETAPA 2: Adicionar na Panela ===
-    adicionar_passo_jogavel_com_img(pirao_carne, "[ETAPA 2] Coloque água na panela",
+    adicionar_passo_jogavel_com_img(pirao_carne, "Coloque água na panela",
                             "Água", "AAAA", 10, "sprites/pirao_agua_panela.png");
-    adicionar_passo_jogavel_com_img(pirao_carne, "[ETAPA 2] Adicione a carne",
+    adicionar_passo_jogavel_com_img(pirao_carne, "Adicione a carne",
                             "Carne", "CCCC", 10, "sprites/pirao_carne_panela.png");
-    adicionar_passo_jogavel_com_img(pirao_carne, "[ETAPA 2] Adicione os legumes",
-                            "Cenoura", "LLLL", 10, "sprites/pirao_legumes_panela.png");
-    adicionar_passo_jogavel_com_img(pirao_carne, "[ETAPA 2] Tempere a panela",
+    adicionar_passo_jogavel_com_img(pirao_carne, "Adicione os legumes",
+                            "Legumes", "LLLL", 10, "sprites/pirao_legumes_panela.png");
+    adicionar_passo_jogavel_com_img(pirao_carne, "Tempere a panela",
                             "Temperado", "TTTT", 8, "sprites/pirao_temperado.png");
 
     // === ETAPA 3: Retirar Ingredientes (Minigame de Peneiramento) ===
-    adicionar_passo_jogavel_com_img(pirao_carne, "[ETAPA 3] Retire a carne com peneira",
+    adicionar_passo_jogavel_com_img(pirao_carne, "Retire a carne com peneira",
                             "Carne", "MMMM", 12, "sprites/pirao_carne_retirada.png");
-    adicionar_passo_jogavel_com_img(pirao_carne, "[ETAPA 3] Retire os legumes",
-                            "Cenoura", "VVVV", 12, "sprites/pirao_legumes_retirados.png");
+    adicionar_passo_jogavel_com_img(pirao_carne, "Retire os legumes",
+                            "Legumes", "VVVV", 12, "sprites/pirao_legumes_retirados.png");
 
     // === ETAPA 4: O Pirão (Clímax) ===
-    adicionar_passo_jogavel_com_img(pirao_carne, "[ETAPA 4] Adicione farinha aos poucos",
+    adicionar_passo_jogavel_com_img(pirao_carne, "Adicione farinha aos poucos",
                             "Farinha de mandioca", "FFFF", 10, "sprites/pirao_farinha_adiciona.png");
-    adicionar_passo_jogavel_com_img(pirao_carne, "[ETAPA 4] Mexa bem o pirão",
+    adicionar_passo_jogavel_com_img(pirao_carne, "Mexa bem o pirão",
                             "Farinha de mandioca", "EEEE", 12, "sprites/pirao_mexendo.png");
-    adicionar_passo_jogavel_com_img(pirao_carne, "[ETAPA 4] Finalize com coentro",
+    adicionar_passo_jogavel_com_img(pirao_carne, "Finalize com coentro",
                             "Coentro", "FFFF", 8, "sprites/pirao_coentro_final.png");
 
     // Define imagens de inicio e pronta do Pirão

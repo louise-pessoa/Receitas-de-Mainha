@@ -69,33 +69,6 @@ static void montar_grid(void) {
         ing = ing->prox;
         i++;
     }
-    
-    // Adiciona Forno manualmente embaixo da Cebola (coluna 2, linha 2)
-    // Forno só é adicionado para receitas que precisam: Escondidinho e Pirão de Carne
-    int adiciona_forno = 0;
-    if (cozinhar.receita != NULL) {
-        if (strcmp(cozinhar.receita->nome, "Escondidinho") == 0 ||
-            strcmp(cozinhar.receita->nome, "Pirão de Carne") == 0) {
-            adiciona_forno = 1;
-        }
-    }
-    
-    if (adiciona_forno && i < COZ_MAX_ING_GRID) {
-        strncpy(cozinhar.grid[i].nome, "Forno",
-                sizeof(cozinhar.grid[i].nome) - 1);
-        cozinhar.grid[i].nome[sizeof(cozinhar.grid[i].nome) - 1] = '\0';
-        cozinhar.grid[i].destacado = 0;
-        cozinhar.grid[i].usado = 0;
-        
-        // Forno: coluna 2, linha 2 (embaixo da Cebola)
-        float w = 130;
-        float h = 70;
-        float gx = 30 + 2 * (w + 14);
-        float gy = 410 + 1 * (h + 10);
-        cozinhar.grid[i].area = (Rectangle){ gx, gy, w, h };
-        i++;
-    }
-    
     cozinhar.n_grid = i;
 }
 

@@ -89,6 +89,24 @@ static int _spr_leite_carregado = 0;
 static Texture2D _spr_ovo;
 static int _spr_ovo_carregado = 0;
 
+static Texture2D _spr_alho;
+static int _spr_alho_carregado = 0;
+
+static Texture2D _spr_banana;
+static int _spr_banana_carregado = 0;
+
+static Texture2D _spr_limao;
+static int _spr_limao_carregado = 0;
+
+static Texture2D _spr_pao;
+static int _spr_pao_carregado = 0;
+
+static Texture2D _spr_pimenta;
+static int _spr_pimenta_carregado = 0;
+
+static Texture2D _spr_tomate;
+static int _spr_tomate_carregado = 0;
+
 void catcher_carregar_sprites(void) {
     _spr_cesta = LoadTexture("sprites/cesta.png");
     if (_spr_cesta.id != 0) {
@@ -179,6 +197,42 @@ void catcher_carregar_sprites(void) {
         SetTextureFilter(_spr_ovo, TEXTURE_FILTER_BILINEAR);
         _spr_ovo_carregado = 1;
     }
+
+    _spr_alho = LoadTexture("sprites/alho.png");
+    if (_spr_alho.id != 0) {
+        SetTextureFilter(_spr_alho, TEXTURE_FILTER_BILINEAR);
+        _spr_alho_carregado = 1;
+    }
+
+    _spr_banana = LoadTexture("sprites/banana.png");
+    if (_spr_banana.id != 0) {
+        SetTextureFilter(_spr_banana, TEXTURE_FILTER_BILINEAR);
+        _spr_banana_carregado = 1;
+    }
+
+    _spr_limao = LoadTexture("sprites/limao.png");
+    if (_spr_limao.id != 0) {
+        SetTextureFilter(_spr_limao, TEXTURE_FILTER_BILINEAR);
+        _spr_limao_carregado = 1;
+    }
+
+    _spr_pao = LoadTexture("sprites/pao.png");
+    if (_spr_pao.id != 0) {
+        SetTextureFilter(_spr_pao, TEXTURE_FILTER_BILINEAR);
+        _spr_pao_carregado = 1;
+    }
+
+    _spr_pimenta = LoadTexture("sprites/pimenta.png");
+    if (_spr_pimenta.id != 0) {
+        SetTextureFilter(_spr_pimenta, TEXTURE_FILTER_BILINEAR);
+        _spr_pimenta_carregado = 1;
+    }
+
+    _spr_tomate = LoadTexture("sprites/tomate.png");
+    if (_spr_tomate.id != 0) {
+        SetTextureFilter(_spr_tomate, TEXTURE_FILTER_BILINEAR);
+        _spr_tomate_carregado = 1;
+    }
 }
 
 void catcher_descarregar_sprites(void) {
@@ -221,6 +275,12 @@ void catcher_descarregar_sprites(void) {
     if (_spr_goiabada_carregado) { UnloadTexture(_spr_goiabada); _spr_goiabada_carregado = 0; }
     if (_spr_leite_carregado)    { UnloadTexture(_spr_leite);    _spr_leite_carregado    = 0; }
     if (_spr_ovo_carregado)      { UnloadTexture(_spr_ovo);      _spr_ovo_carregado      = 0; }
+    if (_spr_alho_carregado)     { UnloadTexture(_spr_alho);     _spr_alho_carregado     = 0; }
+    if (_spr_banana_carregado)   { UnloadTexture(_spr_banana);   _spr_banana_carregado   = 0; }
+    if (_spr_limao_carregado)    { UnloadTexture(_spr_limao);    _spr_limao_carregado    = 0; }
+    if (_spr_pao_carregado)      { UnloadTexture(_spr_pao);      _spr_pao_carregado      = 0; }
+    if (_spr_pimenta_carregado)  { UnloadTexture(_spr_pimenta);  _spr_pimenta_carregado  = 0; }
+    if (_spr_tomate_carregado)   { UnloadTexture(_spr_tomate);   _spr_tomate_carregado   = 0; }
 }
 
 // retorna o sprite correspondente ao nome do ingrediente, ou NULL se nao houver
@@ -254,6 +314,12 @@ static const Texture2D* _sprite_para_ingrediente(const char *nome) {
     if (_spr_goiabada_carregado && strstr(nome, "Goiabada") != NULL) return &_spr_goiabada;
     if (_spr_leite_carregado    && strstr(nome, "Leite")    != NULL) return &_spr_leite;
     if (_spr_ovo_carregado      && strstr(nome, "Ovo")      != NULL) return &_spr_ovo;
+    if (_spr_alho_carregado     && strstr(nome, "Alho")     != NULL) return &_spr_alho;
+    if (_spr_banana_carregado   && strstr(nome, "Banana")   != NULL) return &_spr_banana;
+    if (_spr_limao_carregado    && strstr(nome, "Limao")    != NULL) return &_spr_limao;
+    if (_spr_pao_carregado      && strstr(nome, "Pao")      != NULL) return &_spr_pao;
+    if (_spr_pimenta_carregado  && strstr(nome, "Pimenta")  != NULL) return &_spr_pimenta;
+    if (_spr_tomate_carregado   && strstr(nome, "Tomate")   != NULL) return &_spr_tomate;
     return NULL;
 }
 

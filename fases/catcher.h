@@ -47,6 +47,7 @@ typedef struct {
 
     double tempo_inicio;
     float  tempo_decorrido;
+    int    periodo_garantido;        // segundos de spawn garantido por dificuldade
     int    ultimo_segundo_penalizado;
 
     int    pontos;

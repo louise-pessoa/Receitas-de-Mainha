@@ -10,10 +10,27 @@ gráfica em Raylib.
 ---
 
 ## Estruturas de Dados e Algoritmos (obrigatórios)
-- **Lista encadeada** — armazena receitas e seus ingredientes
-- **Pilha** — controla a ordem dos passos da receita
-- **Insertion sort** — organiza os ingredientes coletados na ordem de
-  utilização da receita
+
+### Lista encadeada — receitas (`dados/receitas.h`)
+- As receitas disponíveis no jogo formam uma lista encadeada (`struct receita *prox`)
+- Cada receita é um nó alocado dinamicamente via `inserir_receita`
+
+### Array — ingredientes de cada receita (`dados/receitas.h`)
+- Os ingredientes de cada receita são armazenados como array estático de strings: `char ingredientes[MAX_INGREDIENTES][60]`
+- Adicionados em ordem de uso com `inserir_ingrediente(receita, nome)`
+- Acesso por índice: `receita->ingredientes[i]`
+
+### Pilha — passos de cozinhar (`dados/pilha.h/c`)
+- Os passos jogáveis de cada receita são armazenados em uma pilha (`struct No *passos`)
+- Criados com `push_passo` na inicialização do jogo (em ordem de execução)
+- Na fase de cozinhar, uma cópia de trabalho é feita; `pop_passo` remove o passo do topo ao ser executado corretamente
+- A pilha original da receita não é consumida, permitindo replay
+
+### Insertion sort — fase de ordenação (`fases/ordenacao.h/c`)
+- Após o catcher, os ingredientes coletados ficam em um array na **ordem em que foram coletados pelo jogador**
+- O insertion sort os ordena para a **ordem correta de uso da receita** (definida por `ordem_correta = índice na receita`)
+- O algoritmo é animado frame a frame (um passo a cada 550ms) para fins didáticos
+- Não há embaralhamento artificial — a desordem vem naturalmente da coleta
 
 ---
 

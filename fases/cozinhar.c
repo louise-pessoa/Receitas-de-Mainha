@@ -57,11 +57,13 @@ static void montar_grid(void) {
         cozinhar.grid[i].destacado = 0;
         cozinhar.grid[i].usado = 0;
 
+        // grid 5 colunas em 2 linhas
         int col = i % 5;
-        float w = 125;
-        float h = 65;
-        float gx = 20 + col * (w + 8);
-        float gy = 488;
+        int row = i / 5;
+        float w = 130;
+        float h = 70;
+        float gx = 30 + col * (w + 14);
+        float gy = 410 + row * (h + 10);
         cozinhar.grid[i].area = (Rectangle){ gx, gy, w, h };
     }
     cozinhar.n_grid = total;
@@ -151,6 +153,16 @@ void cozinhar_iniciar(Receita *receita) {
         }
     }
 
+    // carrega textura inicial da receita
+    cozinhar.textura_inicio_carregada = 0;
+    if (receita->img_inicio[0] != '\0') {
+        cozinhar.textura_inicio = LoadTexture(receita->img_inicio);
+        if (cozinhar.textura_inicio.id != 0) {
+            SetTextureFilter(cozinhar.textura_inicio, TEXTURE_FILTER_BILINEAR);
+            cozinhar.textura_inicio_carregada = 1;
+        }
+    }
+
     montar_grid();
     cozinhar.passo_idx = 0;
     cozinhar.fase = COZ_FASE_CLICAR;
@@ -205,6 +217,7 @@ static void fase_clicar(void) {
                 cozinhar.erros++;
                 cozinhar.pontos -= 2;
                 if (cozinhar.pontos < 0) cozinhar.pontos = 0;
+                estado.erro_passo++;
             }
             return;
         }
@@ -227,7 +240,17 @@ static void fase_teclas(void) {
                         cozinhar.grid[k].usado = 1;
                     }
                 }
-                avancar_passo(1);
+                // Adiciona delay visual para forno
+                if (strcmp(p->ingrediente, "Forno") == 0) {
+                    cozinhar.delay_forno = 3.0f;  // 3 segundos de delay
+                    cozinhar.fase = COZ_FASE_FEEDBACK;
+                    cozinhar.feedback_acerto = 1;
+                    cozinhar.feedback_timer = 0.0f;
+                    cozinhar.acertos++;
+                    cozinhar.pontos += 10;
+                } else {
+                    avancar_passo(1);
+                }
                 return;
             }
         } else if (tecla != KEY_F11 && tecla != KEY_LEFT_ALT &&
@@ -236,6 +259,7 @@ static void fase_teclas(void) {
             cozinhar.pos_tecla = 0;
             cozinhar.pontos -= 1;
             if (cozinhar.pontos < 0) cozinhar.pontos = 0;
+            estado.erro_passo++;
         }
         tecla = GetKeyPressed();
     }
@@ -243,7 +267,11 @@ static void fase_teclas(void) {
 
 static void fase_feedback(void) {
     cozinhar.feedback_timer += GetFrameTime();
-    if (cozinhar.feedback_timer >= 1.0f) {
+    
+    // Se está no forno, usa delay maior
+    float tempo_minimo = (cozinhar.delay_forno > 0) ? cozinhar.delay_forno : 1.0f;
+    
+    if (cozinhar.feedback_timer >= tempo_minimo) {
         if (cozinhar.feedback_acerto) {
             // pop: remove passo concluido do topo da pilha
             cozinhar.pilha = pop_passo(cozinhar.pilha);
@@ -259,6 +287,7 @@ static void fase_feedback(void) {
         cozinhar.fase = COZ_FASE_CLICAR;
         cozinhar.tempo_passo = 0.0f;
         cozinhar.pos_tecla = 0;
+        cozinhar.delay_forno = 0.0f;  // Reset delay
         marcar_destacado();
     }
 }
@@ -448,6 +477,24 @@ static void desenhar_feedback(void) {
 }
 
 static void desenhar_imagem_passo(void) {
+    // Mostra imagem inicial no primeiro passo
+    if (cozinhar.passo_idx == 0 && cozinhar.textura_inicio_carregada) {
+        Texture2D tex = cozinhar.textura_inicio;
+
+        float max_altura = ALT - 100 - 80;
+        float escala_altura = max_altura / tex.height;
+        float max_largura = LARG;
+        float escala_largura = max_largura / tex.width;
+        float escala = escala_altura < escala_largura ? escala_altura : escala_largura;
+
+        float largura = tex.width * escala;
+        float altura = tex.height * escala;
+        float x = (LARG - largura) / 2;
+        float y = 80;
+        DrawTextureEx(tex, (Vector2){x, y}, 0, escala, WHITE);
+        return;
+    }
+
     if (pilha_vazia(cozinhar.pilha)) return;
     if (cozinhar.texturas_passos == NULL || cozinhar.texturas_carregadas == NULL) return;
     
@@ -553,6 +600,12 @@ void cozinhar_limpar(void) {
     if (cozinhar.textura_pronta_carregada) {
         UnloadTexture(cozinhar.textura_pronta);
         cozinhar.textura_pronta_carregada = 0;
+    }
+    
+    // libera textura inicial
+    if (cozinhar.textura_inicio_carregada) {
+        UnloadTexture(cozinhar.textura_inicio);
+        cozinhar.textura_inicio_carregada = 0;
     }
     
     // libera textura frigideira pronta

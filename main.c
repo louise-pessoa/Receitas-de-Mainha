@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
 #include <pthread.h>
 #include "raylib.h"
 #include "api/groq.h"
@@ -32,16 +33,23 @@ static void alternar_fullscreen(void) {
 static void atualizar_selecao_receitas(void) {
     if (tela_atual != TELA_RECEITAS) return;
 
-    // contar total de receitas na lista
+    // contar total de receitas DESBLOQUEADAS
     int total = 0;
-    { Receita *r = receitas_disponiveis; while (r) { total++; r = r->prox; } }
+    { Receita *r = receitas_disponiveis; while (r) { if (r->desbloqueada) total++; r = r->prox; } }
     if (total == 0) return;
 
-    // descobrir indice atual (1-based); 0 = nenhuma
+    // descobrir indice atual entre desbloqueadas (1-based); 0 = nenhuma
     int idx = 0;
     { int k = 1; Receita *r = receitas_disponiveis;
-      while (r) { if (r == receita_selecionada) { idx = k; break; } k++; r = r->prox; } }
-    if (idx == 0) idx = 1; // seleciona primeira se nada selecionado
+      while (r) { if (r->desbloqueada && r == receita_selecionada) { idx = k; break; } 
+                  if (r->desbloqueada) k++; 
+                  r = r->prox; } }
+    if (idx == 0) {
+        // seleciona primeira desbloqueada se nada selecionado
+        Receita *r = receitas_disponiveis;
+        while (r) { if (r->desbloqueada) { receita_selecionada = r; break; } r = r->prox; }
+        idx = 1;
+    }
 
     if (IsKeyPressed(KEY_ONE))   idx = 1;
     if (IsKeyPressed(KEY_TWO))   idx = 2;
@@ -49,7 +57,13 @@ static void atualizar_selecao_receitas(void) {
     if (IsKeyPressed(KEY_DOWN))  idx = (idx % total) + 1;
     if (IsKeyPressed(KEY_UP))    idx = (idx - 2 + total) % total + 1;
 
-    receita_selecionada = buscar_receita_idx(receitas_disponiveis, idx);
+    // busca a idx-esima receita DESBLOQUEADA
+    receita_selecionada = NULL;
+    { int k = 1; Receita *r = receitas_disponiveis;
+      while (r) { if (r->desbloqueada) {
+                      if (k == idx) { receita_selecionada = r; break; }
+                      k++;
+                  } r = r->prox; } }
 
     if (IsKeyPressed(KEY_ENTER) && !IsKeyDown(KEY_LEFT_ALT) &&
         receita_selecionada != NULL) {
@@ -153,6 +167,17 @@ int main(void) {
             case TELA_INGREDIENTES:
                 if (IsKeyPressed(KEY_ENTER) && !IsKeyDown(KEY_LEFT_ALT)) {
                     if (receita_selecionada != NULL) {
+                        // Verifica se é Pirão e se as 3 primeiras foram completadas
+                        if (strcmp(receita_selecionada->nome, "Pirão de Carne") == 0) {
+                            if (estado.receitas_completadas < 3) {
+                                printf("[BLOQUEIO] Pirão de Carne está bloqueado! Complete as 3 outras receitas primeiro.\n");
+                                printf("[PROGRESSO] Completadas: %d/3\n", estado.receitas_completadas);
+                                // Volta ao menu de receitas para escolher outra
+                                tela_atual = TELA_RECEITAS;
+                                break;
+                            }
+                        }
+                        
                         catcher_iniciar(receita_selecionada);
                         tela_atual = TELA_CATCHER;
                     }
@@ -189,8 +214,33 @@ int main(void) {
                 if (cozinhar.terminou &&
                     IsKeyPressed(KEY_ENTER) && !IsKeyDown(KEY_LEFT_ALT)) {
                     cozinhar_limpar();
-                    disparar_jurados();
-                    tela_atual = TELA_RESULTADO;
+                    
+                    // Incrementa contador de receitas completadas
+                    if (receita_selecionada != NULL) {
+                        estado.receitas_completadas++;
+                        printf("[PROGRESSO] Receita '%s' completada! Total: %d/4\n",
+                               receita_selecionada->nome, estado.receitas_completadas);
+                        
+                        // Se completou as 3 primeiras, desbloqueia Pirão
+                        if (estado.receitas_completadas == 3) {
+                            Receita *pirao = buscar_receita(receitas_disponiveis, "Pirão de Carne");
+                            if (pirao) {
+                                pirao->desbloqueada = 1;
+                                printf("[DESBLOQUEIO] Pirão de Carne desbloqueado! Vá ao Marco Zero (TELA_RESULTADO).\n");
+                            }
+                        }
+                        
+                        // JURADOS SÓ NA FASE FINAL (PIRÃO)
+                        if (strcmp(receita_selecionada->nome, "Pirão de Carne") == 0) {
+                            // Fase final: chama jurados
+                            disparar_jurados();
+                            tela_atual = TELA_RESULTADO;
+                        } else {
+                            // Receitas normais: volta ao menu sem jurados
+                            receita_selecionada = NULL;
+                            tela_atual = TELA_RECEITAS;
+                        }
+                    }
                 }
                 break;
 

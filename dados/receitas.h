@@ -10,6 +10,7 @@ typedef struct receita {
     int  dificuldade;
     int  tempo;
     int  pontuacao;
+    int  desbloqueada;      // 1 se pode jogar, 0 se bloqueada
 
     char ingredientes[MAX_INGREDIENTES][60];  // nomes em ordem de uso
     int  n_ingredientes;

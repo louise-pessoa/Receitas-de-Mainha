@@ -21,6 +21,7 @@ typedef struct {
     int passos_total;
     int tempo_extra;
     int erro_passo;
+    int receitas_completadas;   // contador de receitas terminadas (para desbloquear Pirão)
 } EstadoJogo;
 
 // estados de tela do jogo (qual tela esta sendo exibida)

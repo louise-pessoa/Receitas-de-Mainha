@@ -469,7 +469,8 @@ void catcher_iniciar(Receita *receita) {
 
     catcher.tempo_inicio = GetTime();
     catcher.tempo_decorrido = 0.0f;
-    catcher.ultimo_segundo_penalizado = 0;
+    catcher.periodo_garantido = (receita != NULL && receita->dificuldade <= 3) ? 30 : 20;
+    catcher.ultimo_segundo_penalizado = catcher.periodo_garantido;
 
     catcher.pontos = estado.pontuacao;   // herda pontuacao atual
     catcher.erros_distrator = 0;
@@ -511,26 +512,16 @@ void catcher_atualizar(void) {
 
     // ---- timer ----
     catcher.tempo_decorrido = (float)(GetTime() - catcher.tempo_inicio);
-    if (catcher.tempo_decorrido > (float)CATCHER_TEMPO_LIMITE) {
-        catcher.tempo_decorrido = (float)CATCHER_TEMPO_LIMITE;
-    }
 
-    // penalidade por segundo enquanto a receita nao estiver completa
+    // penalidade por segundo somente apos o periodo garantido
     int seg_inteiro = (int)catcher.tempo_decorrido;
     if (catcher.coletados < catcher.n_alvos &&
         seg_inteiro > catcher.ultimo_segundo_penalizado) {
         int delta = seg_inteiro - catcher.ultimo_segundo_penalizado;
+        estado.tempo_extra += delta;
         catcher.pontos -= delta;
         if (catcher.pontos < 0) catcher.pontos = 0;
         catcher.ultimo_segundo_penalizado = seg_inteiro;
-    }
-
-    // condicao de fim por tempo
-    if (catcher.tempo_decorrido >= (float)CATCHER_TEMPO_LIMITE) {
-        catcher.terminou = 1;
-        catcher.venceu   = (catcher.coletados >= catcher.n_alvos);
-        estado.pontuacao = catcher.pontos;
-        return;
     }
 
     // ---- movimento da cesta ----
@@ -545,9 +536,10 @@ void catcher_atualizar(void) {
         catcher.cesta_x = LARG_TELA - catcher.cesta_w;
     }
 
-    // ---- garantia: forcas spawn de ingredientes que nunca apareceram ----
-    float restante_seg = (float)CATCHER_TEMPO_LIMITE - catcher.tempo_decorrido;
-    if (restante_seg <= 8.0f) {
+    // ---- garantia: forca spawn de ingredientes que nunca apareceram ----
+    // dispara 5 segundos antes do periodo garantido expirar
+    float limite_spawn = (float)(catcher.periodo_garantido - 5);
+    if (catcher.tempo_decorrido >= limite_spawn) {
         for (int i = 0; i < catcher.n_alvos; i++) {
             if (!catcher.alvos[i].coletado && !catcher.spawnou[i]) {
                 spawnar_forcado(i);
@@ -557,8 +549,9 @@ void catcher_atualizar(void) {
 
     // ---- spawn de itens ----
     catcher.spawn_timer += dt;
-    // intervalo encurta com o tempo pra aumentar pressao
-    float prog = catcher.tempo_decorrido / (float)CATCHER_TEMPO_LIMITE;
+    // intervalo encurta ate o fim do periodo garantido, depois fica no minimo
+    float ref = (float)catcher.periodo_garantido;
+    float prog = catcher.tempo_decorrido < ref ? catcher.tempo_decorrido / ref : 1.0f;
     catcher.spawn_intervalo = SPAWN_BASE - (SPAWN_BASE - SPAWN_MIN) * prog;
     if (catcher.spawn_timer >= catcher.spawn_intervalo) {
         catcher.spawn_timer = 0.0f;
@@ -602,13 +595,10 @@ void catcher_atualizar(void) {
         }
     }
 
-    // ---- vitoria antecipada ----
+    // ---- vitoria: todos os ingredientes coletados ----
     if (catcher.coletados >= catcher.n_alvos) {
         catcher.terminou = 1;
         catcher.venceu   = 1;
-        // bonus de tempo: cada segundo restante vale 1 ponto
-        int restante = CATCHER_TEMPO_LIMITE - (int)catcher.tempo_decorrido;
-        if (restante > 0) catcher.pontos += restante;
         estado.pontuacao = catcher.pontos;
     }
 }
@@ -706,11 +696,15 @@ static void desenhar_hud(void) {
     DrawRectangle(0, 0, LARG_TELA, ALT_HUD, COR_HUD);
     DrawRectangle(0, ALT_HUD - 4, LARG_TELA, 4, (Color){255, 200, 0, 255});
 
-    // tempo restante
-    int restante = CATCHER_TEMPO_LIMITE - (int)catcher.tempo_decorrido;
-    if (restante < 0) restante = 0;
-    Color cor_tempo = restante <= 10 ? (Color){255, 120, 120, 255} : WHITE;
-    DrawText(TextFormat("Tempo: %02ds", restante), 20, 18, 28, cor_tempo);
+    // indicador de periodo garantido / tempo extra
+    int elapsed = (int)catcher.tempo_decorrido;
+    if (elapsed < catcher.periodo_garantido) {
+        int restante = catcher.periodo_garantido - elapsed;
+        DrawText(TextFormat("Garantido: %02ds", restante), 20, 18, 28, WHITE);
+    } else {
+        int extra = elapsed - catcher.periodo_garantido;
+        DrawText(TextFormat("+%02ds", extra), 20, 18, 28, (Color){255, 80, 80, 255});
+    }
 
     // pontos
     DrawText(TextFormat("Pontos: %d", catcher.pontos), 240, 18, 28,
@@ -774,8 +768,8 @@ static void desenhar_fundo(void) {
 static void desenhar_tela_fim(void) {
     DrawRectangle(0, 0, LARG_TELA, ALT_TELA, (Color){0, 0, 0, 170});
 
-    const char *titulo = catcher.venceu ? "RECEITA COMPLETA!" : "TEMPO ESGOTADO!";
-    Color cor_titulo = catcher.venceu ? COR_BOM : COR_RUIM;
+    const char *titulo = "RECEITA COMPLETA!";
+    Color cor_titulo = COR_BOM;
     int tam = 48;
     int tw = MeasureText(titulo, tam);
     DrawText(titulo, (LARG_TELA - tw) / 2, 180, tam, cor_titulo);

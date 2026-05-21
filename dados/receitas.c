@@ -13,6 +13,7 @@ Receita *_criar_no_receita(const char *nome, int dificuldade, int tempo, int pon
     novo->dificuldade    = dificuldade;
     novo->tempo          = tempo;
     novo->pontuacao      = pontuacao;
+    novo->desbloqueada   = 1;  // inicialmente desbloqueada
     novo->n_ingredientes = 0;
     novo->img_receita_pronta[0] = '\0';
     novo->img_inicio[0]         = '\0';

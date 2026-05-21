@@ -59,6 +59,7 @@ void resetar_partida(void) {
     estado.passos_total      = 0;
     estado.tempo_extra       = 0;
     estado.erro_passo        = 0;
+    // NÃO reseta receitas_completadas - persiste por toda a sessão
     _inicio_timer           = 0;
     //jurados_prontos = 0;
 
@@ -69,6 +70,7 @@ void resetar_partida(void) {
 
 void iniciar_jogo(void) {
     resetar_partida();
+    estado.receitas_completadas = 0;  // inicializa contador na primeira execução
     tela_atual = TELA_MENU;     // <-- ADICIONAR
     printf("[SISTEMA] Jogo iniciado. Boa sorte!\n");
 }
@@ -109,10 +111,15 @@ void integrar_modulos(void) {
         receitas_disponiveis = NULL;
     }
 
-    // === cria as 3 receitas ===
+    // === cria as 3 receitas iniciais + Pirão como desbloqueável ===
     receitas_disponiveis = inserir_receita(receitas_disponiveis, "Tapioca",      2, 15, 50);
     receitas_disponiveis = inserir_receita(receitas_disponiveis, "Escondidinho", 4, 40, 80);
     receitas_disponiveis = inserir_receita(receitas_disponiveis, "Bolo de Rolo", 5, 60, 100);
+    receitas_disponiveis = inserir_receita(receitas_disponiveis, "Pirão de Carne", 6, 80, 150);
+    
+    // Pirão de Carne começa bloqueado
+    Receita *pirao = buscar_receita(receitas_disponiveis, "Pirão de Carne");
+    if (pirao) pirao->desbloqueada = 0;
 
     // === ingredientes da Tapioca ===
     Receita *tapioca = buscar_receita(receitas_disponiveis, "Tapioca");
@@ -192,5 +199,33 @@ void integrar_modulos(void) {
     bolo->passos = push_passo(bolo->passos,
         "Espalhe a goiabada e enrole", "Goiabada", "DDDD", "");
 
-    printf("[SISTEMA] Modulos integrados. 3 receitas disponiveis.\n");
+    // === ingredientes do Pirão de Carne (desbloqueavel - final do jogo no Marco Zero) ===
+    Receita *pirao_carne = buscar_receita(receitas_disponiveis, "Pirão de Carne");
+    inserir_ingrediente(pirao_carne, "Caldo de carne");
+    inserir_ingrediente(pirao_carne, "Carne desfiada");
+    inserir_ingrediente(pirao_carne, "Farinha de mandioca");
+    inserir_ingrediente(pirao_carne, "Manteiga");
+    inserir_ingrediente(pirao_carne, "Alho");
+
+    // === passos do Pirão de Carne (6 passos) ===
+    pirao_carne->passos = push_passo(pirao_carne->passos,
+        "Desfie a carne", "Carne desfiada", "DDDD", "sprites/prato_carne.png");
+    pirao_carne->passos = push_passo(pirao_carne->passos,
+        "Aqueca o caldo", "Caldo de carne", "SSSS", "sprites/prato_caldo.png");
+    pirao_carne->passos = push_passo(pirao_carne->passos,
+        "Adicione a carne ao caldo", "Carne desfiada", "AAAA", "sprites/prato_carne_caldo.png");
+    pirao_carne->passos = push_passo(pirao_carne->passos,
+        "Derreta manteiga e frite alho", "Manteiga", "MMMM", "sprites/prato_alho.png");
+    pirao_carne->passos = push_passo(pirao_carne->passos,
+        "Despeje o refogado na panela", "Alho", "RRRR", "sprites/prato_refogado.png");
+    pirao_carne->passos = push_passo(pirao_carne->passos,
+        "Adicione a farinha de mandioca", "Farinha de mandioca", "FFFF", "sprites/prato_pirao.png");
+
+    // Define imagens de inicio e pronta do Pirão
+    strncpy(pirao_carne->img_inicio, "sprites/prato_vazio.png", sizeof(pirao_carne->img_inicio) - 1);
+    pirao_carne->img_inicio[sizeof(pirao_carne->img_inicio) - 1] = '\0';
+    strncpy(pirao_carne->img_receita_pronta, "sprites/pirao_pronto.png", sizeof(pirao_carne->img_receita_pronta) - 1);
+    pirao_carne->img_receita_pronta[sizeof(pirao_carne->img_receita_pronta) - 1] = '\0';
+
+    printf("[SISTEMA] Modulos integrados. 3 receitas + 1 desbloque\u00e1vel (Pir\u00e3o de Carne).\n");
 }

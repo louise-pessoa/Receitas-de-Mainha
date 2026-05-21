@@ -1,62 +1,36 @@
 #include "receitas.h"
+#include "pilha.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
- 
-Receita *_criar_no_receita(const char *nome, int dificuldade,int tempo, int pontuacao) {
+
+Receita *_criar_no_receita(const char *nome, int dificuldade, int tempo, int pontuacao) {
     Receita *novo = (Receita *) malloc(sizeof(Receita));
     if (novo == NULL) return NULL;
 
     strncpy(novo->nome, nome, sizeof(novo->nome) - 1);
     novo->nome[sizeof(novo->nome) - 1] = '\0';
-    novo->dificuldade = dificuldade;
-    novo->tempo = tempo;
-    novo->pontuacao = pontuacao;
-    novo->ingredientes = NULL;
-
-    novo->passo_acao[0]  = '\0';
-    novo->ingrediente[0] = '\0';
-
-    novo->n_passos_jog = 0;
+    novo->dificuldade    = dificuldade;
+    novo->tempo          = tempo;
+    novo->pontuacao      = pontuacao;
+    novo->n_ingredientes = 0;
     novo->img_receita_pronta[0] = '\0';
-    novo->img_inicio[0] = '\0';
-
-    novo->passos       = NULL;
-    novo->prox         = NULL;
-    return novo;
-}
-
-Ingrediente *_criar_no_ingrediente(const char *nome, const char *quantidade) {
-    Ingrediente *novo = (Ingrediente *) malloc(sizeof(Ingrediente));
-    if (novo == NULL) {
-        return NULL;
-    }
-
-    strncpy(novo->nome, nome, sizeof(novo->nome) - 1);
-    novo->nome[sizeof(novo->nome) - 1] = '\0';
-
-    strncpy(novo->quantidade, quantidade, sizeof(novo->quantidade) - 1);
-    novo->quantidade[sizeof(novo->quantidade) - 1] = '\0';
-
-    novo->prox = NULL;
+    novo->img_inicio[0]         = '\0';
+    novo->passos = NULL;
+    novo->prox   = NULL;
     return novo;
 }
 
 // Lista de receitas
 
-// Insere no final da lista e retorna o inicio da lista (pode ser o novo no se a lista tava vazia).
-Receita *inserir_receita(Receita *lista, const char *nome,int dificuldade, int tempo, int pontuacao) {
+Receita *inserir_receita(Receita *lista, const char *nome, int dificuldade, int tempo, int pontuacao) {
     Receita *novo = _criar_no_receita(nome, dificuldade, tempo, pontuacao);
     if (novo == NULL) return lista;
 
-    if (lista == NULL) {
-        return novo;
-    }
+    if (lista == NULL) return novo;
 
     Receita *aux = lista;
-    while (aux->prox != NULL) {
-        aux = aux->prox;
-    }
+    while (aux->prox != NULL) aux = aux->prox;
     aux->prox = novo;
     return lista;
 }
@@ -71,27 +45,23 @@ void listar_receitas(Receita *lista) {
     int i = 1;
     Receita *aux = lista;
     while (aux != NULL) {
-        printf("%d. %-20s | dificuldade: %d | tempo: %3d min | pontos: %d\n",i, aux->nome, aux->dificuldade, aux->tempo, aux->pontuacao);
+        printf("%d. %-20s | dificuldade: %d | tempo: %3d min | pontos: %d\n",
+               i, aux->nome, aux->dificuldade, aux->tempo, aux->pontuacao);
         aux = aux->prox;
         i++;
     }
     printf("============================\n");
 }
 
-// Busca por nome 
-
 Receita *buscar_receita(Receita *lista, const char *nome) {
     Receita *aux = lista;
     while (aux != NULL) {
-        if (strcmp(aux->nome, nome) == 0) {
-            return aux;
-        }
+        if (strcmp(aux->nome, nome) == 0) return aux;
         aux = aux->prox;
     }
     return NULL;
 }
 
-// Busca por indice 
 Receita *buscar_receita_idx(Receita *lista, int indice) {
     if (indice < 1) return NULL;
     int i = 1;
@@ -104,101 +74,28 @@ Receita *buscar_receita_idx(Receita *lista, int indice) {
     return NULL;
 }
 
-void definir_passo(Receita *no, const char *acao, const char *ing) {
-    if (no == NULL) return;
-    strncpy(no->passo_acao, acao, sizeof(no->passo_acao) - 1);
-    no->passo_acao[sizeof(no->passo_acao) - 1] = '\0';
-    strncpy(no->ingrediente, ing, sizeof(no->ingrediente) - 1);
-    no->ingrediente[sizeof(no->ingrediente) - 1] = '\0';
-}
+// Ingredientes
 
-void adicionar_passo_jogavel(Receita *receita, const char *acao,
-                             const char *ingrediente, const char *teclas,
-                             int tempo_limite) {
-    if (receita == NULL) return;
-    if (receita->n_passos_jog >= MAX_PASSOS_JOGAVEIS) return;
+Receita *inserir_ingrediente(Receita *receita, const char *nome) {
+    if (receita == NULL) return NULL;
+    if (receita->n_ingredientes >= MAX_INGREDIENTES) return receita;
 
-    PassoJogavel *p = &receita->passos_jog[receita->n_passos_jog++];
-    strncpy(p->acao, acao, sizeof(p->acao) - 1);
-    p->acao[sizeof(p->acao) - 1] = '\0';
-    strncpy(p->ingrediente, ingrediente, sizeof(p->ingrediente) - 1);
-    p->ingrediente[sizeof(p->ingrediente) - 1] = '\0';
-    strncpy(p->teclas, teclas, sizeof(p->teclas) - 1);
-    p->teclas[sizeof(p->teclas) - 1] = '\0';
-    p->tempo_limite = tempo_limite;
-    p->img_passo[0] = '\0';  // sem imagem por padrão
-}
-
-void adicionar_passo_jogavel_com_img(Receita *receita, const char *acao,
-                                     const char *ingrediente, const char *teclas,
-                                     int tempo_limite, const char *img_passo) {
-    if (receita == NULL) return;
-    if (receita->n_passos_jog >= MAX_PASSOS_JOGAVEIS) return;
-
-    PassoJogavel *p = &receita->passos_jog[receita->n_passos_jog++];
-    strncpy(p->acao, acao, sizeof(p->acao) - 1);
-    p->acao[sizeof(p->acao) - 1] = '\0';
-    strncpy(p->ingrediente, ingrediente, sizeof(p->ingrediente) - 1);
-    p->ingrediente[sizeof(p->ingrediente) - 1] = '\0';
-    strncpy(p->teclas, teclas, sizeof(p->teclas) - 1);
-    p->teclas[sizeof(p->teclas) - 1] = '\0';
-    p->tempo_limite = tempo_limite;
-    strncpy(p->img_passo, img_passo, sizeof(p->img_passo) - 1);
-    p->img_passo[sizeof(p->img_passo) - 1] = '\0';
-}
-
-// Lista de ingredientes por receita
-
-// Adiciona um ingrediente no final da lista de ingredientes da receita.
-Receita *inserir_ingrediente(Receita *receita, const char *nome,const char *quantidade) {
-    if (receita == NULL) {
-        fprintf(stderr, "Erro: receita nula em inserir_ingrediente.\n");
-        return NULL;
-    }
-
-    Ingrediente *novo = _criar_no_ingrediente(nome, quantidade);
-    if (novo == NULL) return receita;
-
-    if (receita->ingredientes == NULL) {
-        receita->ingredientes = novo;
-    } else {
-        Ingrediente *aux = receita->ingredientes;
-        while (aux->prox != NULL) {
-            aux = aux->prox;
-        }
-        aux->prox = novo;
-    }
+    strncpy(receita->ingredientes[receita->n_ingredientes], nome, 59);
+    receita->ingredientes[receita->n_ingredientes][59] = '\0';
+    receita->n_ingredientes++;
     return receita;
 }
 
 void listar_ingredientes(const Receita *receita) {
-    if (receita == NULL) {
-        printf("Receita invalida.\n");
-        return;
-    }
+    if (receita == NULL) { printf("Receita invalida.\n"); return; }
 
     printf("\n--- Ingredientes de %s ---\n", receita->nome);
-    if (receita->ingredientes == NULL) {
+    if (receita->n_ingredientes == 0) {
         printf("  (nenhum ingrediente cadastrado)\n");
         return;
     }
-
-    Ingrediente *aux = receita->ingredientes;
-    int i = 1;
-    while (aux != NULL) {
-        printf("  %d. %-25s - %s\n", i, aux->nome, aux->quantidade);
-        aux = aux->prox;
-        i++;
-    }
-}
-
-//(NP) Adicionei funções de liberação de memória 
-
-static void liberar_ingredientes(Ingrediente *lista) {
-    while (lista != NULL) {
-        Ingrediente *tmp = lista;
-        lista = lista->prox;
-        free(tmp);
+    for (int i = 0; i < receita->n_ingredientes; i++) {
+        printf("  %d. %s\n", i + 1, receita->ingredientes[i]);
     }
 }
 
@@ -206,7 +103,8 @@ void liberar_receitas(Receita *lista) {
     while (lista != NULL) {
         Receita *tmp = lista;
         lista = lista->prox;
-        liberar_ingredientes(tmp->ingredientes);
+        while (!pilha_vazia(tmp->passos))
+            tmp->passos = pop_passo(tmp->passos);
         free(tmp);
     }
 }

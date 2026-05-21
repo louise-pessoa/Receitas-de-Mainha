@@ -48,48 +48,43 @@ static int char_para_keycode(char c) {
 // ==========================================
 static void montar_grid(void) {
     cozinhar.n_grid = 0;
-    Ingrediente *ing = cozinhar.receita->ingredientes;
-    int i = 0;
-    while (ing != NULL && i < COZ_MAX_ING_GRID) {
-        strncpy(cozinhar.grid[i].nome, ing->nome,
+    Receita *r = cozinhar.receita;
+    int total = r->n_ingredientes < COZ_MAX_ING_GRID ? r->n_ingredientes : COZ_MAX_ING_GRID;
+    for (int i = 0; i < total; i++) {
+        strncpy(cozinhar.grid[i].nome, r->ingredientes[i],
                 sizeof(cozinhar.grid[i].nome) - 1);
         cozinhar.grid[i].nome[sizeof(cozinhar.grid[i].nome) - 1] = '\0';
         cozinhar.grid[i].destacado = 0;
         cozinhar.grid[i].usado = 0;
 
-        // grid adaptavel: 5 colunas em uma linha, menor para caber todos
         int col = i % 5;
         float w = 125;
         float h = 65;
         float gx = 20 + col * (w + 8);
         float gy = 488;
         cozinhar.grid[i].area = (Rectangle){ gx, gy, w, h };
-
-        ing = ing->prox;
-        i++;
     }
-    cozinhar.n_grid = i;
+    cozinhar.n_grid = total;
 }
 
 static void marcar_destacado(void) {
-    if (cozinhar.passo_idx >= cozinhar.receita->n_passos_jog) return;
-    const char *alvo = cozinhar.receita->passos_jog[cozinhar.passo_idx].ingrediente;
+    if (pilha_vazia(cozinhar.pilha)) return;
+    const char *alvo = cozinhar.pilha->dado.ingrediente;
     for (int k = 0; k < cozinhar.n_grid; k++) {
         cozinhar.grid[k].destacado = (strcmp(cozinhar.grid[k].nome, alvo) == 0);
     }
 }
 
 void cozinhar_iniciar(Receita *receita) {
-    // libera pilha anterior se existir
+    // libera pilha de trabalho anterior
     while (!pilha_vazia(cozinhar.pilha))
         cozinhar.pilha = pop_passo(cozinhar.pilha);
 
     // libera texturas anteriores
     if (cozinhar.texturas_passos != NULL) {
-        for (int i = 0; i < cozinhar.receita->n_passos_jog; i++) {
-            if (cozinhar.texturas_carregadas[i]) {
+        for (int i = 0; i < cozinhar.n_passos; i++) {
+            if (cozinhar.texturas_carregadas[i])
                 UnloadTexture(cozinhar.texturas_passos[i]);
-            }
         }
         free(cozinhar.texturas_passos);
         free(cozinhar.texturas_carregadas);
@@ -97,31 +92,49 @@ void cozinhar_iniciar(Receita *receita) {
 
     memset(&cozinhar, 0, sizeof(cozinhar));
     cozinhar.receita = receita;
-    if (receita == NULL || receita->n_passos_jog == 0) {
+    if (receita == NULL || pilha_vazia(receita->passos)) {
         cozinhar.terminou = 1;
         cozinhar.venceu = 0;
         return;
     }
 
-    // aloca arrays de texturas
-    cozinhar.texturas_passos = (Texture2D *)malloc(sizeof(Texture2D) * receita->n_passos_jog);
-    cozinhar.texturas_carregadas = (int *)malloc(sizeof(int) * receita->n_passos_jog);
-    if (cozinhar.texturas_passos != NULL && cozinhar.texturas_carregadas != NULL) {
-        memset(cozinhar.texturas_carregadas, 0, sizeof(int) * receita->n_passos_jog);
-        // pré-carrega as texturas dos passos
-        for (int i = 0; i < receita->n_passos_jog; i++) {
-            if (receita->passos_jog[i].img_passo[0] != '\0') {
-                cozinhar.texturas_passos[i] = LoadTexture(receita->passos_jog[i].img_passo);
-                if (cozinhar.texturas_passos[i].id != 0) {
-                    SetTextureFilter(cozinhar.texturas_passos[i], TEXTURE_FILTER_BILINEAR);
-                    cozinhar.texturas_carregadas[i] = 1;
+    // conta passos e constroi pilha de trabalho a partir de receita->passos.
+    // receita->passos tem o ultimo passo no topo (push em ordem 1..N).
+    // ao iterar e re-empilhar, invertemos: passo 1 fica no topo de cozinhar.pilha.
+    int n = 0;
+    No *src = receita->passos;
+    while (src != NULL) { n++; src = src->prox; }
+    cozinhar.n_passos = n;
+
+    src = receita->passos;
+    while (src != NULL) {
+        cozinhar.pilha = push_passo(cozinhar.pilha,
+            src->dado.acao, src->dado.ingrediente,
+            src->dado.teclas, src->dado.img_passo);
+        src = src->prox;
+    }
+
+    // aloca e carrega texturas iterando cozinhar.pilha (topo = passo 1)
+    cozinhar.texturas_passos    = (Texture2D *)malloc(sizeof(Texture2D) * n);
+    cozinhar.texturas_carregadas = (int *)malloc(sizeof(int) * n);
+    if (cozinhar.texturas_passos && cozinhar.texturas_carregadas) {
+        memset(cozinhar.texturas_carregadas, 0, sizeof(int) * n);
+        No *node = cozinhar.pilha;
+        int idx = 0;
+        while (node != NULL) {
+            if (node->dado.img_passo[0] != '\0') {
+                cozinhar.texturas_passos[idx] = LoadTexture(node->dado.img_passo);
+                if (cozinhar.texturas_passos[idx].id != 0) {
+                    SetTextureFilter(cozinhar.texturas_passos[idx], TEXTURE_FILTER_BILINEAR);
+                    cozinhar.texturas_carregadas[idx] = 1;
                 }
             }
+            node = node->prox;
+            idx++;
         }
     }
 
     // carrega textura frigideira pronta (para empratar)
-    cozinhar.textura_frigideira_pronta_carregada = 0;
     Texture2D tex_frigideira = LoadTexture("sprites/frigideira_pronta.png");
     if (tex_frigideira.id != 0) {
         cozinhar.textura_frigideira_pronta = tex_frigideira;
@@ -130,23 +143,12 @@ void cozinhar_iniciar(Receita *receita) {
     }
 
     // carrega textura da receita pronta
-    cozinhar.textura_pronta_carregada = 0;
     if (receita->img_receita_pronta[0] != '\0') {
         cozinhar.textura_pronta = LoadTexture(receita->img_receita_pronta);
         if (cozinhar.textura_pronta.id != 0) {
             SetTextureFilter(cozinhar.textura_pronta, TEXTURE_FILTER_BILINEAR);
             cozinhar.textura_pronta_carregada = 1;
         }
-    }
-
-    // empilha os passos em ordem reversa: ultimo passo entra primeiro,
-    // assim o topo da pilha (LIFO) corresponde ao primeiro passo da receita
-    int i = receita->n_passos_jog - 1;
-    while (i >= 0) {
-        cozinhar.pilha = push_passo(cozinhar.pilha,
-                                    receita->passos_jog[i].acao,
-                                    receita->passos_jog[i].ingrediente);
-        i--;
     }
 
     montar_grid();
@@ -159,14 +161,14 @@ void cozinhar_iniciar(Receita *receita) {
     cozinhar.erros = 0;
     cozinhar.acertos = 0;
     cozinhar.pontos         = estado.pontuacao;
-    estado.passos_total     = receita->n_passos_jog;
+    estado.passos_total     = n;
     estado.passos_acertados = 0;
     cozinhar.terminou = 0;
     cozinhar.venceu = 0;
     marcar_destacado();
 
     printf("[COZINHAR] Iniciado para '%s' com %d passos (pilha carregada)\n",
-           receita->nome, receita->n_passos_jog);
+           receita->nome, n);
 }
 
 // ==========================================
@@ -210,7 +212,7 @@ static void fase_clicar(void) {
 }
 
 static void fase_teclas(void) {
-    PassoJogavel *p = &cozinhar.receita->passos_jog[cozinhar.passo_idx];
+    Passo *p = &cozinhar.pilha->dado;
 
     // qualquer tecla pressionada?
     int tecla = GetKeyPressed();
@@ -320,7 +322,7 @@ static void desenhar_cabecalho(void) {
 
     DrawText(TextFormat("Passo %d / %d",
                         cozinhar.passo_idx + 1,
-                        cozinhar.receita->n_passos_jog),
+                        cozinhar.n_passos),
              580, 20, 22, WHITE);
 
     // pontos
@@ -333,8 +335,8 @@ static void desenhar_cabecalho(void) {
 }
 
 static void desenhar_instrucao(void) {
-    if (cozinhar.passo_idx >= cozinhar.receita->n_passos_jog) return;
-    PassoJogavel *p = &cozinhar.receita->passos_jog[cozinhar.passo_idx];
+    if (pilha_vazia(cozinhar.pilha)) return;
+    Passo *p = &cozinhar.pilha->dado;
 
     // balao de instrucao no topo
     DrawRectangleRounded((Rectangle){40, 70, 720, 90}, 0.2f, 8, WHITE);
@@ -355,7 +357,8 @@ static void desenhar_instrucao(void) {
 
 static void desenhar_sequencia(void) {
     if (cozinhar.fase != COZ_FASE_TECLAS) return;
-    PassoJogavel *p = &cozinhar.receita->passos_jog[cozinhar.passo_idx];
+    if (pilha_vazia(cozinhar.pilha)) return;
+    Passo *p = &cozinhar.pilha->dado;
     int len = (int)strlen(p->teclas);
     if (len == 0) return;
 
@@ -445,7 +448,7 @@ static void desenhar_feedback(void) {
 }
 
 static void desenhar_imagem_passo(void) {
-    if (cozinhar.passo_idx >= cozinhar.receita->n_passos_jog) return;
+    if (pilha_vazia(cozinhar.pilha)) return;
     if (cozinhar.texturas_passos == NULL || cozinhar.texturas_carregadas == NULL) return;
     
     if (cozinhar.texturas_carregadas[cozinhar.passo_idx]) {
@@ -535,11 +538,10 @@ int cozinhar_venceu(void)   { return cozinhar.venceu; }
 
 void cozinhar_limpar(void) {
     // libera texturas
-    if (cozinhar.texturas_passos != NULL && cozinhar.receita != NULL) {
-        for (int i = 0; i < cozinhar.receita->n_passos_jog; i++) {
-            if (cozinhar.texturas_carregadas[i]) {
+    if (cozinhar.texturas_passos != NULL) {
+        for (int i = 0; i < cozinhar.n_passos; i++) {
+            if (cozinhar.texturas_carregadas[i])
                 UnloadTexture(cozinhar.texturas_passos[i]);
-            }
         }
         free(cozinhar.texturas_passos);
         free(cozinhar.texturas_carregadas);

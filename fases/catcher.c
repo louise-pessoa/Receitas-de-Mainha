@@ -451,15 +451,12 @@ void catcher_iniciar(Receita *receita) {
 
     // copia ingredientes da receita para alvos
     if (receita != NULL) {
-        Ingrediente *ing = receita->ingredientes;
-        while (ing != NULL && catcher.n_alvos < CATCHER_MAX_ALVOS) {
-            strncpy(catcher.alvos[catcher.n_alvos].nome, ing->nome,
-                    sizeof(catcher.alvos[catcher.n_alvos].nome) - 1);
-            catcher.alvos[catcher.n_alvos].nome[
-                sizeof(catcher.alvos[catcher.n_alvos].nome) - 1] = '\0';
-            catcher.alvos[catcher.n_alvos].coletado = 0;
+        for (int i = 0; i < receita->n_ingredientes && i < CATCHER_MAX_ALVOS; i++) {
+            strncpy(catcher.alvos[i].nome, receita->ingredientes[i],
+                    sizeof(catcher.alvos[i].nome) - 1);
+            catcher.alvos[i].nome[sizeof(catcher.alvos[i].nome) - 1] = '\0';
+            catcher.alvos[i].coletado = 0;
             catcher.n_alvos++;
-            ing = ing->prox;
         }
     }
 
@@ -583,6 +580,7 @@ void catcher_atualizar(void) {
                 if (idx >= 0 && idx < catcher.n_alvos &&
                     !catcher.alvos[idx].coletado) {
                     catcher.alvos[idx].coletado = 1;
+                    catcher.ordem_coleta[catcher.n_coletados_em_ordem++] = idx;
                     catcher.coletados++;
                     catcher.pontos += 5; // bonus por acerto
                 }

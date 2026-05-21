@@ -27,9 +27,9 @@ typedef struct {
 
 extern EstadoOrdenacao ordenacao;
 
-// inicia a ordenacao usando os ingredientes da receita selecionada,
-// embaralhados (simulando a ordem aleatoria do catcher).
-void ordenacao_iniciar(Receita *receita);
+// inicia a ordenacao com os ingredientes na ordem em que foram coletados no catcher.
+// o insertion sort os coloca na ordem correta de uso da receita.
+void ordenacao_iniciar(Receita *receita, int *ordem_coleta, int n_coletados);
 
 // avanca um passo da animacao (chamado automaticamente por timer)
 void ordenacao_atualizar(void);

@@ -167,7 +167,7 @@ int main(void) {
                     } else if (IsKeyPressed(KEY_ENTER) &&
                                !IsKeyDown(KEY_LEFT_ALT)) {
                         if (catcher.venceu) {
-                            ordenacao_iniciar(receita_selecionada);
+                            ordenacao_iniciar(receita_selecionada, catcher.ordem_coleta, catcher.n_coletados_em_ordem);
                             tela_atual = TELA_ORDENACAO;
                         } else {
                             disparar_jurados();

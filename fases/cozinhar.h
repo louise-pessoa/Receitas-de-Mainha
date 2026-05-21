@@ -28,7 +28,8 @@ typedef struct {
     IngredienteIcone grid[COZ_MAX_ING_GRID];
     int n_grid;
 
-    int passo_idx;           // qual passo da receita estamos
+    int n_passos;            // total de passos da receita
+    int passo_idx;           // quantos passos ja foram concluidos
     CozFase fase;
 
     int  pos_tecla;          // posicao atual na sequencia

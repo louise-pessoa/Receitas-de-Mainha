@@ -20,36 +20,24 @@ EstadoOrdenacao ordenacao;
 // ==========================================
 // INICIALIZACAO
 // ==========================================
-static void embaralhar(void) {
-    // shuffle simples Fisher-Yates
-    for (int i = ordenacao.n - 1; i > 0; i--) {
-        int k = GetRandomValue(0, i);
-        ItemOrdenacao tmp = ordenacao.itens[i];
-        ordenacao.itens[i] = ordenacao.itens[k];
-        ordenacao.itens[k] = tmp;
-    }
-}
 
-void ordenacao_iniciar(Receita *receita) {
+// inicia com os ingredientes na ordem de coleta do catcher.
+// ordem_correta = indice do ingrediente na receita (posicao final desejada).
+void ordenacao_iniciar(Receita *receita, int *ordem_coleta, int n_coletados) {
     memset(&ordenacao, 0, sizeof(ordenacao));
     ordenacao.receita = receita;
 
-    if (receita == NULL) return;
+    if (receita == NULL || ordem_coleta == NULL || n_coletados == 0) return;
 
-    // carrega ingredientes na ordem original (que e a ordem de uso)
-    Ingrediente *ing = receita->ingredientes;
-    int idx = 0;
-    while (ing != NULL && idx < MAX_ORDENACAO) {
-        strncpy(ordenacao.itens[idx].nome, ing->nome,
-                sizeof(ordenacao.itens[idx].nome) - 1);
-        ordenacao.itens[idx].nome[sizeof(ordenacao.itens[idx].nome) - 1] = '\0';
-        ordenacao.itens[idx].ordem_correta = idx;
-        idx++;
-        ing = ing->prox;
+    int total = n_coletados < MAX_ORDENACAO ? n_coletados : MAX_ORDENACAO;
+    for (int i = 0; i < total; i++) {
+        int idx = ordem_coleta[i];
+        strncpy(ordenacao.itens[i].nome, receita->ingredientes[idx],
+                sizeof(ordenacao.itens[i].nome) - 1);
+        ordenacao.itens[i].nome[sizeof(ordenacao.itens[i].nome) - 1] = '\0';
+        ordenacao.itens[i].ordem_correta = idx;
     }
-    ordenacao.n = idx;
-
-    embaralhar();
+    ordenacao.n = total;
 
     ordenacao.i = 1;
     ordenacao.j = 1;
@@ -58,7 +46,7 @@ void ordenacao_iniciar(Receita *receita) {
     ordenacao.timer = 0.0f;
     ordenacao.intervalo = 0.55f;
 
-    printf("[ORDENACAO] Iniciada com %d itens (embaralhados)\n", ordenacao.n);
+    printf("[ORDENACAO] Iniciada com %d itens (ordem de coleta)\n", ordenacao.n);
 }
 
 // ==========================================

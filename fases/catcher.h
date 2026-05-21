@@ -33,7 +33,9 @@ typedef struct {
     IngredienteAlvo alvos[CATCHER_MAX_ALVOS];
     int n_alvos;
     int coletados;
-    int spawnou[CATCHER_MAX_ALVOS];   // 1 se o ingrediente ja apareceu na tela
+    int spawnou[CATCHER_MAX_ALVOS];        // 1 se o ingrediente ja apareceu na tela
+    int ordem_coleta[CATCHER_MAX_ALVOS];   // indices de alvos na ordem de coleta
+    int n_coletados_em_ordem;
 
     ItemCaindo itens[CATCHER_MAX_ITENS];
 

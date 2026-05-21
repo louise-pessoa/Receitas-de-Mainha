@@ -5,6 +5,7 @@
 #include "interface.h"
 #include "../jogo.h"
 #include "../dados/receitas.h"
+#include "../dados/pilha.h"
 
 // ==========================================
 // CORES DO PROJETO
@@ -146,8 +147,12 @@ void tela_receitas(Receita *lista) {
             DrawText(TextFormat("Dif: %d", aux->dificuldade), 370, y + 8, 18, WHITE);
             if (hovered)
                 DrawText("Clique para selecionar", 70, y + 28, 13, COR_AMARELO);
-            else
-                DrawText(TextFormat("%d passos", aux->n_passos_jog), 70, y + 28, 14, COR_AMARELO);
+            else {
+                int np = 0;
+                No *tp = aux->passos;
+                while (tp) { np++; tp = tp->prox; }
+                DrawText(TextFormat("%d passos", np), 70, y + 28, 14, COR_AMARELO);
+            }
 
             // clique: seleciona e avanca direto para ingredientes
             if (hovered && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
@@ -218,20 +223,16 @@ void tela_ingredientes(Receita *receita) {
 
     // lista de ingredientes
     DrawText("Ingredientes:", 50, 270, 22, COR_TEXTO);
-    if (receita->ingredientes == NULL) {
+    if (receita->n_ingredientes == 0) {
         DrawText("(nenhum ingrediente cadastrado)", 70, 305, 18, GRAY);
     } else {
-        Ingrediente *aux = receita->ingredientes;
-        int i = 0, y = 305;
         Color cores[] = {COR_VERMELHO, COR_VERDE, COR_AZUL, COR_LARANJA};
-        while (aux != NULL && i < 8) {
+        int y = 305;
+        for (int i = 0; i < receita->n_ingredientes && i < 8; i++) {
             DrawCircle(65, y + 10, 14, cores[i % 4]);
-            DrawText(TextFormat("%d", i+1), 60, y + 3, 16, WHITE);
-            DrawText(aux->nome, 85, y, 20, COR_TEXTO);
-            DrawText(aux->quantidade, 400, y, 18, GRAY);
-            aux = aux->prox;
+            DrawText(TextFormat("%d", i + 1), 60, y + 3, 16, WHITE);
+            DrawText(receita->ingredientes[i], 85, y, 20, COR_TEXTO);
             y += 30;
-            i++;
         }
     }
 

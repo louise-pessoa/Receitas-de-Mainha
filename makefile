@@ -1,5 +1,5 @@
-CC     = gcc
-SRCS   = main.c jogo.c dados/receitas.c dados/pilha.c api/groq.c fases/catcher.c fases/cozinhar.c ui/interface.c fases/ordenacao.c
+CC = gcc
+SRCS = main.c jogo.c dados/receitas.c dados/pilha.c api/groq.c fases/catcher.c fases/cozinhar.c ui/interface.c fases/ordenacao.c
 TARGET = mainha
 
 # Detecta o sistema operacional

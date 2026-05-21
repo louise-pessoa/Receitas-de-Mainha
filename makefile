@@ -18,7 +18,7 @@ ifeq ($(RAYLIB_LIBS),)
 	# macOS
 	ifeq ($(UNAME_S),Darwin)
 		CFLAGS = -I/opt/homebrew/include -I/usr/local/include
-		LIBS = -L/opt/homebrew/lib -L/usr/local/lib -lraylib -lm -lpthread -lcurl
+		LIBS = -L/opt/homebrew/lib -L/usr/local/lib -lraylib -lm -lpthread -lcurl -Wl,-rpath,/opt/homebrew/lib
 	endif
 else
 	# Usa pkg-config

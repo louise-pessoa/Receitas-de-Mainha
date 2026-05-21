@@ -19,6 +19,7 @@ typedef struct {
     char ingrediente[60];   // nome do ingrediente a clicar
     char teclas[16];        // sequencia de teclas (sem espacos)
     int  tempo_limite;      // segundos para concluir o passo
+    char img_passo[120];    // path da imagem durante o passo (ex: "sprites/frigideira_tapioca.png")
 } PassoJogavel;
 
 
@@ -34,6 +35,9 @@ typedef struct receita {
 
     PassoJogavel passos_jog[MAX_PASSOS_JOGAVEIS];
     int          n_passos_jog;
+
+    char img_receita_pronta[120];  // path da imagem final da receita pronta (ex: "sprites/tapioca_pronta.png")
+    char img_inicio[120];          // path da imagem de inicio da receita (ex: "sprites/frigideira_vazia.png")
 
     struct No  *passos;
     struct receita *prox;
@@ -57,6 +61,11 @@ void definir_passo(Receita *no, const char *acao, const char *ing);
 void adicionar_passo_jogavel(Receita *receita, const char *acao,
                              const char *ingrediente, const char *teclas,
                              int tempo_limite);
+
+// adiciona um passo jogavel com imagem
+void adicionar_passo_jogavel_com_img(Receita *receita, const char *acao,
+                                     const char *ingrediente, const char *teclas,
+                                     int tempo_limite, const char *img_passo);
 
 Receita *_criar_no_receita(const char *nome, int dificuldade, int tempo, int pontuacao);
 

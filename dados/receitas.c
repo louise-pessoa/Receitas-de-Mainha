@@ -18,6 +18,8 @@ Receita *_criar_no_receita(const char *nome, int dificuldade,int tempo, int pont
     novo->ingrediente[0] = '\0';
 
     novo->n_passos_jog = 0;
+    novo->img_receita_pronta[0] = '\0';
+    novo->img_inicio[0] = '\0';
 
     novo->passos       = NULL;
     novo->prox         = NULL;
@@ -124,6 +126,25 @@ void adicionar_passo_jogavel(Receita *receita, const char *acao,
     strncpy(p->teclas, teclas, sizeof(p->teclas) - 1);
     p->teclas[sizeof(p->teclas) - 1] = '\0';
     p->tempo_limite = tempo_limite;
+    p->img_passo[0] = '\0';  // sem imagem por padrão
+}
+
+void adicionar_passo_jogavel_com_img(Receita *receita, const char *acao,
+                                     const char *ingrediente, const char *teclas,
+                                     int tempo_limite, const char *img_passo) {
+    if (receita == NULL) return;
+    if (receita->n_passos_jog >= MAX_PASSOS_JOGAVEIS) return;
+
+    PassoJogavel *p = &receita->passos_jog[receita->n_passos_jog++];
+    strncpy(p->acao, acao, sizeof(p->acao) - 1);
+    p->acao[sizeof(p->acao) - 1] = '\0';
+    strncpy(p->ingrediente, ingrediente, sizeof(p->ingrediente) - 1);
+    p->ingrediente[sizeof(p->ingrediente) - 1] = '\0';
+    strncpy(p->teclas, teclas, sizeof(p->teclas) - 1);
+    p->teclas[sizeof(p->teclas) - 1] = '\0';
+    p->tempo_limite = tempo_limite;
+    strncpy(p->img_passo, img_passo, sizeof(p->img_passo) - 1);
+    p->img_passo[sizeof(p->img_passo) - 1] = '\0';
 }
 
 // Lista de ingredientes por receita

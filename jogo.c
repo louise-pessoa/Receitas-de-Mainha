@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <time.h>
+#include <string.h>
 #include "jogo.h"
 #include "dados/receitas.h"
 #include "dados/pilha.h"
@@ -117,13 +118,14 @@ void integrar_modulos(void) {
     Receita *tapioca = buscar_receita(receitas_disponiveis, "Tapioca");
     inserir_ingrediente(tapioca, "Tapioca granulada", "200g");
     inserir_ingrediente(tapioca, "Coco ralado",       "50g");
-    inserir_ingrediente(tapioca, "Manteiga",          "1 colher");
     inserir_ingrediente(tapioca, "Queijo",            "80g");
+    inserir_ingrediente(tapioca, "Manteiga",          "1 colher");
 
     // === ingredientes do Escondidinho de Carne de Sol ===
     Receita *escondidinho = buscar_receita(receitas_disponiveis, "Escondidinho");
     inserir_ingrediente(escondidinho, "Carne de sol",  "400g");
     inserir_ingrediente(escondidinho, "Mandioca",      "600g");
+    inserir_ingrediente(escondidinho, "Cebola",        "2 unidades");
     inserir_ingrediente(escondidinho, "Manteiga",      "2 colheres");
     inserir_ingrediente(escondidinho, "Queijo coalho", "200g");
 
@@ -138,23 +140,45 @@ void integrar_modulos(void) {
     inserir_ingrediente(bolo, "Fermento",         "1 colher");
 
     // === passos jogaveis ===
-    // tapioca: hidrata, mistura coco, derrete manteiga
-    adicionar_passo_jogavel(tapioca, "Hidrate a tapioca peneirando",
-                            "Tapioca granulada", "SSSS", 12);
-    adicionar_passo_jogavel(tapioca, "Misture o coco ralado",
-                            "Coco ralado", "ADAD", 10);
-    adicionar_passo_jogavel(tapioca, "Derreta a manteiga na frigideira",
-                            "Manteiga", "SPACE", 8);
+    // tapioca: hidrata, adiciona coco, adiciona queijo, derrete manteiga
+    adicionar_passo_jogavel_com_img(tapioca, "Hidrate a tapioca peneirando",
+                            "Tapioca granulada", "SSSS", 12, "sprites/frigideira_vazia.png");
+    adicionar_passo_jogavel_com_img(tapioca, "Adicione o coco ralado",
+                            "Coco ralado", "ADAD", 10, "sprites/frigideira_tapioca.png");
+    adicionar_passo_jogavel_com_img(tapioca, "Adicione o queijo",
+                            "Queijo", "QWER", 10, "sprites/frigideira_coco.png");
+    adicionar_passo_jogavel_com_img(tapioca, "Derreta a manteiga por cima",
+                            "Manteiga", "SPACE", 8, "sprites/frigideira_queijo.png");
 
-    // escondidinho: dessalga a carne, cozinha mandioca, desfaz carne, monta e gratina
-    adicionar_passo_jogavel(escondidinho, "Dessalgue e grelhe a carne de sol",
-                            "Carne de sol", "WSWS", 12);
-    adicionar_passo_jogavel(escondidinho, "Cozinhe e amasse a mandioca",
-                            "Mandioca", "SSSS", 10);
-    adicionar_passo_jogavel(escondidinho, "Misture manteiga ao pure",
-                            "Manteiga", "ADAD", 10);
-    adicionar_passo_jogavel(escondidinho, "Monte e cubra com queijo coalho",
-                            "Queijo coalho", "QWER", 12);
+    // Define imagens de inicio e pronta da tapioca
+    strncpy(tapioca->img_inicio, "sprites/frigideira_vazia.png", sizeof(tapioca->img_inicio) - 1);
+    tapioca->img_inicio[sizeof(tapioca->img_inicio) - 1] = '\0';
+    strncpy(tapioca->img_receita_pronta, "sprites/tapioca_pronta.png", sizeof(tapioca->img_receita_pronta) - 1);
+    tapioca->img_receita_pronta[sizeof(tapioca->img_receita_pronta) - 1] = '\0';
+
+    // escondidinho: 8 passos com progressão visual (antes e depois das ações)
+    adicionar_passo_jogavel_com_img(escondidinho, "Corte a carne de sol",
+                            "Carne de sol", "WSWS", 12, "sprites/tabua_carne.png");
+    adicionar_passo_jogavel_com_img(escondidinho, "Descasque a macaxeira",
+                            "Mandioca", "SSSS", 10, "sprites/macaxeira_tabua.png");
+    adicionar_passo_jogavel_com_img(escondidinho, "Corte a cebola",
+                            "Cebola", "QWER", 10, "sprites/tabua_cebola.png");
+    adicionar_passo_jogavel_com_img(escondidinho, "Misture macaxeira com manteiga",
+                            "Manteiga", "ADAD", 10, "sprites/macaxeira_cozida.png");
+    adicionar_passo_jogavel_com_img(escondidinho, "Coloque a carne na travessa",
+                            "Carne de sol", "SPACE", 8, "sprites/travessa_vazia.png");
+    adicionar_passo_jogavel_com_img(escondidinho, "Coloque a macaxeira",
+                            "Mandioca", "DDD", 8, "sprites/travessa_carne.png");
+    adicionar_passo_jogavel_com_img(escondidinho, "Coloque o queijo coalho",
+                            "Queijo coalho", "CCC", 8, "sprites/travessa_macaxeira.png");
+    adicionar_passo_jogavel_com_img(escondidinho, "Leve ao forno",
+                            "Forno", "FFF", 8, "sprites/travessa_queijo.png");
+
+    // Define imagens de inicio e pronta do escondidinho
+    strncpy(escondidinho->img_inicio, "sprites/tabua_carne.png", sizeof(escondidinho->img_inicio) - 1);
+    escondidinho->img_inicio[sizeof(escondidinho->img_inicio) - 1] = '\0';
+    strncpy(escondidinho->img_receita_pronta, "sprites/escondidinho_pronto.png", sizeof(escondidinho->img_receita_pronta) - 1);
+    escondidinho->img_receita_pronta[sizeof(escondidinho->img_receita_pronta) - 1] = '\0';
 
     // bolo de rolo: cremeia manteiga+acucar, ovos, farinha, recheia
     adicionar_passo_jogavel(bolo, "Bata manteiga com acucar",

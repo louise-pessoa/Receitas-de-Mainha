@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdlib.h>
 #include "raylib.h"
 #include "cozinhar.h"
 #include "../jogo.h"
@@ -56,13 +57,12 @@ static void montar_grid(void) {
         cozinhar.grid[i].destacado = 0;
         cozinhar.grid[i].usado = 0;
 
-        // grid 4x2 abaixo do balao
-        int col = i % 4;
-        int row = i / 4;
-        float w = 160;
-        float h = 80;
-        float gx = 60 + col * (w + 20);
-        float gy = 350 + row * (h + 16);
+        // grid adaptavel: 5 colunas em uma linha, menor para caber todos
+        int col = i % 5;
+        float w = 125;
+        float h = 65;
+        float gx = 20 + col * (w + 8);
+        float gy = 488;
         cozinhar.grid[i].area = (Rectangle){ gx, gy, w, h };
 
         ing = ing->prox;
@@ -84,12 +84,59 @@ void cozinhar_iniciar(Receita *receita) {
     while (!pilha_vazia(cozinhar.pilha))
         cozinhar.pilha = pop_passo(cozinhar.pilha);
 
+    // libera texturas anteriores
+    if (cozinhar.texturas_passos != NULL) {
+        for (int i = 0; i < cozinhar.receita->n_passos_jog; i++) {
+            if (cozinhar.texturas_carregadas[i]) {
+                UnloadTexture(cozinhar.texturas_passos[i]);
+            }
+        }
+        free(cozinhar.texturas_passos);
+        free(cozinhar.texturas_carregadas);
+    }
+
     memset(&cozinhar, 0, sizeof(cozinhar));
     cozinhar.receita = receita;
     if (receita == NULL || receita->n_passos_jog == 0) {
         cozinhar.terminou = 1;
         cozinhar.venceu = 0;
         return;
+    }
+
+    // aloca arrays de texturas
+    cozinhar.texturas_passos = (Texture2D *)malloc(sizeof(Texture2D) * receita->n_passos_jog);
+    cozinhar.texturas_carregadas = (int *)malloc(sizeof(int) * receita->n_passos_jog);
+    if (cozinhar.texturas_passos != NULL && cozinhar.texturas_carregadas != NULL) {
+        memset(cozinhar.texturas_carregadas, 0, sizeof(int) * receita->n_passos_jog);
+        // pré-carrega as texturas dos passos
+        for (int i = 0; i < receita->n_passos_jog; i++) {
+            if (receita->passos_jog[i].img_passo[0] != '\0') {
+                cozinhar.texturas_passos[i] = LoadTexture(receita->passos_jog[i].img_passo);
+                if (cozinhar.texturas_passos[i].id != 0) {
+                    SetTextureFilter(cozinhar.texturas_passos[i], TEXTURE_FILTER_BILINEAR);
+                    cozinhar.texturas_carregadas[i] = 1;
+                }
+            }
+        }
+    }
+
+    // carrega textura frigideira pronta (para empratar)
+    cozinhar.textura_frigideira_pronta_carregada = 0;
+    Texture2D tex_frigideira = LoadTexture("sprites/frigideira_pronta.png");
+    if (tex_frigideira.id != 0) {
+        cozinhar.textura_frigideira_pronta = tex_frigideira;
+        SetTextureFilter(cozinhar.textura_frigideira_pronta, TEXTURE_FILTER_BILINEAR);
+        cozinhar.textura_frigideira_pronta_carregada = 1;
+    }
+
+    // carrega textura da receita pronta
+    cozinhar.textura_pronta_carregada = 0;
+    if (receita->img_receita_pronta[0] != '\0') {
+        cozinhar.textura_pronta = LoadTexture(receita->img_receita_pronta);
+        if (cozinhar.textura_pronta.id != 0) {
+            SetTextureFilter(cozinhar.textura_pronta, TEXTURE_FILTER_BILINEAR);
+            cozinhar.textura_pronta_carregada = 1;
+        }
     }
 
     // empilha os passos em ordem reversa: ultimo passo entra primeiro,
@@ -200,9 +247,8 @@ static void fase_feedback(void) {
             cozinhar.pilha = pop_passo(cozinhar.pilha);
             cozinhar.passo_idx++;
             if (pilha_vazia(cozinhar.pilha)) {
-                cozinhar.terminou = 1;
                 cozinhar.venceu = 1;
-                cozinhar.fase = COZ_FASE_FIM;
+                cozinhar.fase = COZ_FASE_EMPRATAR;
                 estado.pontuacao = cozinhar.pontos;
                 return;
             }
@@ -216,7 +262,55 @@ static void fase_feedback(void) {
 }
 
 // ==========================================
-// DESENHO
+// FASE EMPRATAR
+// ==========================================
+static void fase_empratar(void) {
+    // verifica clique no botão EMPRATAR
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        Vector2 mouse = GetMousePosition();
+        // botão no topo: 300-500, 10-50
+        if (mouse.x >= 300 && mouse.x <= 500 && mouse.y >= 10 && mouse.y <= 50) {
+            cozinhar.terminou = 1;
+            cozinhar.fase = COZ_FASE_FIM;
+        }
+    }
+    
+    // fallback: ENTER também funciona
+    if (IsKeyPressed(KEY_ENTER)) {
+        cozinhar.terminou = 1;
+        cozinhar.fase = COZ_FASE_FIM;
+    }
+}
+
+static void desenhar_empratar(void) {
+    ClearBackground(COR_FUNDO_COZ);
+    
+    // desenha frigideira pronta
+    if (cozinhar.textura_frigideira_pronta_carregada) {
+        Texture2D tex = cozinhar.textura_frigideira_pronta;
+        float max_altura = ALT - 100;
+        float escala_altura = max_altura / tex.height;
+        float escala_largura = (LARG - 40) / tex.width;
+        float escala = (escala_altura < escala_largura) ? escala_altura : escala_largura;
+        
+        float largura = tex.width * escala;
+        float altura = tex.height * escala;
+        float x = (LARG - largura) / 2;
+        float y = 80;
+        DrawTextureEx(tex, (Vector2){x, y}, 0, escala, WHITE);
+    }
+    
+    // desenha botão EMPRATAR no topo
+    Rectangle btn_empratar = {300, 10, 200, 40};
+    DrawRectangleRec(btn_empratar, COR_VERDE_COZ);
+    DrawRectangleRoundedLines(btn_empratar, 0.1f, 10, 2, COR_AMA_COZ);
+    
+    int txt_width = MeasureText("EMPRATAR", 24);
+    DrawText("EMPRATAR", 400 - txt_width/2, 18, 24, WHITE);
+}
+
+// ==========================================
+// DESENHO - FIM
 // ==========================================
 static void desenhar_cabecalho(void) {
     DrawRectangle(0, 0, LARG, 60, COR_AZUL_COZ);
@@ -242,19 +336,19 @@ static void desenhar_instrucao(void) {
     if (cozinhar.passo_idx >= cozinhar.receita->n_passos_jog) return;
     PassoJogavel *p = &cozinhar.receita->passos_jog[cozinhar.passo_idx];
 
-    // balao de instrucao
-    DrawRectangleRounded((Rectangle){40, 80, 720, 110}, 0.2f, 8, WHITE);
-    DrawRectangleRoundedLines((Rectangle){40, 80, 720, 110}, 0.2f, 8, 2.0f,
+    // balao de instrucao no topo
+    DrawRectangleRounded((Rectangle){40, 70, 720, 90}, 0.2f, 8, WHITE);
+    DrawRectangleRoundedLines((Rectangle){40, 70, 720, 90}, 0.2f, 8, 2.0f,
                               COR_AZUL_COZ);
-    DrawText("Instrucao:", 60, 92, 18, COR_AZUL_COZ);
-    DrawText(p->acao, 60, 116, 22, COR_TEXTO_COZ);
+    DrawText("Instrucao:", 60, 80, 16, COR_AZUL_COZ);
+    DrawText(p->acao, 60, 98, 18, COR_TEXTO_COZ);
 
     if (cozinhar.fase == COZ_FASE_CLICAR) {
-        DrawText(TextFormat("1) Clique no ingrediente: %s", p->ingrediente),
-                 60, 150, 18, COR_LARA_COZ);
+        DrawText(TextFormat("1) Clique: %s", p->ingrediente),
+                 60, 120, 14, COR_LARA_COZ);
     } else if (cozinhar.fase == COZ_FASE_TECLAS) {
-        DrawText("2) Digite a sequencia de teclas:",
-                 60, 150, 18, COR_VERDE_COZ);
+        DrawText("2) Teclas:",
+                 60, 120, 14, COR_VERDE_COZ);
     }
 
 }
@@ -266,11 +360,11 @@ static void desenhar_sequencia(void) {
     if (len == 0) return;
 
     // calcula largura dos blocos
-    int box = 60;
-    int gap = 12;
+    int box = 50;
+    int gap = 8;
     int total = len * box + (len - 1) * gap;
     int x0 = (LARG - total) / 2;
-    int y0 = 240;
+    int y0 = 175;  // no topo, abaixo das instruções
 
     for (int k = 0; k < len; k++) {
         int x = x0 + k * (box + gap);
@@ -350,21 +444,53 @@ static void desenhar_feedback(void) {
     DrawText(txt, (LARG - tw) / 2, 240, tam, cor);
 }
 
-static void desenhar_fim(void) {
-    DrawRectangle(0, 0, LARG, ALT, (Color){0, 0, 0, 170});
-    const char *titulo = cozinhar.venceu ? "RECEITA PRONTA!" : "FIM DE COZINHA";
-    Color cor = cozinhar.venceu ? COR_VERDE_COZ : COR_VERM_COZ;
-    int tam = 56;
-    int tw = MeasureText(titulo, tam);
-    DrawText(titulo, (LARG - tw) / 2, 180, tam, cor);
+static void desenhar_imagem_passo(void) {
+    if (cozinhar.passo_idx >= cozinhar.receita->n_passos_jog) return;
+    if (cozinhar.texturas_passos == NULL || cozinhar.texturas_carregadas == NULL) return;
+    
+    if (cozinhar.texturas_carregadas[cozinhar.passo_idx]) {
+        Texture2D tex = cozinhar.texturas_passos[cozinhar.passo_idx];
+        
+        // calcula escala para ocupar quase toda a tela mantendo aspecto ratio
+        // deixa espaço de ~100px no topo e ~80px na base para elementos da UI
+        float max_altura = ALT - 100 - 80;  // 420px disponíveis
+        float escala_altura = max_altura / tex.height;
+        float max_largura = LARG;
+        float escala_largura = max_largura / tex.width;
+        float escala = escala_altura < escala_largura ? escala_altura : escala_largura;
+        
+        float largura = tex.width * escala;
+        float altura = tex.height * escala;
+        float x = (LARG - largura) / 2;
+        float y = 80;  // começa logo após o cabeçalho
+        DrawTextureEx(tex, (Vector2){x, y}, 0, escala, WHITE);
+    }
+}
 
+static void desenhar_fim(void) {
+    // desenha a imagem pronta (pré-carregada)
+    if (cozinhar.venceu && cozinhar.textura_pronta_carregada) {
+        Texture2D tex_pronta = cozinhar.textura_pronta;
+        float max_altura = ALT - 150;
+        float escala_altura = max_altura / tex_pronta.height;
+        float escala_largura = (LARG - 40) / tex_pronta.width;
+        float escala = (escala_altura < escala_largura) ? escala_altura : escala_largura;
+        
+        float largura = tex_pronta.width * escala;
+        float altura = tex_pronta.height * escala;
+        float x = (LARG - largura) / 2;
+        float y = 20;
+        DrawTextureEx(tex_pronta, (Vector2){x, y}, 0, escala, WHITE);
+    }
+    
+    // pontuação embaixo da imagem
     DrawText(TextFormat("Acertos: %d  Erros: %d",
                         cozinhar.acertos, cozinhar.erros),
-             280, 270, 22, WHITE);
+             280, 470, 22, WHITE);
     DrawText(TextFormat("Pontos finais: %d", cozinhar.pontos),
-             290, 310, 22, COR_AMA_COZ);
+             290, 510, 22, COR_AMA_COZ);
 
-    DrawText("[ENTER] Resultado final", 270, 420, 22, COR_AMA_COZ);
+    DrawText("[ENTER] Resultado final", 270, 550, 22, COR_AMA_COZ);
 }
 
 void tela_cozinhar(void) {
@@ -379,18 +505,61 @@ void tela_cozinhar(void) {
             case COZ_FASE_CLICAR:    fase_clicar();    break;
             case COZ_FASE_TECLAS:    fase_teclas();    break;
             case COZ_FASE_FEEDBACK:  fase_feedback();  break;
+            case COZ_FASE_EMPRATAR:  fase_empratar();  break;
             default: break;
         }
     }
 
+    if (cozinhar.fase == COZ_FASE_EMPRATAR) {
+        desenhar_empratar();
+        return;
+    }
+
+    if (cozinhar.fase == COZ_FASE_FIM) {
+        ClearBackground(COR_FUNDO_COZ);
+        desenhar_fim();
+        return;
+    }
+
     ClearBackground(COR_FUNDO_COZ);
     desenhar_cabecalho();
+    desenhar_imagem_passo();
+    desenhar_grid();
     desenhar_instrucao();
     desenhar_sequencia();
-    desenhar_grid();
     desenhar_feedback();
-    if (cozinhar.terminou) desenhar_fim();
 }
 
 int cozinhar_terminou(void) { return cozinhar.terminou; }
 int cozinhar_venceu(void)   { return cozinhar.venceu; }
+
+void cozinhar_limpar(void) {
+    // libera texturas
+    if (cozinhar.texturas_passos != NULL && cozinhar.receita != NULL) {
+        for (int i = 0; i < cozinhar.receita->n_passos_jog; i++) {
+            if (cozinhar.texturas_carregadas[i]) {
+                UnloadTexture(cozinhar.texturas_passos[i]);
+            }
+        }
+        free(cozinhar.texturas_passos);
+        free(cozinhar.texturas_carregadas);
+        cozinhar.texturas_passos = NULL;
+        cozinhar.texturas_carregadas = NULL;
+    }
+    
+    // libera textura pronta
+    if (cozinhar.textura_pronta_carregada) {
+        UnloadTexture(cozinhar.textura_pronta);
+        cozinhar.textura_pronta_carregada = 0;
+    }
+    
+    // libera textura frigideira pronta
+    if (cozinhar.textura_frigideira_pronta_carregada) {
+        UnloadTexture(cozinhar.textura_frigideira_pronta);
+        cozinhar.textura_frigideira_pronta_carregada = 0;
+    }
+    
+    // libera pilha
+    while (!pilha_vazia(cozinhar.pilha))
+        cozinhar.pilha = pop_passo(cozinhar.pilha);
+}

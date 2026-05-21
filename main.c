@@ -188,6 +188,7 @@ int main(void) {
             case TELA_PILHA:
                 if (cozinhar.terminou &&
                     IsKeyPressed(KEY_ENTER) && !IsKeyDown(KEY_LEFT_ALT)) {
+                    cozinhar_limpar();
                     disparar_jurados();
                     tela_atual = TELA_RESULTADO;
                 }

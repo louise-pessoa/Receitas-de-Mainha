@@ -147,6 +147,20 @@ int main(void) {
             tela_atual = TELA_PILHA;
         }
 
+        // ---- CHEAT: Ctrl+P para ir direto para o Pirão (DEBUG) ----
+        if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_P)) {
+            // Desbloqueia e seleciona Pirão
+            Receita *pirao = buscar_receita(receitas_disponiveis, "Pirão de Carne");
+            if (pirao) {
+                pirao->desbloqueada = 1;
+                receita_selecionada = pirao;
+                estado.receitas_completadas = 3;  // simula já ter completado 3 receitas
+                cozinhar_iniciar(receita_selecionada);
+                tela_atual = TELA_PILHA;
+                printf("[CHEAT] Ctrl+P: Pulando para o PIRÃO DE CARNE!\n");
+            }
+        }
+
         // ---- transforma coordenadas do mouse para o canvas virtual ----
         float sw = (float)GetScreenWidth();
         float sh = (float)GetScreenHeight();

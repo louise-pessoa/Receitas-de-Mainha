@@ -222,9 +222,9 @@ void integrar_modulos(void) {
         "Adicione a farinha de mandioca", "Farinha de mandioca", "FFFF", "sprites/prato_pirao.png");
 
     // Define imagens de inicio e pronta do Pirão
-    strncpy(pirao_carne->img_inicio, "sprites/prato_vazio.png", sizeof(pirao_carne->img_inicio) - 1);
+    strncpy(pirao_carne->img_inicio, "sprites/pirao_ingredientes_mesa.png", sizeof(pirao_carne->img_inicio) - 1);
     pirao_carne->img_inicio[sizeof(pirao_carne->img_inicio) - 1] = '\0';
-    strncpy(pirao_carne->img_receita_pronta, "sprites/pirao_pronto.png", sizeof(pirao_carne->img_receita_pronta) - 1);
+    strncpy(pirao_carne->img_receita_pronta, "sprites/pirao_completo.png", sizeof(pirao_carne->img_receita_pronta) - 1);
     pirao_carne->img_receita_pronta[sizeof(pirao_carne->img_receita_pronta) - 1] = '\0';
 
     printf("[SISTEMA] Modulos integrados. 3 receitas + 1 desbloque\u00e1vel (Pir\u00e3o de Carne).\n");

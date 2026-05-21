@@ -24,6 +24,8 @@ typedef struct {
 
 typedef struct {
     Receita *receita;
+    Texture2D textura_inicio;  // imagem inicial da receita
+    int textura_inicio_carregada;
 
     IngredienteIcone grid[COZ_MAX_ING_GRID];
     int n_grid;
@@ -37,6 +39,7 @@ typedef struct {
     float tempo_passo;       // segundos desde o inicio do passo
     float feedback_timer;
     int   feedback_acerto;
+    float delay_forno;       // timer de delay para visualizar forno
 
     int erros;
     int acertos;

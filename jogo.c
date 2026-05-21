@@ -59,6 +59,7 @@ void resetar_partida(void) {
     estado.passos_total      = 0;
     estado.tempo_extra       = 0;
     estado.erro_passo        = 0;
+    // NÃO reseta receitas_completadas - persiste por toda a sessão
     _inicio_timer           = 0;
     //jurados_prontos = 0;
 
@@ -69,6 +70,7 @@ void resetar_partida(void) {
 
 void iniciar_jogo(void) {
     resetar_partida();
+    estado.receitas_completadas = 0;  // inicializa contador na primeira execução
     tela_atual = TELA_MENU;     // <-- ADICIONAR
     printf("[SISTEMA] Jogo iniciado. Boa sorte!\n");
 }
@@ -109,10 +111,15 @@ void integrar_modulos(void) {
         receitas_disponiveis = NULL;
     }
 
-    // === cria as 3 receitas ===
+    // === cria as 3 receitas iniciais + Pirão como desbloqueável ===
     receitas_disponiveis = inserir_receita(receitas_disponiveis, "Tapioca",      2, 15, 50);
     receitas_disponiveis = inserir_receita(receitas_disponiveis, "Escondidinho", 4, 40, 80);
     receitas_disponiveis = inserir_receita(receitas_disponiveis, "Bolo de Rolo", 5, 60, 100);
+    receitas_disponiveis = inserir_receita(receitas_disponiveis, "Pirão de Carne", 6, 80, 150);
+    
+    // Pirão de Carne começa bloqueado
+    Receita *pirao = buscar_receita(receitas_disponiveis, "Pirão de Carne");
+    if (pirao) pirao->desbloqueada = 0;
 
     // === ingredientes da Tapioca ===
     Receita *tapioca = buscar_receita(receitas_disponiveis, "Tapioca");
@@ -172,7 +179,7 @@ void integrar_modulos(void) {
     adicionar_passo_jogavel_com_img(escondidinho, "Coloque o queijo coalho",
                             "Queijo coalho", "CCC", 8, "sprites/travessa_macaxeira.png");
     adicionar_passo_jogavel_com_img(escondidinho, "Leve ao forno",
-                            "Forno", "FFF", 8, "sprites/travessa_queijo.png");
+                            "Forno", "FFF", 12, "sprites/travessa_forno.png");
 
     // Define imagens de inicio e pronta do escondidinho
     strncpy(escondidinho->img_inicio, "sprites/tabua_carne.png", sizeof(escondidinho->img_inicio) - 1);
@@ -192,5 +199,33 @@ void integrar_modulos(void) {
     adicionar_passo_jogavel(bolo, "Espalhe a goiabada e enrole",
                             "Goiabada", "DDDD", 12);
 
-    printf("[SISTEMA] Modulos integrados. 3 receitas disponiveis.\n");
+    // === ingredientes do Pirão de Carne (desbloqueavel - final do jogo no Marco Zero) ===
+    Receita *pirao_carne = buscar_receita(receitas_disponiveis, "Pirão de Carne");
+    inserir_ingrediente(pirao_carne, "Caldo de carne",    "1 litro");
+    inserir_ingrediente(pirao_carne, "Carne desfiada",    "500g");
+    inserir_ingrediente(pirao_carne, "Farinha de mandioca", "300g");
+    inserir_ingrediente(pirao_carne, "Manteiga",          "3 colheres");
+    inserir_ingrediente(pirao_carne, "Alho",              "4 dentes");
+
+    // === passos do Pirão de Carne (6 passos) ===
+    adicionar_passo_jogavel_com_img(pirao_carne, "Desfile a carne",
+                            "Carne desfiada", "DDDD", 10, "sprites/prato_carne.png");
+    adicionar_passo_jogavel_com_img(pirao_carne, "Aqueça o caldo",
+                            "Caldo de carne", "SSSS", 12, "sprites/prato_caldo.png");
+    adicionar_passo_jogavel_com_img(pirao_carne, "Adicione a carne ao caldo",
+                            "Carne desfiada", "AAAA", 10, "sprites/prato_carne_caldo.png");
+    adicionar_passo_jogavel_com_img(pirao_carne, "Derreta manteiga e frite alho",
+                            "Manteiga", "MMMM", 10, "sprites/prato_alho.png");
+    adicionar_passo_jogavel_com_img(pirao_carne, "Despeje o refogado na panela",
+                            "Alho", "RRRR", 8, "sprites/prato_refogado.png");
+    adicionar_passo_jogavel_com_img(pirao_carne, "Adicione a farinha de mandioca",
+                            "Farinha de mandioca", "FFFF", 12, "sprites/prato_pirao.png");
+
+    // Define imagens de inicio e pronta do Pirão
+    strncpy(pirao_carne->img_inicio, "sprites/prato_vazio.png", sizeof(pirao_carne->img_inicio) - 1);
+    pirao_carne->img_inicio[sizeof(pirao_carne->img_inicio) - 1] = '\0';
+    strncpy(pirao_carne->img_receita_pronta, "sprites/pirao_pronto.png", sizeof(pirao_carne->img_receita_pronta) - 1);
+    pirao_carne->img_receita_pronta[sizeof(pirao_carne->img_receita_pronta) - 1] = '\0';
+
+    printf("[SISTEMA] Modulos integrados. 3 receitas + 1 desbloque\u00e1vel (Pir\u00e3o de Carne).\n");
 }

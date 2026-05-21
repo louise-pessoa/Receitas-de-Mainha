@@ -28,6 +28,7 @@ typedef struct receita {
     int  dificuldade;
     int  tempo;
     int  pontuacao;
+    int  desbloqueada;      // 1 se pode jogar, 0 se bloqueada
     Ingrediente *ingredientes;
 
     char passo_acao[50];

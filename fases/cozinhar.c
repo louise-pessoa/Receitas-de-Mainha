@@ -244,7 +244,7 @@ static void desenhar_instrucao(void) {
 
     // balao de instrucao
     DrawRectangleRounded((Rectangle){40, 80, 720, 110}, 0.2f, 8, WHITE);
-    DrawRectangleRoundedLines((Rectangle){40, 80, 720, 110}, 0.2f, 8, 2.0f,
+    DrawRectangleRoundedLinesEx((Rectangle){40, 80, 720, 110}, 0.2f, 8, 2.0f,
                               COR_AZUL_COZ);
     DrawText("Instrucao:", 60, 92, 18, COR_AZUL_COZ);
     DrawText(p->acao, 60, 116, 22, COR_TEXTO_COZ);
@@ -291,7 +291,7 @@ static void desenhar_sequencia(void) {
             borda = (Color){180, 180, 180, 255};
         }
         DrawRectangleRounded((Rectangle){x, y0, box, box}, 0.25f, 8, fundo);
-        DrawRectangleRoundedLines((Rectangle){x, y0, box, box}, 0.25f, 8, 2.0f,
+        DrawRectangleRoundedLinesEx((Rectangle){x, y0, box, box}, 0.25f, 8, 2.0f,
                                   borda);
         const char *nome = nome_tecla(p->teclas[k]);
         int tam = (strlen(nome) > 1) ? 18 : 32;
@@ -310,12 +310,12 @@ static void desenhar_grid(void) {
         else                       fundo = WHITE;
 
         DrawRectangleRounded(it->area, 0.25f, 8, fundo);
-        DrawRectangleRoundedLines(it->area, 0.25f, 8, 2.0f,
+        DrawRectangleRoundedLinesEx(it->area, 0.25f, 8, 2.0f,
                                   it->destacado ? COR_LARA_COZ
                                                 : (Color){180,180,180,255});
         if (it->destacado && cozinhar.fase == COZ_FASE_CLICAR) {
             // contorno externo para chamar atencao
-            DrawRectangleRoundedLines(
+            DrawRectangleRoundedLinesEx(
                 (Rectangle){ it->area.x - 3, it->area.y - 3,
                              it->area.width + 6, it->area.height + 6 },
                 0.25f, 8, 2.0f, COR_LARA_COZ);

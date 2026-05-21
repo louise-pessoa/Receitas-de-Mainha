@@ -153,14 +153,14 @@ void tela_ordenacao(void) {
                              0.2f, 8, cor_corpo);
         // borda destacada
         if (destaque) {
-            DrawRectangleRoundedLines((Rectangle){x - 2, y - 2,
+            DrawRectangleRoundedLinesEx((Rectangle){x - 2, y - 2,
                                                   carta_w + 4, carta_h + 4},
                                       0.2f, 8, 2.0f, borda);
-            DrawRectangleRoundedLines((Rectangle){x - 1, y - 1,
+            DrawRectangleRoundedLinesEx((Rectangle){x - 1, y - 1,
                                                   carta_w + 2, carta_h + 2},
                                       0.2f, 8, 2.0f, borda);
         } else {
-            DrawRectangleRoundedLines((Rectangle){x, y, carta_w, carta_h},
+            DrawRectangleRoundedLinesEx((Rectangle){x, y, carta_w, carta_h},
                                       0.2f, 8, 2.0f, COR_TEXTO_ORD);
         }
 

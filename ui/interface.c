@@ -26,7 +26,7 @@
 // desenha botao colorido com texto centralizado
 static void desenhar_botao(int x, int y, int w, int h, Color cor, const char *texto) {
     DrawRectangleRounded((Rectangle){x, y, w, h}, 0.4f, 8, cor);
-    DrawRectangleRoundedLines((Rectangle){x, y, w, h}, 0.4f, 8, 2.0f, WHITE);
+    DrawRectangleRoundedLinesEx((Rectangle){x, y, w, h}, 0.4f, 8, 2.0f, WHITE);
     int tam = 22;
     int tw = MeasureText(texto, tam);
     DrawText(texto, x + (w - tw) / 2, y + (h - tam) / 2, tam, WHITE);
@@ -211,7 +211,7 @@ void tela_ingredientes(Receita *receita) {
 
     // balao de instrucao
     DrawRectangleRounded((Rectangle){100, 140, 600, 110}, 0.1f, 8, WHITE);
-    DrawRectangleRoundedLines((Rectangle){100, 140, 600, 110}, 0.1f, 8, 2.0f, COR_AZUL);
+    DrawRectangleRoundedLinesEx((Rectangle){100, 140, 600, 110}, 0.1f, 8, 2.0f, COR_AZUL);
     DrawText("Memorize os ingredientes abaixo!", 120, 155, 20, COR_VERDE);
     DrawText("Eles vao cair do ceu em 25 segundos — use [<-][->] para", 120, 182, 17, COR_TEXTO);
     DrawText("mover a cesta e coletar so os certos. Errados custam pontos!", 120, 207, 17, COR_VERMELHO);
@@ -258,7 +258,7 @@ void tela_pilha(const char *passo_atual, int num_passo, int total_passos, double
 
     // instrucao no topo
     DrawRectangleRounded((Rectangle){100, 20, 600, 60}, 0.3f, 8, (Color){255, 245, 200, 240});
-    DrawRectangleRoundedLines((Rectangle){100, 20, 600, 60}, 0.3f, 8, 2.0f, COR_LARANJA);
+    DrawRectangleRoundedLinesEx((Rectangle){100, 20, 600, 60}, 0.3f, 8, 2.0f, COR_LARANJA);
     DrawText("*", 115, 35, 22, COR_AMARELO);
     int tw = MeasureText(passo_atual, 22);
     DrawText(passo_atual, (800 - tw)/2, 35, 22, COR_TEXTO);
@@ -273,7 +273,7 @@ void tela_pilha(const char *passo_atual, int num_passo, int total_passos, double
 
     // balao da vovo com dica
     DrawRectangleRounded((Rectangle){30, 320, 220, 80}, 0.2f, 8, (Color){255,220,230,255});
-    DrawRectangleRoundedLines((Rectangle){30, 320, 220, 80}, 0.2f, 8, 2.0f, (Color){255,150,180,255});
+    DrawRectangleRoundedLinesEx((Rectangle){30, 320, 220, 80}, 0.2f, 8, 2.0f, (Color){255,150,180,255});
     DrawText("Siga a ordem!", 45, 335, 18, COR_TEXTO);
     DrawText("Voce consegue!", 45, 358, 17, COR_TEXTO);
 

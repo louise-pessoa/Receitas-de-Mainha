@@ -518,6 +518,17 @@ static void desenhar_imagem_passo(void) {
 }
 
 static void desenhar_fim(void) {
+    // DEBUG: imprime estado uma vez por entrada
+    static int _ja_imprimiu = 0;
+    if (!_ja_imprimiu) {
+        printf("[DEBUG desenhar_fim] venceu=%d textura_pronta_carregada=%d "
+               "textura_pronta.id=%u textura_pronta.width=%d textura_pronta.height=%d\n",
+               cozinhar.venceu, cozinhar.textura_pronta_carregada,
+               cozinhar.textura_pronta.id,
+               cozinhar.textura_pronta.width, cozinhar.textura_pronta.height);
+        _ja_imprimiu = 1;
+    }
+
     // desenha a imagem pronta (pré-carregada)
     if (cozinhar.venceu && cozinhar.textura_pronta_carregada) {
         Texture2D tex_pronta = cozinhar.textura_pronta;
@@ -525,22 +536,29 @@ static void desenhar_fim(void) {
         float escala_altura = max_altura / tex_pronta.height;
         float escala_largura = (LARG - 40) / tex_pronta.width;
         float escala = (escala_altura < escala_largura) ? escala_altura : escala_largura;
-        
+
         float largura = tex_pronta.width * escala;
         float altura = tex_pronta.height * escala;
         float x = (LARG - largura) / 2;
         float y = 20;
         DrawTextureEx(tex_pronta, (Vector2){x, y}, 0, escala, WHITE);
+    } else {
+        // FALLBACK VISUAL: mostra na tela qual condicao falhou
+        DrawText("(textura pronta nao foi desenhada)", 200, 200, 22, COR_VERM_COZ);
+        DrawText(TextFormat("venceu=%d  carregada=%d  id=%u",
+                            cozinhar.venceu, cozinhar.textura_pronta_carregada,
+                            cozinhar.textura_pronta.id),
+                 200, 240, 20, COR_TEXTO_COZ);
     }
-    
-    // pontuação embaixo da imagem
+
+    // pontuação embaixo da imagem (texto em marrom escuro pra ler em fundo amarelo)
     DrawText(TextFormat("Acertos: %d  Erros: %d",
                         cozinhar.acertos, cozinhar.erros),
-             280, 470, 22, WHITE);
+             280, 470, 22, COR_TEXTO_COZ);
     DrawText(TextFormat("Pontos finais: %d", cozinhar.pontos),
-             290, 510, 22, COR_AMA_COZ);
+             290, 510, 22, COR_LARA_COZ);
 
-    DrawText("[ENTER] Resultado final", 270, 550, 22, COR_AMA_COZ);
+    DrawText("[ENTER] Resultado final", 270, 550, 22, COR_LARA_COZ);
 }
 
 void tela_cozinhar(void) {

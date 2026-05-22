@@ -66,7 +66,7 @@ void integrar_modulos(void) {
     Receita *tapioca = buscar_receita(receitas_disponiveis, "Tapioca");
     inserir_ingrediente(tapioca, "Tapioca granulada");
     inserir_ingrediente(tapioca, "Coco ralado");
-    inserir_ingrediente(tapioca, "Queijo");
+    inserir_ingrediente(tapioca, "Queijo coalho");
     inserir_ingrediente(tapioca, "Manteiga");
 
     // === ingredientes do Escondidinho de Carne de Sol ===
@@ -76,7 +76,6 @@ void integrar_modulos(void) {
     inserir_ingrediente(escondidinho, "Cebola");
     inserir_ingrediente(escondidinho, "Manteiga");
     inserir_ingrediente(escondidinho, "Queijo coalho");
-    inserir_ingrediente(escondidinho, "Forno");
 
     // === ingredientes do Bolo de Rolo (ordem de uso: manteiga, acucar, ovos, farinha, goiabada) ===
     Receita *bolo = buscar_receita(receitas_disponiveis, "Bolo de Rolo");
@@ -85,8 +84,6 @@ void integrar_modulos(void) {
     inserir_ingrediente(bolo, "Ovos");
     inserir_ingrediente(bolo, "Farinha de trigo");
     inserir_ingrediente(bolo, "Goiabada");
-    inserir_ingrediente(bolo, "Baunilha");
-    inserir_ingrediente(bolo, "Fermento");
 
     // === passos jogaveis (push em ordem de execucao: passo 1 primeiro) ===
 
@@ -96,7 +93,7 @@ void integrar_modulos(void) {
     tapioca->passos = push_passo(tapioca->passos,
         "Adicione o coco ralado", "Coco ralado", "ADAD", "sprites/frigideira_tapioca.png");
     tapioca->passos = push_passo(tapioca->passos,
-        "Adicione o queijo", "Queijo", "QWER", "sprites/frigideira_coco.png");
+        "Adicione o queijo", "Queijo coalho", "QWER", "sprites/frigideira_coco.png");
     tapioca->passos = push_passo(tapioca->passos,
         "Derreta a manteiga por cima", "Manteiga", "SPACE", "sprites/frigideira_queijo.png");
 
@@ -121,7 +118,7 @@ void integrar_modulos(void) {
     escondidinho->passos = push_passo(escondidinho->passos,
         "Coloque o queijo coalho", "Queijo coalho", "CCC", "sprites/travessa_macaxeira.png");
     escondidinho->passos = push_passo(escondidinho->passos,
-        "Leve ao forno", "Forno", "FFF", "sprites/travessa_queijo.png");
+        "Leve ao forno", "", "FFF", "sprites/travessa_queijo.png");
 
     strncpy(escondidinho->img_inicio, "sprites/tabua_carne.png", sizeof(escondidinho->img_inicio) - 1);
     escondidinho->img_inicio[sizeof(escondidinho->img_inicio) - 1] = '\0';
@@ -139,6 +136,8 @@ void integrar_modulos(void) {
         "Misture a farinha de trigo", "Farinha de trigo", "QWERTY", "");
     bolo->passos = push_passo(bolo->passos,
         "Espalhe a goiabada e enrole", "Goiabada", "DDDD", "");
+    bolo->passos = push_passo(bolo->passos,
+        "Leve ao forno", "", "FFF", "");
 
     // === ingredientes do Pirão de Carne (desbloqueavel - final do jogo no Marco Zero) ===
     Receita *pirao_carne = buscar_receita(receitas_disponiveis, "Pirão de Carne");

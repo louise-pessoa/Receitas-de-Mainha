@@ -326,9 +326,9 @@ static const Texture2D* _sprite_para_ingrediente(const char *nome) {
 // lista de distratores: ingredientes que NAO devem entrar na receita.
 // (mistura de coisas comestiveis e bobas pra atrapalhar)
 static const char *DISTRATORES_GERAIS[] = {
-    "Sal", "Pimenta", "Alho", "Tomate", "Limao",
-    "Pao", "Queijo", "Banana", "Arroz", "Feijao",
-    "Carne", "Cebolinha", "Mostarda", "Chocolate",
+    "Pimenta", "Alho", "Tomate", "Limao",
+    "Pao", "Banana", "Arroz", "Feijao",
+    "Cebolinha", "Mostarda", "Chocolate",
     "Sapato", "Pedra"
 };
 static const int N_DISTRATORES_GERAIS =
@@ -446,6 +446,11 @@ static void spawnar_forcado(int idx) {
 // INICIALIZACAO
 // ==========================================
 void catcher_iniciar(Receita *receita) {
+    // descarrega textura anterior se existir
+    if (catcher.bg_carregado) {
+        UnloadTexture(catcher.bg_coletar);
+    }
+
     memset(&catcher, 0, sizeof(catcher));
     catcher.receita = receita;
 
@@ -484,6 +489,13 @@ void catcher_iniciar(Receita *receita) {
 
     catcher.spawn_timer = 0.0f;
     catcher.spawn_intervalo = SPAWN_BASE;
+
+    // carrega textura de fundo
+    catcher.bg_coletar = LoadTexture("sprites/bg_coletar.png");
+    if (catcher.bg_coletar.id != 0) {
+        SetTextureFilter(catcher.bg_coletar, TEXTURE_FILTER_BILINEAR);
+        catcher.bg_carregado = 1;
+    }
 
     printf("[CATCHER] Iniciado para '%s' com %d ingredientes\n",
            receita ? receita->nome : "(sem receita)", catcher.n_alvos);
@@ -747,18 +759,26 @@ static void desenhar_checklist(void) {
 }
 
 static void desenhar_fundo(void) {
-    // ceu com gradiente simulado
-    DrawRectangleGradientV(0, ALT_HUD, LARG_TELA, ALT_TELA - ALT_HUD - ALT_CHAO,
-                           COR_CEU, COR_CEU_BAIXO);
+    // desenha textura de fundo se carregada
+    if (catcher.bg_carregado) {
+        DrawTexturePro(catcher.bg_coletar,
+                       (Rectangle){0, 0, catcher.bg_coletar.width, catcher.bg_coletar.height},
+                       (Rectangle){0, ALT_HUD, LARG_TELA, ALT_TELA - ALT_HUD},
+                       (Vector2){0, 0}, 0.0f, WHITE);
+    } else {
+        // fallback para fundo com gradiente
+        DrawRectangleGradientV(0, ALT_HUD, LARG_TELA, ALT_TELA - ALT_HUD - ALT_CHAO,
+                               COR_CEU, COR_CEU_BAIXO);
 
-    // nuvens decorativas
-    DrawCircle(120, 130, 22, (Color){255, 255, 255, 200});
-    DrawCircle(150, 125, 26, (Color){255, 255, 255, 200});
-    DrawCircle(178, 132, 20, (Color){255, 255, 255, 200});
+        // nuvens decorativas
+        DrawCircle(120, 130, 22, (Color){255, 255, 255, 200});
+        DrawCircle(150, 125, 26, (Color){255, 255, 255, 200});
+        DrawCircle(178, 132, 20, (Color){255, 255, 255, 200});
 
-    DrawCircle(560, 100, 18, (Color){255, 255, 255, 180});
-    DrawCircle(585, 95,  24, (Color){255, 255, 255, 180});
-    DrawCircle(615, 105, 20, (Color){255, 255, 255, 180});
+        DrawCircle(560, 100, 18, (Color){255, 255, 255, 180});
+        DrawCircle(585, 95,  24, (Color){255, 255, 255, 180});
+        DrawCircle(615, 105, 20, (Color){255, 255, 255, 180});
+    }
 
     // chao
     DrawRectangle(0, ALT_TELA - ALT_CHAO, LARG_TELA, ALT_CHAO, COR_CHAO);

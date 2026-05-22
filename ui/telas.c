@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "raylib.h"
 #include "telas.h"
 #include "../jogo.h"
@@ -19,6 +20,112 @@
 #define COR_TEXTO (Color){60, 30, 10, 255}     // marrom escuro
 #define COR_BRANCO WHITE
 #define COR_BARRA_FUNDO (Color){30, 60, 140, 255} // azul escuro barra
+
+// ==========================================
+// ESTADO GLOBAL (texturas)
+// ==========================================
+typedef struct {
+    Texture2D bg_jurados;
+    int bg_carregado;
+} EstadoTelas;
+
+static EstadoTelas telas_estado = {0};
+
+// cache simples de sprites (nome -> texture)
+#define TELAS_SPRITE_CACHE 64
+typedef struct {
+    char nome[64];
+    Texture2D tex;
+    int carregado;
+} SpriteEntry;
+
+static SpriteEntry sprite_cache[TELAS_SPRITE_CACHE];
+
+static void construir_caminho_sprite_telas(const char *nome, char *caminho, int tam) {
+    // Mapeamentos explicitos fornecidos pelo usuario
+    struct Map { const char *nome; const char *file; } map[] = {
+        {"Tapioca granulada", "massa_tapioca.png"},
+        {"Carne de sol", "carne.png"},
+        {"Farinha de mandioca", "farinha.png"},
+        {"Farinha de trigo", "farinha.png"},
+        {"Queijo coalho", "queijo.png"},
+        {"Ovos", "ovo.png"},
+    };
+    for (size_t i = 0; i < sizeof(map)/sizeof(map[0]); i++) {
+        if (strcasecmp(nome, map[i].nome) == 0) {
+            snprintf(caminho, tam, "sprites/%s", map[i].file);
+            return;
+        }
+    }
+
+    // Fallback: lowercase + underscores
+    snprintf(caminho, tam, "sprites/");
+    int len = strlen(caminho);
+    for (int i = 0; i < (int)strlen(nome) && len < tam - 5; i++) {
+        char c = nome[i];
+        if (c >= 'A' && c <= 'Z') c = c - 'A' + 'a';
+        if (c == ' ') c = '_';
+        caminho[len++] = c;
+    }
+    snprintf(caminho + len, tam - len, ".png");
+}
+
+// retorna Texture2D; se nao encontrado, tex.id == 0
+static Texture2D obter_sprite_telas(const char *nome) {
+    if (nome == NULL) return (Texture2D){0};
+    // procurar no cache
+    for (int i = 0; i < TELAS_SPRITE_CACHE; i++) {
+        if (sprite_cache[i].carregado && strcmp(sprite_cache[i].nome, nome) == 0) {
+            return sprite_cache[i].tex;
+        }
+    }
+    // encontrar posicao livre
+    int idx = -1;
+    for (int i = 0; i < TELAS_SPRITE_CACHE; i++) if (!sprite_cache[i].carregado) { idx = i; break; }
+    if (idx == -1) idx = 0; // sobrescreve o primeiro se cheio
+
+    char path[256] = {0};
+    construir_caminho_sprite_telas(nome, path, sizeof(path));
+    Texture2D t = LoadTexture(path);
+    if (t.id == 0) {
+        // tentar sem underline
+        for (int k = 0; k < (int)strlen(path); k++) if (path[k] == '_') path[k] = ' ';
+        t = LoadTexture(path);
+    }
+    if (t.id != 0) {
+        SetTextureFilter(t, TEXTURE_FILTER_BILINEAR);
+        strncpy(sprite_cache[idx].nome, nome, sizeof(sprite_cache[idx].nome)-1);
+        sprite_cache[idx].tex = t;
+        sprite_cache[idx].carregado = 1;
+        return t;
+    }
+    return (Texture2D){0};
+}
+
+// carrega texturas das telas
+void telas_carregar_sprites(void) {
+    telas_estado.bg_jurados = LoadTexture("sprites/jurados_nota.png");
+    if (telas_estado.bg_jurados.id != 0) {
+        SetTextureFilter(telas_estado.bg_jurados, TEXTURE_FILTER_BILINEAR);
+        telas_estado.bg_carregado = 1;
+    }
+}
+
+// descarrega texturas das telas
+void telas_limpar(void) {
+    if (telas_estado.bg_carregado) {
+        UnloadTexture(telas_estado.bg_jurados);
+        telas_estado.bg_carregado = 0;
+    }
+
+    // limpar cache de sprites
+    for (int i = 0; i < TELAS_SPRITE_CACHE; i++) {
+        if (sprite_cache[i].carregado) {
+            UnloadTexture(sprite_cache[i].tex);
+            sprite_cache[i].carregado = 0;
+        }
+    }
+}
 
 // ==========================================
 // UTILITARIOS
@@ -175,7 +282,18 @@ void tela_receitas(Receita *lista) {
     if (receita_selecionada != NULL) {
         DrawRectangleRounded((Rectangle){520, 200, 240, 110}, 0.2f, 8, COR_VERDE);
         DrawText("Selecionada:", 535, 210, 16, WHITE);
-        DrawText(receita_selecionada->nome, 535, 235, 18, WHITE);
+        // tentar desenhar sprite do nome da receita
+        Texture2D rtex = obter_sprite_telas(receita_selecionada->nome);
+        if (rtex.id != 0) {
+            float rw = 200;
+            float rh = 70;
+            float scale = fminf(rw / rtex.width, rh / rtex.height);
+            float tx = 520 + (240 - rtex.width*scale)/2.0f;
+            float ty = 200 + (110 - rtex.height*scale)/2.0f;
+            DrawTextureEx(rtex, (Vector2){tx, ty}, 0.0f, scale, WHITE);
+        } else {
+            DrawText(receita_selecionada->nome, 535, 235, 18, WHITE);
+        }
         DrawText(TextFormat("Dif: %d | %d min",
                             receita_selecionada->dificuldade,
                             receita_selecionada->tempo),
@@ -211,8 +329,19 @@ void tela_ingredientes(Receita *receita) {
 
     // nome da receita
     DrawRectangleRounded((Rectangle){50, 75, 700, 50}, 0.3f, 8, COR_LARANJA);
-    int tw = MeasureText(receita->nome, 28);
-    DrawText(receita->nome, (800 - tw)/2, 85, 28, WHITE);
+    // tentar desenhar sprite do nome da receita
+    Texture2D rtex2 = obter_sprite_telas(receita->nome);
+    if (rtex2.id != 0) {
+        float rw = 600;
+        float rh = 40;
+        float scale = fminf(rw / rtex2.width, rh / rtex2.height);
+        float tx = (800 - rtex2.width*scale)/2.0f;
+        float ty = 85 - rtex2.height*scale/2.0f;
+        DrawTextureEx(rtex2, (Vector2){tx, ty}, 0.0f, scale, WHITE);
+    } else {
+        int tw = MeasureText(receita->nome, 28);
+        DrawText(receita->nome, (800 - tw)/2, 85, 28, WHITE);
+    }
 
     // balao de instrucao
     DrawRectangleRounded((Rectangle){100, 140, 600, 110}, 0.1f, 8, WHITE);
@@ -231,7 +360,17 @@ void tela_ingredientes(Receita *receita) {
         for (int i = 0; i < receita->n_ingredientes && i < 8; i++) {
             DrawCircle(65, y + 10, 14, cores[i % 4]);
             DrawText(TextFormat("%d", i + 1), 60, y + 3, 16, WHITE);
-            DrawText(receita->ingredientes[i], 85, y, 20, COR_TEXTO);
+            // desenhar sprite do ingrediente se existir
+            Texture2D itex = obter_sprite_telas(receita->ingredientes[i]);
+            if (itex.id != 0) {
+                float sz = 28;
+                float scale = sz / itex.width;
+                float tx = 85;
+                float ty = y - 6;
+                DrawTextureEx(itex, (Vector2){tx, ty}, 0.0f, scale, WHITE);
+            } else {
+                DrawText(receita->ingredientes[i], 85, y, 20, COR_TEXTO);
+            }
             y += 30;
         }
     }
@@ -318,8 +457,16 @@ void tela_feedback(int acertou) {
 // ==========================================
 void tela_resultado(int venceu, ResultadoJurados *j)
 {
-    ClearBackground(COR_FUNDO);
-    DrawRectangle(0, 0, 800, 600, venceu ? (Color){220,255,220,255} : (Color){255,220,220,255});
+    // desenha fundo
+    if (telas_estado.bg_carregado) {
+        DrawTexturePro(telas_estado.bg_jurados,
+                       (Rectangle){0, 0, telas_estado.bg_jurados.width, telas_estado.bg_jurados.height},
+                       (Rectangle){0, 0, 800, 600},
+                       (Vector2){0, 0}, 0.0f, WHITE);
+    } else {
+        ClearBackground(COR_FUNDO);
+        DrawRectangle(0, 0, 800, 600, venceu ? (Color){220,255,220,255} : (Color){255,220,220,255});
+    }
 
     for (int i = 0; i < 8; i++) {
         DrawRectangle(i*100, 0, 100, 50, (Color){200,230,255,180});

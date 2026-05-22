@@ -104,6 +104,7 @@ int main(void) {
 
     // carrega sprites depois que a janela existe (textura precisa de contexto OpenGL)
     catcher_carregar_sprites();
+    telas_carregar_sprites();
 
     RenderTexture2D alvo = LoadRenderTexture(LARG_VIRTUAL, ALT_VIRTUAL);
     SetTextureFilter(alvo.texture, TEXTURE_FILTER_BILINEAR);

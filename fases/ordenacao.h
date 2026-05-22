@@ -1,6 +1,7 @@
 #ifndef ORDENACAO_H
 #define ORDENACAO_H
 
+#include "raylib.h"
 #include "../dados/receitas.h"
 
 #define MAX_ORDENACAO 12
@@ -8,6 +9,8 @@
 typedef struct {
     char nome[60];
     int  ordem_correta;  // posicao final desejada
+    Texture2D sprite;    // sprite do ingrediente
+    int sprite_carregado;
 } ItemOrdenacao;
 
 typedef struct {
@@ -23,6 +26,9 @@ typedef struct {
     float intervalo;  // segundos entre cada passo da animacao
 
     Receita *receita;
+
+    Texture2D bg_ordenar;
+    int bg_carregado;
 } EstadoOrdenacao;
 
 extern EstadoOrdenacao ordenacao;
@@ -38,5 +44,8 @@ void ordenacao_atualizar(void);
 void tela_ordenacao(void);
 
 int  ordenacao_terminou(void);
+
+// libera texturas da ordenacao
+void ordenacao_limpar(void);
 
 #endif

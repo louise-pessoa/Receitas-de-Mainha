@@ -47,8 +47,45 @@ static int char_para_keycode(char c) {
 // INICIALIZACAO
 // ==========================================
 static void montar_grid(void) {
+    // liberar sprites antigos do grid
+    for (int ii = 0; ii < cozinhar.n_grid; ii++) {
+        if (cozinhar.grid[ii].sprite_carregado) {
+            UnloadTexture(cozinhar.grid[ii].sprite);
+            cozinhar.grid[ii].sprite_carregado = 0;
+        }
+    }
     cozinhar.n_grid = 0;
     Receita *r = cozinhar.receita;
+    
+    // Verifica se o passo atual tem ingrediente vazio (passo especial como forno)
+    if (!pilha_vazia(cozinhar.pilha) && cozinhar.pilha->dado.ingrediente[0] == '\0') {
+        // Passo especial - mostra um botão para o tipo de passo
+        const char *nome_especial = "Forno";  // poderia ser parametrizável
+        
+        strncpy(cozinhar.grid[0].nome, nome_especial,
+                sizeof(cozinhar.grid[0].nome) - 1);
+        cozinhar.grid[0].nome[sizeof(cozinhar.grid[0].nome) - 1] = '\0';
+        cozinhar.grid[0].destacado = 1;  // sempre destacado
+        cozinhar.grid[0].usado = 0;
+        
+        float w = 130;
+        float h = 70;
+        float gx = 30 + 2 * (w + 14);  // centralizar
+        float gy = 410;
+        cozinhar.grid[0].area = (Rectangle){ gx, gy, w, h };
+        // tentar carregar sprite do forno
+        char path[256] = {0};
+        // mapeamento explicito
+        snprintf(path, sizeof(path), "sprites/travessa_forno.png");
+        cozinhar.grid[0].sprite = LoadTexture(path);
+        if (cozinhar.grid[0].sprite.id != 0) {
+            SetTextureFilter(cozinhar.grid[0].sprite, TEXTURE_FILTER_BILINEAR);
+            cozinhar.grid[0].sprite_carregado = 1;
+        }
+        cozinhar.n_grid = 1;
+        return;
+    }
+    
     int total = r->n_ingredientes < COZ_MAX_ING_GRID ? r->n_ingredientes : COZ_MAX_ING_GRID;
     for (int i = 0; i < total; i++) {
         strncpy(cozinhar.grid[i].nome, r->ingredientes[i],
@@ -56,6 +93,7 @@ static void montar_grid(void) {
         cozinhar.grid[i].nome[sizeof(cozinhar.grid[i].nome) - 1] = '\0';
         cozinhar.grid[i].destacado = 0;
         cozinhar.grid[i].usado = 0;
+        cozinhar.grid[i].sprite_carregado = 0;
 
         // grid 5 colunas em 2 linhas
         int col = i % 5;
@@ -65,6 +103,35 @@ static void montar_grid(void) {
         float gx = 30 + col * (w + 14);
         float gy = 410 + row * (h + 10);
         cozinhar.grid[i].area = (Rectangle){ gx, gy, w, h };
+        // carregar sprite do ingrediente (mapear nomes conhecidos)
+        char path[256] = {0};
+        // mapeamentos do jogo (mesmos que telas/ordenacao)
+        if (strcasecmp(cozinhar.grid[i].nome, "Tapioca granulada") == 0) snprintf(path, sizeof(path), "sprites/massa_tapioca.png");
+        else if (strcasecmp(cozinhar.grid[i].nome, "Carne de sol") == 0) snprintf(path, sizeof(path), "sprites/carne.png");
+        else if (strcasecmp(cozinhar.grid[i].nome, "Farinha de mandioca") == 0) snprintf(path, sizeof(path), "sprites/farinha.png");
+        else if (strcasecmp(cozinhar.grid[i].nome, "Farinha de trigo") == 0) snprintf(path, sizeof(path), "sprites/farinha.png");
+        else if (strcasecmp(cozinhar.grid[i].nome, "Queijo coalho") == 0) snprintf(path, sizeof(path), "sprites/queijo.png");
+        else if (strcasecmp(cozinhar.grid[i].nome, "Ovos") == 0) snprintf(path, sizeof(path), "sprites/ovo.png");
+        else {
+            // fallback: lowercase + underscore
+            char namebuf[128] = {0};
+            int p = 0;
+            for (int k = 0; k < (int)strlen(cozinhar.grid[i].nome) && p < (int)sizeof(namebuf)-1; k++) {
+                char c = cozinhar.grid[i].nome[k];
+                if (c >= 'A' && c <= 'Z') c = c - 'A' + 'a';
+                if (c == ' ') c = '_';
+                namebuf[p++] = c;
+            }
+            namebuf[p] = '\0';
+            snprintf(path, sizeof(path), "sprites/%s.png", namebuf);
+        }
+        if (path[0] != '\0') {
+            cozinhar.grid[i].sprite = LoadTexture(path);
+            if (cozinhar.grid[i].sprite.id != 0) {
+                SetTextureFilter(cozinhar.grid[i].sprite, TEXTURE_FILTER_BILINEAR);
+                cozinhar.grid[i].sprite_carregado = 1;
+            }
+        }
     }
     cozinhar.n_grid = total;
 }
@@ -163,10 +230,49 @@ void cozinhar_iniciar(Receita *receita) {
         }
     }
 
+    // carrega sticker de bom trabalho (mainha animada)
+    cozinhar.textura_mainha_animada_carregada = 0;
+    Texture2D tex_mainha = LoadTexture("sprites/mainha_animada.png");
+    printf("[DEBUG] LoadTexture 'sprites/mainha_animada.png': id=%u width=%d height=%d\n", 
+           tex_mainha.id, tex_mainha.width, tex_mainha.height);
+    if (tex_mainha.id != 0) {
+        cozinhar.textura_mainha_animada = tex_mainha;
+        SetTextureFilter(cozinhar.textura_mainha_animada, TEXTURE_FILTER_BILINEAR);
+        cozinhar.textura_mainha_animada_carregada = 1;
+        printf("[DEBUG] mainha_animada carregada com sucesso: %d x %d\n", tex_mainha.width, tex_mainha.height);
+    } else {
+        printf("[DEBUG] ERRO: mainha_animada nao carregada!\n");
+    }
+    cozinhar.mostrando_mainha = 0;
+    cozinhar.timer_mainha = 0.0f;
+    
+    // carrega sticker de erro (mainha brava)
+    cozinhar.textura_mainha_brava_carregada = 0;
+    Texture2D tex_brava = LoadTexture("sprites/mainha_brava.png");
+    printf("[DEBUG] LoadTexture mainha_brava: id=%u\n", tex_brava.id);
+    if (tex_brava.id != 0) {
+        cozinhar.textura_mainha_brava = tex_brava;
+        SetTextureFilter(cozinhar.textura_mainha_brava, TEXTURE_FILTER_BILINEAR);
+        cozinhar.textura_mainha_brava_carregada = 1;
+        printf("[DEBUG] mainha_brava carregada com sucesso\n");
+    }
+    cozinhar.mostrando_mainha_brava = 0;
+    cozinhar.timer_mainha_brava = 0.0f;
+    
+    // carrega sprite de vitória (mainha vitória)
+    cozinhar.textura_mainha_vitoria_carregada = 0;
+    Texture2D tex_vitoria = LoadTexture("sprites/mainha_vitoria.png");
+    if (tex_vitoria.id != 0) {
+        cozinhar.textura_mainha_vitoria = tex_vitoria;
+        SetTextureFilter(cozinhar.textura_mainha_vitoria, TEXTURE_FILTER_BILINEAR);
+        cozinhar.textura_mainha_vitoria_carregada = 1;
+    }
+
     montar_grid();
     cozinhar.passo_idx = 0;
     cozinhar.fase = COZ_FASE_CLICAR;
     cozinhar.pos_tecla = 0;
+    cozinhar.pontos_anterior = 0;
     cozinhar.tempo_passo = 0.0f;
     cozinhar.feedback_timer = 0.0f;
     cozinhar.feedback_acerto = 0;
@@ -205,6 +311,18 @@ static void fase_clicar(void) {
     cozinhar.tempo_passo += GetFrameTime();
 
     if (!IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) return;
+
+    Passo *p = &cozinhar.pilha->dado;
+    
+    // Se é um passo especial (ingrediente vazio), qualquer clique no botão avança
+    if (p->ingrediente[0] == '\0') {
+        Vector2 m = GetMousePosition();
+        if (cozinhar.n_grid > 0 && CheckCollisionPointRec(m, cozinhar.grid[0].area)) {
+            cozinhar.fase = COZ_FASE_TECLAS;
+            cozinhar.pos_tecla = 0;
+        }
+        return;
+    }
 
     Vector2 m = GetMousePosition();
     for (int k = 0; k < cozinhar.n_grid; k++) {
@@ -273,6 +391,11 @@ static void fase_feedback(void) {
     
     if (cozinhar.feedback_timer >= tempo_minimo) {
         if (cozinhar.feedback_acerto) {
+            // Ativa sticker de bom trabalho (mainha animada)
+            cozinhar.mostrando_mainha = 1;
+            cozinhar.timer_mainha = 1.5f;  // 1.5 segundos de exibição
+            printf("[DEBUG] Acerto! Sticker animado ativado\n");
+            
             // pop: remove passo concluido do topo da pilha
             cozinhar.pilha = pop_passo(cozinhar.pilha);
             cozinhar.passo_idx++;
@@ -282,12 +405,19 @@ static void fase_feedback(void) {
                 estado.pontuacao = cozinhar.pontos;
                 return;
             }
+        } else {
+            // Ativa sticker de erro (mainha brava)
+            cozinhar.mostrando_mainha_brava = 1;
+            cozinhar.timer_mainha_brava = 1.5f;  // 1.5 segundos de exibição
+            printf("[DEBUG] Erro! Sticker brava ativado. mostrando_brava=%d timer_brava=%.2f\n",
+                   cozinhar.mostrando_mainha_brava, cozinhar.timer_mainha_brava);
         }
         // se errou, reinicia o mesmo passo; se acertou, ja avancou o idx acima
         cozinhar.fase = COZ_FASE_CLICAR;
         cozinhar.tempo_passo = 0.0f;
         cozinhar.pos_tecla = 0;
         cozinhar.delay_forno = 0.0f;  // Reset delay
+        montar_grid();  // reconstrói grid para o novo passo
         marcar_destacado();
     }
 }
@@ -447,16 +577,31 @@ static void desenhar_grid(void) {
                 0.25f, 8, 2.0f, COR_LARA_COZ);
         }
 
-        int tw = MeasureText(it->nome, 16);
-        if (tw > (int)it->area.width - 14) {
-            DrawText(it->nome, (int)(it->area.x + 8),
-                     (int)(it->area.y + it->area.height / 2 - 8), 14,
-                     COR_TEXTO_COZ);
+        // desenhar sprite do ingrediente se carregado
+        if (it->sprite_carregado) {
+            Texture2D t = it->sprite;
+            float pad = 8;
+            float avail_w = it->area.width - pad*2;
+            float avail_h = it->area.height - pad*2;
+            float scale_w = avail_w / t.width;
+            float scale_h = avail_h / t.height;
+            float scale = scale_w < scale_h ? scale_w : scale_h;
+            if (scale > 1.0f) scale = 1.0f;
+            float tx = it->area.x + (it->area.width - t.width*scale)/2.0f;
+            float ty = it->area.y + (it->area.height - t.height*scale)/2.0f;
+            DrawTextureEx(t, (Vector2){tx, ty}, 0.0f, scale, WHITE);
         } else {
-            DrawText(it->nome,
-                     (int)(it->area.x + (it->area.width - tw) / 2),
-                     (int)(it->area.y + it->area.height / 2 - 8),
-                     16, COR_TEXTO_COZ);
+            int tw = MeasureText(it->nome, 16);
+            if (tw > (int)it->area.width - 14) {
+                DrawText(it->nome, (int)(it->area.x + 8),
+                         (int)(it->area.y + it->area.height / 2 - 8), 14,
+                         COR_TEXTO_COZ);
+            } else {
+                DrawText(it->nome,
+                         (int)(it->area.x + (it->area.width - tw) / 2),
+                         (int)(it->area.y + it->area.height / 2 - 8),
+                         16, COR_TEXTO_COZ);
+            }
         }
 
         if (it->usado) {
@@ -550,6 +695,17 @@ static void desenhar_fim(void) {
                             cozinhar.textura_pronta.id),
                  200, 240, 20, COR_TEXTO_COZ);
     }
+    
+    // desenha sprite mainha vitória no canto inferior direito
+    if (cozinhar.textura_mainha_vitoria_carregada) {
+        Texture2D tex = cozinhar.textura_mainha_vitoria;
+        float escala = 0.55f;  // tamanho do sprite de vitória
+        float largura = tex.width * escala;
+        float altura = tex.height * escala;
+        float x = LARG - largura - 20;  // canto inferior direito
+        float y = ALT - altura - 20;
+        DrawTextureEx(tex, (Vector2){x, y}, 0, escala, WHITE);
+    }
 
     // pontuação embaixo da imagem (texto em marrom escuro pra ler em fundo amarelo)
     DrawText(TextFormat("Acertos: %d  Erros: %d",
@@ -561,11 +717,115 @@ static void desenhar_fim(void) {
     DrawText("[ENTER] Resultado final", 270, 550, 22, COR_LARA_COZ);
 }
 
+// ==========================================
+// DESENHA STICKER DE BOM TRABALHO
+// ==========================================
+static void desenhar_mainha_animada(void) {
+    // Debug: mostrar estado
+    static int _debug_print_animada = 0;
+    if (!_debug_print_animada || cozinhar.mostrando_mainha) {
+        printf("[DEBUG desenhar_mainha_animada] mostrando=%d timer=%.2f carregada=%d\n",
+               cozinhar.mostrando_mainha, cozinhar.timer_mainha, cozinhar.textura_mainha_animada_carregada);
+        _debug_print_animada = 1;
+    }
+    
+    if (!cozinhar.mostrando_mainha || cozinhar.timer_mainha <= 0.0f) {
+        cozinhar.mostrando_mainha = 0;
+        return;
+    }
+
+    if (!cozinhar.textura_mainha_animada_carregada) {
+        printf("[DEBUG desenhar_mainha_animada] FALHOU: Textura não carregada!\n");
+        return;
+    }
+
+    Texture2D tex = cozinhar.textura_mainha_animada;
+    
+    // Anima tamanho e opacidade com base no tempo restante
+    // No início (1.5s): tamanho 1.0, opacidade 1.0
+    // No final (0s): tamanho 0.7, opacidade 0.3
+    float progresso = cozinhar.timer_mainha / 1.5f;  // 0 a 1
+    float escala = 0.7f + (progresso * 0.3f);       // 0.7 a 1.0
+    float opacidade = 0.3f + (progresso * 0.7f);    // 0.3 a 1.0 
+    
+    Color cor = (Color){255, 255, 255, (unsigned char)(opacidade * 255)};
+    
+    // Desenha no canto superior direito
+    float tamanho = 120.0f * escala;
+    float x = LARG - tamanho - 20;
+    float y = 20;
+    
+    printf("[DEBUG desenhar_mainha_animada] RENDERIZANDO: timer=%.2f pos=(%.0f,%.0f) escala=%.2f size=%dx%d alpha=%d\n", 
+           cozinhar.timer_mainha, x, y, escala, tex.width, tex.height, cor.a);
+    
+    DrawTextureEx(tex, (Vector2){x, y}, 0, escala, cor);
+}
+
+// ==========================================
+// DESENHA STICKER DE ERRO
+// ==========================================
+static void desenhar_mainha_brava(void) {
+    if (!cozinhar.mostrando_mainha_brava || cozinhar.timer_mainha_brava <= 0.0f) {
+        cozinhar.mostrando_mainha_brava = 0;
+        return;
+    }
+
+    if (!cozinhar.textura_mainha_brava_carregada) {
+        return;
+    }
+
+    Texture2D tex = cozinhar.textura_mainha_brava;
+    
+    // Anima tamanho e opacidade com base no tempo restante
+    // Mesmo efeito que mainha_animada
+    float progresso = cozinhar.timer_mainha_brava / 1.5f;  // 0 a 1
+    float escala = 0.7f + (progresso * 0.3f);             // 0.7 a 1.0
+    float opacidade = 0.3f + (progresso * 0.7f);          // 0.3 a 1.0 
+    
+    Color cor = (Color){255, 255, 255, (unsigned char)(opacidade * 255)};
+    
+    // Desenha no canto superior esquerdo
+    float tamanho = 120.0f * escala;
+    float x = 20;
+    float y = 20;
+    
+    DrawTextureEx(tex, (Vector2){x, y}, 0, escala, cor);
+}
+
 void tela_cozinhar(void) {
     if (cozinhar.receita == NULL) {
         ClearBackground(COR_FUNDO_COZ);
         DrawText("Nenhuma receita carregada.", 220, 280, 22, COR_VERM_COZ);
         return;
+    }
+
+    // Gerencia tempo dos stickers
+    if (cozinhar.mostrando_mainha && cozinhar.timer_mainha > 0.0f) {
+        cozinhar.timer_mainha -= GetFrameTime();
+        if (cozinhar.timer_mainha <= 0.0f) {
+            cozinhar.mostrando_mainha = 0;
+        }
+    }
+    if (cozinhar.mostrando_mainha_brava && cozinhar.timer_mainha_brava > 0.0f) {
+        cozinhar.timer_mainha_brava -= GetFrameTime();
+        if (cozinhar.timer_mainha_brava <= 0.0f) {
+            cozinhar.mostrando_mainha_brava = 0;
+        }
+    }
+
+    // Detecta mudancas de pontos (acerto = ganha pontos, erro = perde pontos)
+    if (cozinhar.pontos > cozinhar.pontos_anterior) {
+        // Ganhou pontos = acerto!
+        cozinhar.mostrando_mainha = 1;
+        cozinhar.timer_mainha = 1.5f;
+        printf("[DEBUG] ACERTO! pontos: %d -> %d\n", cozinhar.pontos_anterior, cozinhar.pontos);
+        cozinhar.pontos_anterior = cozinhar.pontos;
+    } else if (cozinhar.pontos < cozinhar.pontos_anterior) {
+        // Perdeu pontos = erro!
+        cozinhar.mostrando_mainha_brava = 1;
+        cozinhar.timer_mainha_brava = 1.5f;
+        printf("[DEBUG] ERRO! pontos: %d -> %d\n", cozinhar.pontos_anterior, cozinhar.pontos);
+        cozinhar.pontos_anterior = cozinhar.pontos;
     }
 
     if (!cozinhar.terminou) {
@@ -596,6 +856,8 @@ void tela_cozinhar(void) {
     desenhar_instrucao();
     desenhar_sequencia();
     desenhar_feedback();
+    desenhar_mainha_animada();  // Renderiza sticker de bom trabalho
+    desenhar_mainha_brava();    // Renderiza sticker de erro
 }
 
 int cozinhar_terminou(void) { return cozinhar.terminou; }
@@ -632,7 +894,33 @@ void cozinhar_limpar(void) {
         cozinhar.textura_frigideira_pronta_carregada = 0;
     }
     
+    // libera textura mainha animada (sticker de bom trabalho)
+    if (cozinhar.textura_mainha_animada_carregada) {
+        UnloadTexture(cozinhar.textura_mainha_animada);
+        cozinhar.textura_mainha_animada_carregada = 0;
+    }
+    
+    // libera textura mainha brava (sticker de erro)
+    if (cozinhar.textura_mainha_brava_carregada) {
+        UnloadTexture(cozinhar.textura_mainha_brava);
+        cozinhar.textura_mainha_brava_carregada = 0;
+    }
+    
+    // libera textura mainha vitória
+    if (cozinhar.textura_mainha_vitoria_carregada) {
+        UnloadTexture(cozinhar.textura_mainha_vitoria);
+        cozinhar.textura_mainha_vitoria_carregada = 0;
+    }
+    
     // libera pilha
     while (!pilha_vazia(cozinhar.pilha))
         cozinhar.pilha = pop_passo(cozinhar.pilha);
+
+    // libera sprites do grid
+    for (int ii = 0; ii < COZ_MAX_ING_GRID; ii++) {
+        if (cozinhar.grid[ii].sprite_carregado) {
+            UnloadTexture(cozinhar.grid[ii].sprite);
+            cozinhar.grid[ii].sprite_carregado = 0;
+        }
+    }
 }

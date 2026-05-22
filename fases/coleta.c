@@ -107,6 +107,24 @@ static int _spr_pimenta_carregado = 0;
 static Texture2D _spr_tomate;
 static int _spr_tomate_carregado = 0;
 
+static Texture2D _spr_arroz;
+static int _spr_arroz_carregado = 0;
+
+static Texture2D _spr_cebolinha;
+static int _spr_cebolinha_carregado = 0;
+
+static Texture2D _spr_mostarda;
+static int _spr_mostarda_carregado = 0;
+
+static Texture2D _spr_sal;
+static int _spr_sal_carregado = 0;
+
+static Texture2D _spr_pedra;
+static int _spr_pedra_carregado = 0;
+
+static Texture2D _spr_sapato;
+static int _spr_sapato_carregado = 0;
+
 void catcher_carregar_sprites(void) {
     _spr_cesta = LoadTexture("sprites/cesta.png");
     if (_spr_cesta.id != 0) {
@@ -233,6 +251,42 @@ void catcher_carregar_sprites(void) {
         SetTextureFilter(_spr_tomate, TEXTURE_FILTER_BILINEAR);
         _spr_tomate_carregado = 1;
     }
+
+    _spr_arroz = LoadTexture("sprites/arroz.png");
+    if (_spr_arroz.id != 0) {
+        SetTextureFilter(_spr_arroz, TEXTURE_FILTER_BILINEAR);
+        _spr_arroz_carregado = 1;
+    }
+
+    _spr_cebolinha = LoadTexture("sprites/cebolinha.png");
+    if (_spr_cebolinha.id != 0) {
+        SetTextureFilter(_spr_cebolinha, TEXTURE_FILTER_BILINEAR);
+        _spr_cebolinha_carregado = 1;
+    }
+
+    _spr_mostarda = LoadTexture("sprites/mostarda.png");
+    if (_spr_mostarda.id != 0) {
+        SetTextureFilter(_spr_mostarda, TEXTURE_FILTER_BILINEAR);
+        _spr_mostarda_carregado = 1;
+    }
+
+    _spr_sal = LoadTexture("sprites/sal.png");
+    if (_spr_sal.id != 0) {
+        SetTextureFilter(_spr_sal, TEXTURE_FILTER_BILINEAR);
+        _spr_sal_carregado = 1;
+    }
+
+    _spr_pedra = LoadTexture("sprites/pedra.png");
+    if (_spr_pedra.id != 0) {
+        SetTextureFilter(_spr_pedra, TEXTURE_FILTER_BILINEAR);
+        _spr_pedra_carregado = 1;
+    }
+
+    _spr_sapato = LoadTexture("sprites/sapato.png");
+    if (_spr_sapato.id != 0) {
+        SetTextureFilter(_spr_sapato, TEXTURE_FILTER_BILINEAR);
+        _spr_sapato_carregado = 1;
+    }
 }
 
 void catcher_descarregar_sprites(void) {
@@ -281,6 +335,12 @@ void catcher_descarregar_sprites(void) {
     if (_spr_pao_carregado)      { UnloadTexture(_spr_pao);      _spr_pao_carregado      = 0; }
     if (_spr_pimenta_carregado)  { UnloadTexture(_spr_pimenta);  _spr_pimenta_carregado  = 0; }
     if (_spr_tomate_carregado)   { UnloadTexture(_spr_tomate);   _spr_tomate_carregado   = 0; }
+    if (_spr_arroz_carregado)     { UnloadTexture(_spr_arroz);     _spr_arroz_carregado     = 0; }
+    if (_spr_cebolinha_carregado) { UnloadTexture(_spr_cebolinha); _spr_cebolinha_carregado = 0; }
+    if (_spr_mostarda_carregado)  { UnloadTexture(_spr_mostarda);  _spr_mostarda_carregado  = 0; }
+    if (_spr_sal_carregado)       { UnloadTexture(_spr_sal);       _spr_sal_carregado       = 0; }
+    if (_spr_pedra_carregado)     { UnloadTexture(_spr_pedra);     _spr_pedra_carregado     = 0; }
+    if (_spr_sapato_carregado)    { UnloadTexture(_spr_sapato);    _spr_sapato_carregado    = 0; }
 }
 
 // retorna o sprite correspondente ao nome do ingrediente, ou NULL se nao houver
@@ -320,6 +380,13 @@ static const Texture2D* _sprite_para_ingrediente(const char *nome) {
     if (_spr_pao_carregado      && strstr(nome, "Pao")      != NULL) return &_spr_pao;
     if (_spr_pimenta_carregado  && strstr(nome, "Pimenta")  != NULL) return &_spr_pimenta;
     if (_spr_tomate_carregado   && strstr(nome, "Tomate")   != NULL) return &_spr_tomate;
+    if (_spr_arroz_carregado     && strstr(nome, "Arroz")     != NULL) return &_spr_arroz;
+    // Cebolinha precisa vir ANTES de qualquer matching de "Cebola"
+    if (_spr_cebolinha_carregado && strstr(nome, "Cebolinha") != NULL) return &_spr_cebolinha;
+    if (_spr_mostarda_carregado  && strstr(nome, "Mostarda")  != NULL) return &_spr_mostarda;
+    if (_spr_sal_carregado       && strcmp(nome, "Sal")       == 0)   return &_spr_sal;
+    if (_spr_pedra_carregado     && strstr(nome, "Pedra")     != NULL) return &_spr_pedra;
+    if (_spr_sapato_carregado    && strstr(nome, "Sapato")    != NULL) return &_spr_sapato;
     return NULL;
 }
 

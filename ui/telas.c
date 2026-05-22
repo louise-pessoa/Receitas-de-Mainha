@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "raylib.h"
-#include "interface.h"
+#include "telas.h"
 #include "../jogo.h"
 #include "../dados/receitas.h"
 #include "../dados/pilha.h"

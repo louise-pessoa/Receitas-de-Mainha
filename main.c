@@ -3,11 +3,11 @@
 #include <string.h>
 #include <pthread.h>
 #include "raylib.h"
-#include "api/groq.h"
+#include "api/jurados.h"
 #include "jogo.h"
-#include "ui/interface.h"
+#include "ui/telas.h"
 #include "dados/receitas.h"
-#include "fases/catcher.h"
+#include "fases/coleta.h"
 #include "fases/ordenacao.h"
 #include "fases/cozinhar.h"
 

@@ -3,7 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "raylib.h"
-#include "catcher.h"
+#include "coleta.h"
 #include "../jogo.h"
 
 // ==========================================

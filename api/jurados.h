@@ -1,5 +1,5 @@
-#ifndef GROQ_H
-#define GROQ_H
+#ifndef JURADOS_H
+#define JURADOS_H
 
 #include "../jogo.h"
 

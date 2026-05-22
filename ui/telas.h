@@ -1,7 +1,7 @@
-#ifndef INTERFACE_H
-#define INTERFACE_H
+#ifndef TELAS_H
+#define TELAS_H
 
-#include "../api/groq.h"
+#include "../api/jurados.h"
 #include "raylib.h"
 #include "../dados/receitas.h"
 #include "../jogo.h"

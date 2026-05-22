@@ -1,5 +1,5 @@
-#ifndef CATCHER_H
-#define CATCHER_H
+#ifndef COLETA_H
+#define COLETA_H
 
 #include "raylib.h"
 #include "../dados/receitas.h"

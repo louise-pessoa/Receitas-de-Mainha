@@ -636,7 +636,7 @@ static void desenhar_cesta(void) {
 
         // corpo da cesta (trapezoide simulado por dois retangulos)
         DrawRectangleRounded((Rectangle){x, y, w, h}, 0.35f, 8, COR_CESTA);
-        DrawRectangleRoundedLines((Rectangle){x, y, w, h}, 0.35f, 8, 2.0f, COR_CESTA_ESC);
+        DrawRectangleRoundedLines((Rectangle){x, y, w, h}, 0.35f, 8, COR_CESTA_ESC);
 
         // tramas horizontais
         for (int i = 1; i < 4; i++) {
@@ -737,7 +737,7 @@ static void desenhar_checklist(void) {
 
     DrawRectangleRounded((Rectangle){x, y, w, h}, 0.1f, 8,
                          (Color){255, 255, 255, 220});
-    DrawRectangleRoundedLines((Rectangle){x, y, w, h}, 0.1f, 8, 2.0f, COR_HUD);
+    DrawRectangleRoundedLines((Rectangle){x, y, w, h}, 0.1f, 8, COR_HUD);
     DrawText("Receita", x + 12, y + 8, 18, COR_TEXTO);
 
     for (int i = 0; i < catcher.n_alvos; i++) {

@@ -13,17 +13,17 @@ RAYLIB_LIBS := $(shell pkg-config --libs raylib 2>/dev/null)
 ifeq ($(RAYLIB_LIBS),)
 	# Linux padrão
 	CFLAGS = -I. -I/usr/include
-	LIBS = -lraylib -lm -lpthread -ldl -lrt -lX11 -lcurl
+	LIBS = -lraylib -lm -lpthread -ldl -lrt -lX11
 	
 	# macOS
 	ifeq ($(UNAME_S),Darwin)
 		CFLAGS = -I/opt/homebrew/include -I/usr/local/include
-		LIBS = -L/opt/homebrew/lib -L/usr/local/lib -lraylib -lm -lpthread -lcurl -Wl,-rpath,/opt/homebrew/lib
+		LIBS = -L/opt/homebrew/lib -L/usr/local/lib -lraylib -lm -lpthread -Wl,-rpath,/opt/homebrew/lib
 	endif
 else
 	# Usa pkg-config
 	CFLAGS = -I. $(RAYLIB_CFLAGS)
-	LIBS = $(RAYLIB_LIBS) -lm -lpthread -lcurl
+	LIBS = $(RAYLIB_LIBS) -lm -lpthread
 	
 	# Remove flags específicas do Linux se estiver no macOS
 	ifeq ($(UNAME_S),Darwin)

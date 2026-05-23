@@ -127,17 +127,22 @@ void integrar_modulos(void) {
 
     // bolo de rolo
     bolo->passos = push_passo(bolo->passos,
-        "Bata manteiga com acucar", "Manteiga", "WASDW", "");
+        "Bata manteiga com acucar", "Manteiga", "WASDW", "sprites/bolo_ingredientes_mesa.png");
     bolo->passos = push_passo(bolo->passos,
-        "Adicione o acucar e bata", "Acucar", "ASDF", "");
+        "Adicione o acucar e bata", "Acucar", "ASDF", "sprites/bolo_massa_pronta.png");
     bolo->passos = push_passo(bolo->passos,
-        "Acrescente os ovos um a um", "Ovos", "SPACE", "");
+        "Acrescente os ovos um a um", "Ovos", "SPACE", "sprites/bolo_massa_pronta.png");
     bolo->passos = push_passo(bolo->passos,
-        "Misture a farinha de trigo", "Farinha de trigo", "QWERTY", "");
+        "Misture a farinha de trigo", "Farinha de trigo", "QWERTY", "sprites/bolo_massa_pronta.png");
     bolo->passos = push_passo(bolo->passos,
-        "Espalhe a goiabada e enrole", "Goiabada", "DDDD", "");
+        "Espalhe a goiabada e enrole", "Goiabada", "DDDD", "sprites/bolo_goiabada_assadeira.png");
     bolo->passos = push_passo(bolo->passos,
-        "Leve ao forno", "", "FFF", "");
+        "Leve ao forno", "", "FFF", "sprites/bolo_enrolando.png");
+
+    strncpy(bolo->img_inicio, "sprites/bolo_ingredientes_mesa.png", sizeof(bolo->img_inicio) - 1);
+    bolo->img_inicio[sizeof(bolo->img_inicio) - 1] = '\0';
+    strncpy(bolo->img_receita_pronta, "sprites/bolo_rolo_pronto.png", sizeof(bolo->img_receita_pronta) - 1);
+    bolo->img_receita_pronta[sizeof(bolo->img_receita_pronta) - 1] = '\0';
 
     // === ingredientes do Pirão de Carne (desbloqueavel - final do jogo no Marco Zero) ===
     Receita *pirao_carne = buscar_receita(receitas_disponiveis, "Pirão de Carne");

@@ -218,13 +218,13 @@ void tela_ordenacao(void) {
         if (destaque) {
             DrawRectangleRoundedLines((Rectangle){x - 2, y - 2,
                                                   carta_w + 4, carta_h + 4},
-                                      0.2f, 8, 2.0f, borda);
+                                      0.2f, 8, borda);
             DrawRectangleRoundedLines((Rectangle){x - 1, y - 1,
                                                   carta_w + 2, carta_h + 2},
-                                      0.2f, 8, 2.0f, borda);
+                                      0.2f, 8, borda);
         } else {
             DrawRectangleRoundedLines((Rectangle){x, y, carta_w, carta_h},
-                                      0.2f, 8, 2.0f, COR_TEXTO_ORD);
+                                      0.2f, 8, COR_TEXTO_ORD);
         }
 
         // numero da posicao

@@ -233,15 +233,10 @@ void cozinhar_iniciar(Receita *receita) {
     // carrega sticker de bom trabalho (mainha animada)
     cozinhar.textura_mainha_animada_carregada = 0;
     Texture2D tex_mainha = LoadTexture("sprites/mainha_animada.png");
-    printf("[DEBUG] LoadTexture 'sprites/mainha_animada.png': id=%u width=%d height=%d\n", 
-           tex_mainha.id, tex_mainha.width, tex_mainha.height);
     if (tex_mainha.id != 0) {
         cozinhar.textura_mainha_animada = tex_mainha;
         SetTextureFilter(cozinhar.textura_mainha_animada, TEXTURE_FILTER_BILINEAR);
         cozinhar.textura_mainha_animada_carregada = 1;
-        printf("[DEBUG] mainha_animada carregada com sucesso: %d x %d\n", tex_mainha.width, tex_mainha.height);
-    } else {
-        printf("[DEBUG] ERRO: mainha_animada nao carregada!\n");
     }
     cozinhar.mostrando_mainha = 0;
     cozinhar.timer_mainha = 0.0f;
@@ -249,12 +244,10 @@ void cozinhar_iniciar(Receita *receita) {
     // carrega sticker de erro (mainha brava)
     cozinhar.textura_mainha_brava_carregada = 0;
     Texture2D tex_brava = LoadTexture("sprites/mainha_brava.png");
-    printf("[DEBUG] LoadTexture mainha_brava: id=%u\n", tex_brava.id);
     if (tex_brava.id != 0) {
         cozinhar.textura_mainha_brava = tex_brava;
         SetTextureFilter(cozinhar.textura_mainha_brava, TEXTURE_FILTER_BILINEAR);
         cozinhar.textura_mainha_brava_carregada = 1;
-        printf("[DEBUG] mainha_brava carregada com sucesso\n");
     }
     cozinhar.mostrando_mainha_brava = 0;
     cozinhar.timer_mainha_brava = 0.0f;
@@ -394,7 +387,6 @@ static void fase_feedback(void) {
             // Ativa sticker de bom trabalho (mainha animada)
             cozinhar.mostrando_mainha = 1;
             cozinhar.timer_mainha = 1.5f;  // 1.5 segundos de exibição
-            printf("[DEBUG] Acerto! Sticker animado ativado\n");
             
             // pop: remove passo concluido do topo da pilha
             cozinhar.pilha = pop_passo(cozinhar.pilha);
@@ -409,8 +401,6 @@ static void fase_feedback(void) {
             // Ativa sticker de erro (mainha brava)
             cozinhar.mostrando_mainha_brava = 1;
             cozinhar.timer_mainha_brava = 1.5f;  // 1.5 segundos de exibição
-            printf("[DEBUG] Erro! Sticker brava ativado. mostrando_brava=%d timer_brava=%.2f\n",
-                   cozinhar.mostrando_mainha_brava, cozinhar.timer_mainha_brava);
         }
         // se errou, reinicia o mesmo passo; se acertou, ja avancou o idx acima
         cozinhar.fase = COZ_FASE_CLICAR;
@@ -445,18 +435,32 @@ static void fase_empratar(void) {
 
 static void desenhar_empratar(void) {
     ClearBackground(COR_FUNDO_COZ);
-    
-    // desenha frigideira pronta
-    if (cozinhar.textura_frigideira_pronta_carregada) {
-        Texture2D tex = cozinhar.textura_frigideira_pronta;
-        float max_altura = ALT - 100;
-        float escala_altura = max_altura / tex.height;
-        float escala_largura = (LARG - 40) / tex.width;
+
+    // carrega sob demanda se ainda nao carregou
+    if (!cozinhar.textura_pronta_carregada &&
+        cozinhar.receita && cozinhar.receita->img_receita_pronta[0] != '\0') {
+        cozinhar.textura_pronta = LoadTexture(cozinhar.receita->img_receita_pronta);
+        printf("[EMPRATAR] carregando '%s' id=%u\n",
+               cozinhar.receita->img_receita_pronta, cozinhar.textura_pronta.id);
+        if (cozinhar.textura_pronta.id != 0)
+            cozinhar.textura_pronta_carregada = 1;
+    }
+
+    Texture2D tex = {0};
+    int tem_tex = 0;
+    if (cozinhar.textura_pronta_carregada) {
+        tex = cozinhar.textura_pronta; tem_tex = 1;
+    } else if (cozinhar.textura_frigideira_pronta_carregada) {
+        tex = cozinhar.textura_frigideira_pronta; tem_tex = 1;
+    }
+    if (tem_tex && tex.width > 0 && tex.height > 0) {
+        float max_altura = (float)(ALT - 100);
+        float escala_altura = max_altura / (float)tex.height;
+        float escala_largura = (float)(LARG - 40) / (float)tex.width;
         float escala = (escala_altura < escala_largura) ? escala_altura : escala_largura;
-        
-        float largura = tex.width * escala;
-        float altura = tex.height * escala;
-        float x = (LARG - largura) / 2;
+        float largura = (float)tex.width * escala;
+        float altura = (float)tex.height * escala;
+        float x = ((float)LARG - largura) / 2.0f;
         float y = 80;
         DrawTextureEx(tex, (Vector2){x, y}, 0, escala, WHITE);
     }
@@ -464,7 +468,7 @@ static void desenhar_empratar(void) {
     // desenha botão EMPRATAR no topo
     Rectangle btn_empratar = {300, 10, 200, 40};
     DrawRectangleRec(btn_empratar, COR_VERDE_COZ);
-    DrawRectangleRoundedLines(btn_empratar, 0.1f, 10, 2, COR_AMA_COZ);
+    DrawRectangleRoundedLines(btn_empratar, 0.1f, 10, COR_AMA_COZ);
     
     int txt_width = MeasureText("EMPRATAR", 24);
     DrawText("EMPRATAR", 400 - txt_width/2, 18, 24, WHITE);
@@ -499,7 +503,7 @@ static void desenhar_instrucao(void) {
 
     // balao de instrucao no topo
     DrawRectangleRounded((Rectangle){40, 70, 720, 90}, 0.2f, 8, WHITE);
-    DrawRectangleRoundedLines((Rectangle){40, 70, 720, 90}, 0.2f, 8, 2.0f,
+    DrawRectangleRoundedLines((Rectangle){40, 70, 720, 90}, 0.2f, 8,
                               COR_AZUL_COZ);
     DrawText("Instrucao:", 60, 80, 16, COR_AZUL_COZ);
     DrawText(p->acao, 60, 98, 18, COR_TEXTO_COZ);
@@ -547,7 +551,7 @@ static void desenhar_sequencia(void) {
             borda = (Color){180, 180, 180, 255};
         }
         DrawRectangleRounded((Rectangle){x, y0, box, box}, 0.25f, 8, fundo);
-        DrawRectangleRoundedLines((Rectangle){x, y0, box, box}, 0.25f, 8, 2.0f,
+        DrawRectangleRoundedLines((Rectangle){x, y0, box, box}, 0.25f, 8,
                                   borda);
         const char *nome = nome_tecla(p->teclas[k]);
         int tam = (strlen(nome) > 1) ? 18 : 32;
@@ -566,7 +570,7 @@ static void desenhar_grid(void) {
         else                       fundo = WHITE;
 
         DrawRectangleRounded(it->area, 0.25f, 8, fundo);
-        DrawRectangleRoundedLines(it->area, 0.25f, 8, 2.0f,
+        DrawRectangleRoundedLines(it->area, 0.25f, 8,
                                   it->destacado ? COR_LARA_COZ
                                                 : (Color){180,180,180,255});
         if (it->destacado && cozinhar.fase == COZ_FASE_CLICAR) {
@@ -574,7 +578,7 @@ static void desenhar_grid(void) {
             DrawRectangleRoundedLines(
                 (Rectangle){ it->area.x - 3, it->area.y - 3,
                              it->area.width + 6, it->area.height + 6 },
-                0.25f, 8, 2.0f, COR_LARA_COZ);
+                0.25f, 8, COR_LARA_COZ);
         }
 
         // desenhar sprite do ingrediente se carregado
@@ -663,37 +667,19 @@ static void desenhar_imagem_passo(void) {
 }
 
 static void desenhar_fim(void) {
-    // DEBUG: imprime estado uma vez por entrada
-    static int _ja_imprimiu = 0;
-    if (!_ja_imprimiu) {
-        printf("[DEBUG desenhar_fim] venceu=%d textura_pronta_carregada=%d "
-               "textura_pronta.id=%u textura_pronta.width=%d textura_pronta.height=%d\n",
-               cozinhar.venceu, cozinhar.textura_pronta_carregada,
-               cozinhar.textura_pronta.id,
-               cozinhar.textura_pronta.width, cozinhar.textura_pronta.height);
-        _ja_imprimiu = 1;
-    }
-
     // desenha a imagem pronta (pré-carregada)
     if (cozinhar.venceu && cozinhar.textura_pronta_carregada) {
         Texture2D tex_pronta = cozinhar.textura_pronta;
-        float max_altura = ALT - 150;
-        float escala_altura = max_altura / tex_pronta.height;
-        float escala_largura = (LARG - 40) / tex_pronta.width;
+        float max_altura = (float)(ALT - 150);
+        float escala_altura = max_altura / (float)tex_pronta.height;
+        float escala_largura = (float)(LARG - 40) / (float)tex_pronta.width;
         float escala = (escala_altura < escala_largura) ? escala_altura : escala_largura;
 
-        float largura = tex_pronta.width * escala;
-        float altura = tex_pronta.height * escala;
-        float x = (LARG - largura) / 2;
+        float largura = (float)tex_pronta.width * escala;
+        float altura = (float)tex_pronta.height * escala;
+        float x = ((float)LARG - largura) / 2.0f;
         float y = 20;
         DrawTextureEx(tex_pronta, (Vector2){x, y}, 0, escala, WHITE);
-    } else {
-        // FALLBACK VISUAL: mostra na tela qual condicao falhou
-        DrawText("(textura pronta nao foi desenhada)", 200, 200, 22, COR_VERM_COZ);
-        DrawText(TextFormat("venceu=%d  carregada=%d  id=%u",
-                            cozinhar.venceu, cozinhar.textura_pronta_carregada,
-                            cozinhar.textura_pronta.id),
-                 200, 240, 20, COR_TEXTO_COZ);
     }
     
     // desenha sprite mainha vitória no canto inferior direito
@@ -721,23 +707,12 @@ static void desenhar_fim(void) {
 // DESENHA STICKER DE BOM TRABALHO
 // ==========================================
 static void desenhar_mainha_animada(void) {
-    // Debug: mostrar estado
-    static int _debug_print_animada = 0;
-    if (!_debug_print_animada || cozinhar.mostrando_mainha) {
-        printf("[DEBUG desenhar_mainha_animada] mostrando=%d timer=%.2f carregada=%d\n",
-               cozinhar.mostrando_mainha, cozinhar.timer_mainha, cozinhar.textura_mainha_animada_carregada);
-        _debug_print_animada = 1;
-    }
-    
     if (!cozinhar.mostrando_mainha || cozinhar.timer_mainha <= 0.0f) {
         cozinhar.mostrando_mainha = 0;
         return;
     }
 
-    if (!cozinhar.textura_mainha_animada_carregada) {
-        printf("[DEBUG desenhar_mainha_animada] FALHOU: Textura não carregada!\n");
-        return;
-    }
+    if (!cozinhar.textura_mainha_animada_carregada) return;
 
     Texture2D tex = cozinhar.textura_mainha_animada;
     
@@ -754,9 +729,6 @@ static void desenhar_mainha_animada(void) {
     float tamanho = 120.0f * escala;
     float x = LARG - tamanho - 20;
     float y = 20;
-    
-    printf("[DEBUG desenhar_mainha_animada] RENDERIZANDO: timer=%.2f pos=(%.0f,%.0f) escala=%.2f size=%dx%d alpha=%d\n", 
-           cozinhar.timer_mainha, x, y, escala, tex.width, tex.height, cor.a);
     
     DrawTextureEx(tex, (Vector2){x, y}, 0, escala, cor);
 }
@@ -818,13 +790,11 @@ void tela_cozinhar(void) {
         // Ganhou pontos = acerto!
         cozinhar.mostrando_mainha = 1;
         cozinhar.timer_mainha = 1.5f;
-        printf("[DEBUG] ACERTO! pontos: %d -> %d\n", cozinhar.pontos_anterior, cozinhar.pontos);
         cozinhar.pontos_anterior = cozinhar.pontos;
     } else if (cozinhar.pontos < cozinhar.pontos_anterior) {
         // Perdeu pontos = erro!
         cozinhar.mostrando_mainha_brava = 1;
         cozinhar.timer_mainha_brava = 1.5f;
-        printf("[DEBUG] ERRO! pontos: %d -> %d\n", cozinhar.pontos_anterior, cozinhar.pontos);
         cozinhar.pontos_anterior = cozinhar.pontos;
     }
 

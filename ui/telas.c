@@ -360,17 +360,18 @@ void tela_ingredientes(Receita *receita) {
         for (int i = 0; i < receita->n_ingredientes && i < 8; i++) {
             DrawCircle(65, y + 10, 14, cores[i % 4]);
             DrawText(TextFormat("%d", i + 1), 60, y + 3, 16, WHITE);
-            // desenhar sprite do ingrediente se existir
+            // desenhar sprite do ingrediente se existir, e SEMPRE o nome ao lado
             Texture2D itex = obter_sprite_telas(receita->ingredientes[i]);
+            int text_x = 85;
             if (itex.id != 0) {
                 float sz = 28;
                 float scale = sz / itex.width;
                 float tx = 85;
                 float ty = y - 6;
                 DrawTextureEx(itex, (Vector2){tx, ty}, 0.0f, scale, WHITE);
-            } else {
-                DrawText(receita->ingredientes[i], 85, y, 20, COR_TEXTO);
+                text_x = 125;  // empurra o texto pra direita do sprite
             }
+            DrawText(receita->ingredientes[i], text_x, y, 20, COR_TEXTO);
             y += 30;
         }
     }

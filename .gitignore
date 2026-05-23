@@ -36,6 +36,10 @@
 *.x86_64
 *.hex
 
+# Binarios compilados do projeto (Linux/WSL sem extensao)
+/mainha
+/jogo
+
 # Debug files
 *.dSYM/
 *.su

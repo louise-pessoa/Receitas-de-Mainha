@@ -27,4 +27,10 @@ void tela_resultado(int venceu, ResultadoJurados *j);
 // tela de creditos
 void tela_creditos(void);
 
+// carrega texturas das telas
+void telas_carregar_sprites(void);
+
+// descarrega texturas das telas
+void telas_limpar(void);
+
 #endif

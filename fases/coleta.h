@@ -61,6 +61,9 @@ typedef struct {
 
     float  spawn_timer;
     float  spawn_intervalo;
+
+    Texture2D bg_coletar;
+    int bg_carregado;
 } EstadoCatcher;
 
 extern EstadoCatcher catcher;

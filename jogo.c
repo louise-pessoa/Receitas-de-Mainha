@@ -66,7 +66,7 @@ void integrar_modulos(void) {
     Receita *tapioca = buscar_receita(receitas_disponiveis, "Tapioca");
     inserir_ingrediente(tapioca, "Tapioca granulada");
     inserir_ingrediente(tapioca, "Coco ralado");
-    inserir_ingrediente(tapioca, "Queijo");
+    inserir_ingrediente(tapioca, "Queijo coalho");
     inserir_ingrediente(tapioca, "Manteiga");
 
     // === ingredientes do Escondidinho de Carne de Sol ===
@@ -76,7 +76,6 @@ void integrar_modulos(void) {
     inserir_ingrediente(escondidinho, "Cebola");
     inserir_ingrediente(escondidinho, "Manteiga");
     inserir_ingrediente(escondidinho, "Queijo coalho");
-    inserir_ingrediente(escondidinho, "Forno");
 
     // === ingredientes do Bolo de Rolo (ordem de uso: manteiga, acucar, ovos, farinha, goiabada) ===
     Receita *bolo = buscar_receita(receitas_disponiveis, "Bolo de Rolo");
@@ -85,8 +84,6 @@ void integrar_modulos(void) {
     inserir_ingrediente(bolo, "Ovos");
     inserir_ingrediente(bolo, "Farinha de trigo");
     inserir_ingrediente(bolo, "Goiabada");
-    inserir_ingrediente(bolo, "Baunilha");
-    inserir_ingrediente(bolo, "Fermento");
 
     // === passos jogaveis (push em ordem de execucao: passo 1 primeiro) ===
 
@@ -96,7 +93,7 @@ void integrar_modulos(void) {
     tapioca->passos = push_passo(tapioca->passos,
         "Adicione o coco ralado", "Coco ralado", "ADAD", "sprites/frigideira_tapioca.png");
     tapioca->passos = push_passo(tapioca->passos,
-        "Adicione o queijo", "Queijo", "QWER", "sprites/frigideira_coco.png");
+        "Adicione o queijo", "Queijo coalho", "QWER", "sprites/frigideira_coco.png");
     tapioca->passos = push_passo(tapioca->passos,
         "Derreta a manteiga por cima", "Manteiga", "SPACE", "sprites/frigideira_queijo.png");
 
@@ -121,7 +118,7 @@ void integrar_modulos(void) {
     escondidinho->passos = push_passo(escondidinho->passos,
         "Coloque o queijo coalho", "Queijo coalho", "CCC", "sprites/travessa_macaxeira.png");
     escondidinho->passos = push_passo(escondidinho->passos,
-        "Leve ao forno", "Forno", "FFF", "sprites/travessa_queijo.png");
+        "Leve ao forno", "", "FFF", "sprites/travessa_queijo.png");
 
     strncpy(escondidinho->img_inicio, "sprites/tabua_carne.png", sizeof(escondidinho->img_inicio) - 1);
     escondidinho->img_inicio[sizeof(escondidinho->img_inicio) - 1] = '\0';
@@ -130,15 +127,22 @@ void integrar_modulos(void) {
 
     // bolo de rolo
     bolo->passos = push_passo(bolo->passos,
-        "Bata manteiga com acucar", "Manteiga", "WASDW", "");
+        "Bata manteiga com acucar", "Manteiga", "WASDW", "sprites/bolo_ingredientes_mesa.png");
     bolo->passos = push_passo(bolo->passos,
-        "Adicione o acucar e bata", "Acucar", "ASDF", "");
+        "Adicione o acucar e bata", "Acucar", "ASDF", "sprites/bolo_massa_pronta.png");
     bolo->passos = push_passo(bolo->passos,
-        "Acrescente os ovos um a um", "Ovos", "SPACE", "");
+        "Acrescente os ovos um a um", "Ovos", "SPACE", "sprites/bolo_massa_pronta.png");
     bolo->passos = push_passo(bolo->passos,
-        "Misture a farinha de trigo", "Farinha de trigo", "QWERTY", "");
+        "Misture a farinha de trigo", "Farinha de trigo", "QWERTY", "sprites/bolo_massa_pronta.png");
     bolo->passos = push_passo(bolo->passos,
-        "Espalhe a goiabada e enrole", "Goiabada", "DDDD", "");
+        "Espalhe a goiabada e enrole", "Goiabada", "DDDD", "sprites/bolo_goiabada_assadeira.png");
+    bolo->passos = push_passo(bolo->passos,
+        "Leve ao forno", "", "FFF", "sprites/bolo_enrolando.png");
+
+    strncpy(bolo->img_inicio, "sprites/bolo_ingredientes_mesa.png", sizeof(bolo->img_inicio) - 1);
+    bolo->img_inicio[sizeof(bolo->img_inicio) - 1] = '\0';
+    strncpy(bolo->img_receita_pronta, "sprites/bolo_rolo_pronto.png", sizeof(bolo->img_receita_pronta) - 1);
+    bolo->img_receita_pronta[sizeof(bolo->img_receita_pronta) - 1] = '\0';
 
     // === ingredientes do Pirão de Carne (desbloqueavel - final do jogo no Marco Zero) ===
     Receita *pirao_carne = buscar_receita(receitas_disponiveis, "Pirão de Carne");

@@ -20,6 +20,8 @@ typedef struct {
     Rectangle area;
     int  destacado;
     int  usado;
+    Texture2D sprite;
+    int sprite_carregado;
 } IngredienteIcone;
 
 typedef struct {
@@ -45,6 +47,7 @@ typedef struct {
     int erros;
     int acertos;
     int pontos;
+    int pontos_anterior;      // para detectar mudancas de pontos (acerto/erro)
 
     int   terminou;
     int   venceu;            // 1 se concluiu todos os passos
@@ -58,6 +61,22 @@ typedef struct {
     int textura_frigideira_pronta_carregada;
     Texture2D textura_pronta;     // textura da receita pronta
     int textura_pronta_carregada; // flag se foi carregada
+    
+    // Sticker de bom trabalho (mainha animada)
+    Texture2D textura_mainha_animada;
+    int textura_mainha_animada_carregada;
+    float timer_mainha;           // tempo restante para mostrar sticker
+    int mostrando_mainha;         // flag se está visível agora
+    
+    // Sticker de erro (mainha brava)
+    Texture2D textura_mainha_brava;
+    int textura_mainha_brava_carregada;
+    float timer_mainha_brava;     // tempo restante para mostrar sticker
+    int mostrando_mainha_brava;   // flag se está visível agora
+    
+    // Sprite de vitória (mainha vitória)
+    Texture2D textura_mainha_vitoria;
+    int textura_mainha_vitoria_carregada;
 } EstadoCozinhar;
 
 extern EstadoCozinhar cozinhar;

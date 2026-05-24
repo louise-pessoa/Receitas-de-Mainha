@@ -725,7 +725,7 @@ static void desenhar_cesta(void) {
 
         // corpo da cesta (trapezoide simulado por dois retangulos)
         DrawRectangleRounded((Rectangle){x, y, w, h}, 0.35f, 8, COR_CESTA);
-        DrawRectangleRoundedLines((Rectangle){x, y, w, h}, 0.35f, 8, COR_CESTA_ESC);
+        DrawRectangleRoundedLines((Rectangle){x, y, w, h}, 0.35f, 8, 2.0f, COR_CESTA_ESC);
 
         // tramas horizontais
         for (int i = 1; i < 4; i++) {
@@ -748,7 +748,7 @@ static void desenhar_item(const ItemCaindo *it) {
     if (spr != NULL) {
         // tamanho de exibicao mantendo o aspect ratio original do sprite
         float aspect = (float)spr->width / (float)spr->height;
-        float tam_alvo = ITEM_RAIO * 5.0f;  // ~110px
+        float tam_alvo = ITEM_RAIO * 6.0f;  // aumentado para exibir sprites maiores (~132px)
         float dw, dh;
         if (aspect >= 1.0f) {
             dw = tam_alvo;
@@ -826,7 +826,7 @@ static void desenhar_checklist(void) {
 
     DrawRectangleRounded((Rectangle){x, y, w, h}, 0.1f, 8,
                          (Color){255, 255, 255, 220});
-    DrawRectangleRoundedLines((Rectangle){x, y, w, h}, 0.1f, 8, COR_HUD);
+    DrawRectangleRoundedLines((Rectangle){x, y, w, h}, 0.1f, 8, 2.0f, COR_HUD);
     DrawText("Receita", x + 12, y + 8, 18, COR_TEXTO);
 
     for (int i = 0; i < catcher.n_alvos; i++) {

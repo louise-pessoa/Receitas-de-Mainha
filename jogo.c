@@ -147,18 +147,18 @@ void integrar_modulos(void) {
     // === ingredientes do Pirão de Carne (desbloqueavel - final do jogo no Marco Zero) ===
     Receita *pirao_carne = buscar_receita(receitas_disponiveis, "Pirão de Carne");
     inserir_ingrediente(pirao_carne, "Caldo de carne");
-    inserir_ingrediente(pirao_carne, "Carne desfiada");
+    inserir_ingrediente(pirao_carne, "Carne");
     inserir_ingrediente(pirao_carne, "Farinha de mandioca");
     inserir_ingrediente(pirao_carne, "Manteiga");
     inserir_ingrediente(pirao_carne, "Alho");
 
     // === passos do Pirão de Carne (6 passos) ===
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Desfie a carne", "Carne desfiada", "DDDD", "sprites/prato_carne.png");
+        "Desfie a carne", "Carne", "DDDD", "sprites/prato_carne.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
         "Aqueca o caldo", "Caldo de carne", "SSSS", "sprites/prato_caldo.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Adicione a carne ao caldo", "Carne desfiada", "AAAA", "sprites/prato_carne_caldo.png");
+        "Adicione a carne ao caldo", "Carne", "AAAA", "sprites/prato_carne_caldo.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
         "Derreta manteiga e frite alho", "Manteiga", "MMMM", "sprites/prato_alho.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,

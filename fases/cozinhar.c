@@ -468,7 +468,7 @@ static void desenhar_empratar(void) {
     // desenha botão EMPRATAR no topo
     Rectangle btn_empratar = {300, 10, 200, 40};
     DrawRectangleRec(btn_empratar, COR_VERDE_COZ);
-    DrawRectangleRoundedLines(btn_empratar, 0.1f, 10, COR_AMA_COZ);
+        DrawRectangleRoundedLines(btn_empratar, 0.1f, 10, 2.0f, COR_AMA_COZ);
     
     int txt_width = MeasureText("EMPRATAR", 24);
     DrawText("EMPRATAR", 400 - txt_width/2, 18, 24, WHITE);
@@ -503,8 +503,8 @@ static void desenhar_instrucao(void) {
 
     // balao de instrucao no topo
     DrawRectangleRounded((Rectangle){40, 70, 720, 90}, 0.2f, 8, WHITE);
-    DrawRectangleRoundedLines((Rectangle){40, 70, 720, 90}, 0.2f, 8,
-                              COR_AZUL_COZ);
+        DrawRectangleRoundedLines((Rectangle){40, 70, 720, 90}, 0.2f, 8, 2.0f,
+                                  COR_AZUL_COZ);
     DrawText("Instrucao:", 60, 80, 16, COR_AZUL_COZ);
     DrawText(p->acao, 60, 98, 18, COR_TEXTO_COZ);
 
@@ -552,7 +552,7 @@ static void desenhar_sequencia(void) {
         }
         DrawRectangleRounded((Rectangle){x, y0, box, box}, 0.25f, 8, fundo);
         DrawRectangleRoundedLines((Rectangle){x, y0, box, box}, 0.25f, 8,
-                                  borda);
+                      2.0f, borda);
         const char *nome = nome_tecla(p->teclas[k]);
         int tam = (strlen(nome) > 1) ? 18 : 32;
         int tw = MeasureText(nome, tam);
@@ -571,14 +571,14 @@ static void desenhar_grid(void) {
 
         DrawRectangleRounded(it->area, 0.25f, 8, fundo);
         DrawRectangleRoundedLines(it->area, 0.25f, 8,
-                                  it->destacado ? COR_LARA_COZ
-                                                : (Color){180,180,180,255});
+                                      2.0f, it->destacado ? COR_LARA_COZ
+                                                    : (Color){180,180,180,255});
         if (it->destacado && cozinhar.fase == COZ_FASE_CLICAR) {
             // contorno externo para chamar atencao
             DrawRectangleRoundedLines(
                 (Rectangle){ it->area.x - 3, it->area.y - 3,
                              it->area.width + 6, it->area.height + 6 },
-                0.25f, 8, COR_LARA_COZ);
+                0.25f, 8, 2.0f, COR_LARA_COZ);
         }
 
         // desenhar sprite do ingrediente se carregado
@@ -590,7 +590,7 @@ static void desenhar_grid(void) {
             float scale_w = avail_w / t.width;
             float scale_h = avail_h / t.height;
             float scale = scale_w < scale_h ? scale_w : scale_h;
-            if (scale > 1.0f) scale = 1.0f;
+            if (scale > 1.25f) scale = 1.25f;
             float tx = it->area.x + (it->area.width - t.width*scale)/2.0f;
             float ty = it->area.y + (it->area.height - t.height*scale)/2.0f;
             DrawTextureEx(t, (Vector2){tx, ty}, 0.0f, scale, WHITE);

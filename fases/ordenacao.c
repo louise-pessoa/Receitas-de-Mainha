@@ -174,14 +174,18 @@ void tela_ordenacao(void) {
     // cabecalho
     DrawRectangle(0, 0, 800, 60, COR_AZUL_ORD);
     DrawRectangle(0, 55, 800, 5, COR_AMARELO_ORD);
-    DrawText("ORGANIZANDO INGREDIENTES (Insertion Sort)",
-             80, 16, 24, WHITE);
+    if (!ordenacao.concluido) {
+        const char *hdr = "ORGANIZANDO...";
+        int htw = MeasureText(hdr, 28);
+        DrawText(hdr, (800 - htw) / 2, 16, 28, WHITE);
+    } else {
+        const char *hdr_done = "Tudo organizado pra receita!";
+        int htw = MeasureText(hdr_done, 24);
+        DrawText(hdr_done, (800 - htw) / 2, 16, 24, WHITE);
+    }
 
-    // subtitulo
-    DrawText("Voce coletou os ingredientes fora de ordem!",
-             140, 80, 22, COR_TEXTO_ORD);
-    DrawText("Vamos coloca-los na ordem certa de uso da receita:",
-             100, 110, 18, COR_TEXTO_ORD);
+    // subtitulo pós-ordenacao (apenas quando concluido)
+    // sem subtitulo pós-ordenacao por request
 
     // cartas dos itens
     int total = ordenacao.n;
@@ -204,27 +208,23 @@ void tela_ordenacao(void) {
             if (k == ordenacao.j - 1) { borda = COR_LARANJA_ORD;  destaque = 1; }
         }
 
-        // sombra
+        // sombra e corpo (cores mínimas)
         DrawRectangleRounded((Rectangle){x + 4, y + 4, carta_w, carta_h},
-                             0.2f, 8, (Color){0, 0, 0, 80});
-        // corpo (verde se ja em posicao correta)
+                             0.2f, 8, (Color){0, 0, 0, 50});
         int correto = (ordenacao.itens[k].ordem_correta == k);
         Color cor_corpo = correto && ordenacao.concluido ? COR_VERDE_ORD :
-                          correto ? (Color){200, 240, 200, 255} :
-                          (Color){255, 250, 220, 255};
+                          correto ? (Color){220, 240, 220, 255} :
+                          (Color){250, 250, 240, 255};
         DrawRectangleRounded((Rectangle){x, y, carta_w, carta_h},
                              0.2f, 8, cor_corpo);
-        // borda destacada
+        // borda única, mais sutil — maior quando destacado
         if (destaque) {
             DrawRectangleRoundedLines((Rectangle){x - 2, y - 2,
                                                   carta_w + 4, carta_h + 4},
-                                      0.2f, 8, borda);
-            DrawRectangleRoundedLines((Rectangle){x - 1, y - 1,
-                                                  carta_w + 2, carta_h + 2},
-                                      0.2f, 8, borda);
+                                      0.2f, 8, 3.0f, borda);
         } else {
             DrawRectangleRoundedLines((Rectangle){x, y, carta_w, carta_h},
-                                      0.2f, 8, COR_TEXTO_ORD);
+                                      0.2f, 8, 1.4f, COR_TEXTO_ORD);
         }
 
         // numero da posicao
@@ -240,7 +240,7 @@ void tela_ordenacao(void) {
             float scale_w = avail_w / t.width;
             float scale_h = avail_h / t.height;
             float scale = scale_w < scale_h ? scale_w : scale_h;
-            if (scale > 1.0f) scale = 1.0f;
+            if (scale > 1.25f) scale = 1.25f;
             float tx = x + (carta_w - t.width*scale) / 2.0f;
             float ty = y + pad_y;
             DrawTextureEx(t, (Vector2){tx, ty}, 0.0f, scale, WHITE);
@@ -258,17 +258,9 @@ void tela_ordenacao(void) {
         }
     }
 
-    // legenda
     if (!ordenacao.concluido) {
-        DrawText("Comparando vizinhos e trocando se estiverem fora de ordem...",
-                 80, 370, 18, COR_TEXTO_ORD);
-        DrawText(TextFormat("i = %d   j = %d", ordenacao.i, ordenacao.j),
-                 320, 400, 18, COR_AZUL_ORD);
-
-        DrawRectangle(80, 440, 30, 20, COR_VERMELHO_ORD);
-        DrawText("j (atual)", 120, 440, 18, COR_TEXTO_ORD);
-        DrawRectangle(280, 440, 30, 20, COR_LARANJA_ORD);
-        DrawText("j-1 (vizinho)", 320, 440, 18, COR_TEXTO_ORD);
+        // durante a ordenacao, removemos legenda/indicadores para focar apenas
+        // nos cartões que se movem. Nada extra é desenhado aqui.
     } else {
         DrawRectangleRounded((Rectangle){80, 380, 640, 110}, 0.3f, 8,
                              COR_VERDE_ORD);

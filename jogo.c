@@ -89,59 +89,59 @@ void integrar_modulos(void) {
 
     // tapioca
     tapioca->passos = push_passo(tapioca->passos,
-        "Hidrate a tapioca peneirando", "Tapioca granulada", "SSSS", "sprites/frigideira_vazia.png");
+        "Hidrate a tapioca peneirando", "Tapioca granulada", "SSSS", "sprites/receitas/frigideira_vazia.png");
     tapioca->passos = push_passo(tapioca->passos,
-        "Adicione o coco ralado", "Coco ralado", "ADAD", "sprites/frigideira_tapioca.png");
+        "Adicione o coco ralado", "Coco ralado", "ADAD", "sprites/receitas/frigideira_tapioca.png");
     tapioca->passos = push_passo(tapioca->passos,
-        "Adicione o queijo", "Queijo coalho", "QWER", "sprites/frigideira_coco.png");
+        "Adicione o queijo", "Queijo coalho", "QWER", "sprites/receitas/frigideira_coco.png");
     tapioca->passos = push_passo(tapioca->passos,
-        "Derreta a manteiga por cima", "Manteiga", "SPACE", "sprites/frigideira_queijo.png");
+        "Derreta a manteiga por cima", "Manteiga", "SPACE", "sprites/receitas/frigideira_queijo.png");
 
-    strncpy(tapioca->img_inicio, "sprites/frigideira_vazia.png", sizeof(tapioca->img_inicio) - 1);
+    strncpy(tapioca->img_inicio, "sprites/receitas/frigideira_vazia.png", sizeof(tapioca->img_inicio) - 1);
     tapioca->img_inicio[sizeof(tapioca->img_inicio) - 1] = '\0';
-    strncpy(tapioca->img_receita_pronta, "sprites/tapioca_pronta.png", sizeof(tapioca->img_receita_pronta) - 1);
+    strncpy(tapioca->img_receita_pronta, "sprites/receitas/tapioca_pronta.png", sizeof(tapioca->img_receita_pronta) - 1);
     tapioca->img_receita_pronta[sizeof(tapioca->img_receita_pronta) - 1] = '\0';
 
     // escondidinho
     escondidinho->passos = push_passo(escondidinho->passos,
-        "Corte a carne de sol", "Carne de sol", "WSWS", "sprites/tabua_carne.png");
+        "Corte a carne de sol", "Carne de sol", "WSWS", "sprites/receitas/tabua_carne.png");
     escondidinho->passos = push_passo(escondidinho->passos,
-        "Descasque a macaxeira", "Mandioca", "SSSS", "sprites/macaxeira_tabua.png");
+        "Descasque a macaxeira", "Mandioca", "SSSS", "sprites/receitas/macaxeira_tabua.png");
     escondidinho->passos = push_passo(escondidinho->passos,
-        "Corte a cebola", "Cebola", "QWER", "sprites/tabua_cebola.png");
+        "Corte a cebola", "Cebola", "QWER", "sprites/receitas/tabua_cebola.png");
     escondidinho->passos = push_passo(escondidinho->passos,
-        "Misture macaxeira com manteiga", "Manteiga", "ADAD", "sprites/macaxeira_cozida.png");
+        "Misture macaxeira com manteiga", "Manteiga", "ADAD", "sprites/receitas/macaxeira_cozida.png");
     escondidinho->passos = push_passo(escondidinho->passos,
-        "Coloque a carne na travessa", "Carne de sol", "SPACE", "sprites/travessa_vazia.png");
+        "Coloque a carne na travessa", "Carne de sol", "SPACE", "sprites/receitas/travessa_vazia.png");
     escondidinho->passos = push_passo(escondidinho->passos,
-        "Coloque a macaxeira", "Mandioca", "DDD", "sprites/travessa_carne.png");
+        "Coloque a macaxeira", "Mandioca", "DDD", "sprites/receitas/travessa_carne.png");
     escondidinho->passos = push_passo(escondidinho->passos,
-        "Coloque o queijo coalho", "Queijo coalho", "CCC", "sprites/travessa_macaxeira.png");
+        "Coloque o queijo coalho", "Queijo coalho", "CCC", "sprites/receitas/travessa_macaxeira.png");
     escondidinho->passos = push_passo(escondidinho->passos,
-        "Leve ao forno", "", "FFF", "sprites/travessa_queijo.png");
+        "Leve ao forno", "", "FFF", "sprites/receitas/travessa_queijo.png");
 
-    strncpy(escondidinho->img_inicio, "sprites/tabua_carne.png", sizeof(escondidinho->img_inicio) - 1);
+    strncpy(escondidinho->img_inicio, "sprites/receitas/tabua_carne.png", sizeof(escondidinho->img_inicio) - 1);
     escondidinho->img_inicio[sizeof(escondidinho->img_inicio) - 1] = '\0';
-    strncpy(escondidinho->img_receita_pronta, "sprites/escondidinho_pronto.png", sizeof(escondidinho->img_receita_pronta) - 1);
+    strncpy(escondidinho->img_receita_pronta, "sprites/receitas/escondidinho_pronto.png", sizeof(escondidinho->img_receita_pronta) - 1);
     escondidinho->img_receita_pronta[sizeof(escondidinho->img_receita_pronta) - 1] = '\0';
 
     // bolo de rolo
     bolo->passos = push_passo(bolo->passos,
-        "Bata manteiga com acucar", "Manteiga", "WASDW", "sprites/bolo_ingredientes_mesa.png");
+        "Bata manteiga com acucar", "Manteiga", "WASDW", "sprites/receitas/bolo_ingredientes_mesa.png");
     bolo->passos = push_passo(bolo->passos,
-        "Adicione o acucar e bata", "Acucar", "ASDF", "sprites/bolo_massa_pronta.png");
+        "Adicione o acucar e bata", "Acucar", "ASDF", "sprites/receitas/bolo_massa_pronta.png");
     bolo->passos = push_passo(bolo->passos,
-        "Acrescente os ovos um a um", "Ovos", "SPACE", "sprites/bolo_massa_pronta.png");
+        "Acrescente os ovos um a um", "Ovos", "SPACE", "sprites/receitas/bolo_massa_pronta.png");
     bolo->passos = push_passo(bolo->passos,
-        "Misture a farinha de trigo", "Farinha de trigo", "QWERTY", "sprites/bolo_massa_pronta.png");
+        "Misture a farinha de trigo", "Farinha de trigo", "QWERTY", "sprites/receitas/bolo_massa_pronta.png");
     bolo->passos = push_passo(bolo->passos,
-        "Espalhe a goiabada e enrole", "Goiabada", "DDDD", "sprites/bolo_goiabada_assadeira.png");
+        "Espalhe a goiabada e enrole", "Goiabada", "DDDD", "sprites/receitas/bolo_goiabada_assadeira.png");
     bolo->passos = push_passo(bolo->passos,
-        "Leve ao forno", "", "FFF", "sprites/bolo_enrolando.png");
+        "Leve ao forno", "", "FFF", "sprites/receitas/bolo_enrolando.png");
 
-    strncpy(bolo->img_inicio, "sprites/bolo_ingredientes_mesa.png", sizeof(bolo->img_inicio) - 1);
+    strncpy(bolo->img_inicio, "sprites/receitas/bolo_ingredientes_mesa.png", sizeof(bolo->img_inicio) - 1);
     bolo->img_inicio[sizeof(bolo->img_inicio) - 1] = '\0';
-    strncpy(bolo->img_receita_pronta, "sprites/bolo_rolo_pronto.png", sizeof(bolo->img_receita_pronta) - 1);
+    strncpy(bolo->img_receita_pronta, "sprites/receitas/bolo_rolo_pronto.png", sizeof(bolo->img_receita_pronta) - 1);
     bolo->img_receita_pronta[sizeof(bolo->img_receita_pronta) - 1] = '\0';
 
     // === ingredientes do Pirão de Carne (desbloqueavel - final do jogo no Marco Zero) ===
@@ -154,22 +154,22 @@ void integrar_modulos(void) {
 
     // === passos do Pirão de Carne (6 passos) ===
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Desfie a carne", "Carne", "DDDD", "sprites/prato_carne.png");
+        "Desfie a carne", "Carne", "DDDD", "sprites/receitas/prato_carne.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Aqueca o caldo", "Caldo de carne", "SSSS", "sprites/prato_caldo.png");
+        "Aqueca o caldo", "Caldo de carne", "SSSS", "sprites/receitas/prato_caldo.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Adicione a carne ao caldo", "Carne", "AAAA", "sprites/prato_carne_caldo.png");
+        "Adicione a carne ao caldo", "Carne", "AAAA", "sprites/receitas/prato_carne_caldo.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Derreta manteiga e frite alho", "Manteiga", "MMMM", "sprites/prato_alho.png");
+        "Derreta manteiga e frite alho", "Manteiga", "MMMM", "sprites/receitas/prato_alho.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Despeje o refogado na panela", "Alho", "RRRR", "sprites/prato_refogado.png");
+        "Despeje o refogado na panela", "Alho", "RRRR", "sprites/receitas/prato_refogado.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Adicione a farinha de mandioca", "Farinha de mandioca", "FFFF", "sprites/prato_pirao.png");
+        "Adicione a farinha de mandioca", "Farinha de mandioca", "FFFF", "sprites/receitas/prato_pirao.png");
 
     // Define imagens de inicio e pronta do Pirão
-    strncpy(pirao_carne->img_inicio, "sprites/pirao_ingredientes_mesa.png", sizeof(pirao_carne->img_inicio) - 1);
+    strncpy(pirao_carne->img_inicio, "sprites/receitas/pirao_ingredientes_mesa.png", sizeof(pirao_carne->img_inicio) - 1);
     pirao_carne->img_inicio[sizeof(pirao_carne->img_inicio) - 1] = '\0';
-    strncpy(pirao_carne->img_receita_pronta, "sprites/pirao_completo.png", sizeof(pirao_carne->img_receita_pronta) - 1);
+    strncpy(pirao_carne->img_receita_pronta, "sprites/receitas/pirao_completo.png", sizeof(pirao_carne->img_receita_pronta) - 1);
     pirao_carne->img_receita_pronta[sizeof(pirao_carne->img_receita_pronta) - 1] = '\0';
 
     printf("[SISTEMA] Modulos integrados. 3 receitas + 1 desbloque\u00e1vel (Pir\u00e3o de Carne).\n");

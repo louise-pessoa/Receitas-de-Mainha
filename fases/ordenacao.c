@@ -33,13 +33,13 @@ static void construir_caminho_sprite(const char *nome, char *caminho, int tam_ca
     };
     for (size_t i = 0; i < sizeof(map)/sizeof(map[0]); i++) {
         if (strcasecmp(nome, map[i].nome) == 0) {
-            snprintf(caminho, tam_caminho, "sprites/%s", map[i].file);
+            snprintf(caminho, tam_caminho, "sprites/coleta/%s", map[i].file);
             return;
         }
     }
 
     // Fallback: converte para lowercase e substitui espacos por underscore
-    snprintf(caminho, tam_caminho, "sprites/");
+    snprintf(caminho, tam_caminho, "sprites/coleta/");
     int len = strlen(caminho);
     for (int i = 0; i < (int)strlen(nome) && len < tam_caminho - 5; i++) {
         char c = nome[i];
@@ -92,7 +92,7 @@ void ordenacao_iniciar(Receita *receita, int *ordem_coleta, int n_coletados) {
     ordenacao.intervalo = 0.55f;
 
     // carrega textura de fundo
-    ordenacao.bg_ordenar = LoadTexture("sprites/bg_ordenar.png");
+    ordenacao.bg_ordenar = LoadTexture("sprites/fundos/bg_ordenar.png");
     if (ordenacao.bg_ordenar.id != 0) {
         SetTextureFilter(ordenacao.bg_ordenar, TEXTURE_FILTER_BILINEAR);
         ordenacao.bg_carregado = 1;

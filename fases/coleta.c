@@ -133,175 +133,175 @@ static Texture2D _spr_chocolate;
 static int _spr_chocolate_carregado = 0;
 
 void catcher_carregar_sprites(void) {
-    _spr_cesta = LoadTexture("sprites/cesta.png");
+    _spr_cesta = LoadTexture("sprites/coleta/cesta.png");
     if (_spr_cesta.id != 0) {
         SetTextureFilter(_spr_cesta, TEXTURE_FILTER_BILINEAR);
         _spr_cesta_carregado = 1;
     }
 
-    _spr_massa_tapioca = LoadTexture("sprites/massa_tapioca.png");
+    _spr_massa_tapioca = LoadTexture("sprites/coleta/massa_tapioca.png");
     if (_spr_massa_tapioca.id != 0) {
         SetTextureFilter(_spr_massa_tapioca, TEXTURE_FILTER_BILINEAR);
         _spr_massa_tapioca_carregado = 1;
     }
 
-    _spr_coco_ralado = LoadTexture("sprites/coco_ralado.png");
+    _spr_coco_ralado = LoadTexture("sprites/coleta/coco_ralado.png");
     if (_spr_coco_ralado.id != 0) {
         SetTextureFilter(_spr_coco_ralado, TEXTURE_FILTER_BILINEAR);
         _spr_coco_ralado_carregado = 1;
     }
 
-    _spr_queijo = LoadTexture("sprites/queijo.png");
+    _spr_queijo = LoadTexture("sprites/coleta/queijo.png");
     if (_spr_queijo.id != 0) {
         SetTextureFilter(_spr_queijo, TEXTURE_FILTER_BILINEAR);
         _spr_queijo_carregado = 1;
     }
 
-    _spr_manteiga = LoadTexture("sprites/manteiga.png");
+    _spr_manteiga = LoadTexture("sprites/coleta/manteiga.png");
     if (_spr_manteiga.id != 0) {
         SetTextureFilter(_spr_manteiga, TEXTURE_FILTER_BILINEAR);
         _spr_manteiga_carregado = 1;
     }
 
-    _spr_carne = LoadTexture("sprites/carne.png");
+    _spr_carne = LoadTexture("sprites/coleta/carne.png");
     if (_spr_carne.id != 0) {
         SetTextureFilter(_spr_carne, TEXTURE_FILTER_BILINEAR);
         _spr_carne_carregado = 1;
     }
 
-    _spr_cebola = LoadTexture("sprites/cebola.png");
+    _spr_cebola = LoadTexture("sprites/coleta/cebola.png");
     if (_spr_cebola.id != 0) {
         SetTextureFilter(_spr_cebola, TEXTURE_FILTER_BILINEAR);
         _spr_cebola_carregado = 1;
     }
 
-    _spr_mandioca = LoadTexture("sprites/mandioca.png");
+    _spr_mandioca = LoadTexture("sprites/coleta/mandioca.png");
     if (_spr_mandioca.id != 0) {
         SetTextureFilter(_spr_mandioca, TEXTURE_FILTER_BILINEAR);
         _spr_mandioca_carregado = 1;
     }
 
-    _spr_acucar = LoadTexture("sprites/acucar.png");
+    _spr_acucar = LoadTexture("sprites/coleta/acucar.png");
     if (_spr_acucar.id != 0) {
         SetTextureFilter(_spr_acucar, TEXTURE_FILTER_BILINEAR);
         _spr_acucar_carregado = 1;
     }
 
-    _spr_baunilha = LoadTexture("sprites/baunilha.png");
+    _spr_baunilha = LoadTexture("sprites/coleta/baunilha.png");
     if (_spr_baunilha.id != 0) {
         SetTextureFilter(_spr_baunilha, TEXTURE_FILTER_BILINEAR);
         _spr_baunilha_carregado = 1;
     }
 
-    _spr_farinha = LoadTexture("sprites/farinha.png");
+    _spr_farinha = LoadTexture("sprites/coleta/farinha.png");
     if (_spr_farinha.id != 0) {
         SetTextureFilter(_spr_farinha, TEXTURE_FILTER_BILINEAR);
         _spr_farinha_carregado = 1;
     }
 
-    _spr_fermento = LoadTexture("sprites/fermento.png");
+    _spr_fermento = LoadTexture("sprites/coleta/fermento.png");
     if (_spr_fermento.id != 0) {
         SetTextureFilter(_spr_fermento, TEXTURE_FILTER_BILINEAR);
         _spr_fermento_carregado = 1;
     }
 
-    _spr_goiabada = LoadTexture("sprites/goiabada.png");
+    _spr_goiabada = LoadTexture("sprites/coleta/goiabada.png");
     if (_spr_goiabada.id != 0) {
         SetTextureFilter(_spr_goiabada, TEXTURE_FILTER_BILINEAR);
         _spr_goiabada_carregado = 1;
     }
 
-    _spr_leite = LoadTexture("sprites/leite.png");
+    _spr_leite = LoadTexture("sprites/coleta/leite.png");
     if (_spr_leite.id != 0) {
         SetTextureFilter(_spr_leite, TEXTURE_FILTER_BILINEAR);
         _spr_leite_carregado = 1;
     }
 
-    _spr_ovo = LoadTexture("sprites/ovo.png");
+    _spr_ovo = LoadTexture("sprites/coleta/ovo.png");
     if (_spr_ovo.id != 0) {
         SetTextureFilter(_spr_ovo, TEXTURE_FILTER_BILINEAR);
         _spr_ovo_carregado = 1;
     }
 
-    _spr_alho = LoadTexture("sprites/alho.png");
+    _spr_alho = LoadTexture("sprites/coleta/alho.png");
     if (_spr_alho.id != 0) {
         SetTextureFilter(_spr_alho, TEXTURE_FILTER_BILINEAR);
         _spr_alho_carregado = 1;
     }
 
-    _spr_banana = LoadTexture("sprites/banana.png");
+    _spr_banana = LoadTexture("sprites/coleta/banana.png");
     if (_spr_banana.id != 0) {
         SetTextureFilter(_spr_banana, TEXTURE_FILTER_BILINEAR);
         _spr_banana_carregado = 1;
     }
 
-    _spr_limao = LoadTexture("sprites/limao.png");
+    _spr_limao = LoadTexture("sprites/coleta/limao.png");
     if (_spr_limao.id != 0) {
         SetTextureFilter(_spr_limao, TEXTURE_FILTER_BILINEAR);
         _spr_limao_carregado = 1;
     }
 
-    _spr_pao = LoadTexture("sprites/pao.png");
+    _spr_pao = LoadTexture("sprites/coleta/pao.png");
     if (_spr_pao.id != 0) {
         SetTextureFilter(_spr_pao, TEXTURE_FILTER_BILINEAR);
         _spr_pao_carregado = 1;
     }
 
-    _spr_pimenta = LoadTexture("sprites/pimenta.png");
+    _spr_pimenta = LoadTexture("sprites/coleta/pimenta.png");
     if (_spr_pimenta.id != 0) {
         SetTextureFilter(_spr_pimenta, TEXTURE_FILTER_BILINEAR);
         _spr_pimenta_carregado = 1;
     }
 
-    _spr_tomate = LoadTexture("sprites/tomate.png");
+    _spr_tomate = LoadTexture("sprites/coleta/tomate.png");
     if (_spr_tomate.id != 0) {
         SetTextureFilter(_spr_tomate, TEXTURE_FILTER_BILINEAR);
         _spr_tomate_carregado = 1;
     }
 
-    _spr_arroz = LoadTexture("sprites/arroz.png");
+    _spr_arroz = LoadTexture("sprites/coleta/arroz.png");
     if (_spr_arroz.id != 0) {
         SetTextureFilter(_spr_arroz, TEXTURE_FILTER_BILINEAR);
         _spr_arroz_carregado = 1;
     }
 
-    _spr_cebolinha = LoadTexture("sprites/cebolinha.png");
+    _spr_cebolinha = LoadTexture("sprites/coleta/cebolinha.png");
     if (_spr_cebolinha.id != 0) {
         SetTextureFilter(_spr_cebolinha, TEXTURE_FILTER_BILINEAR);
         _spr_cebolinha_carregado = 1;
     }
 
-    _spr_mostarda = LoadTexture("sprites/mostarda.png");
+    _spr_mostarda = LoadTexture("sprites/coleta/mostarda.png");
     if (_spr_mostarda.id != 0) {
         SetTextureFilter(_spr_mostarda, TEXTURE_FILTER_BILINEAR);
         _spr_mostarda_carregado = 1;
     }
 
-    _spr_sal = LoadTexture("sprites/sal.png");
+    _spr_sal = LoadTexture("sprites/coleta/sal.png");
     if (_spr_sal.id != 0) {
         SetTextureFilter(_spr_sal, TEXTURE_FILTER_BILINEAR);
         _spr_sal_carregado = 1;
     }
 
-    _spr_pedra = LoadTexture("sprites/pedra.png");
+    _spr_pedra = LoadTexture("sprites/coleta/pedra.png");
     if (_spr_pedra.id != 0) {
         SetTextureFilter(_spr_pedra, TEXTURE_FILTER_BILINEAR);
         _spr_pedra_carregado = 1;
     }
 
-    _spr_sapato = LoadTexture("sprites/sapato.png");
+    _spr_sapato = LoadTexture("sprites/coleta/sapato.png");
     if (_spr_sapato.id != 0) {
         SetTextureFilter(_spr_sapato, TEXTURE_FILTER_BILINEAR);
         _spr_sapato_carregado = 1;
     }
 
-    _spr_feijao = LoadTexture("sprites/feijao.png");
+    _spr_feijao = LoadTexture("sprites/coleta/feijao.png");
     if (_spr_feijao.id != 0) {
         SetTextureFilter(_spr_feijao, TEXTURE_FILTER_BILINEAR);
         _spr_feijao_carregado = 1;
     }
 
-    _spr_chocolate = LoadTexture("sprites/chocolate.png");
+    _spr_chocolate = LoadTexture("sprites/coleta/chocolate.png");
     if (_spr_chocolate.id != 0) {
         SetTextureFilter(_spr_chocolate, TEXTURE_FILTER_BILINEAR);
         _spr_chocolate_carregado = 1;
@@ -581,7 +581,7 @@ void catcher_iniciar(Receita *receita) {
     catcher.spawn_intervalo = SPAWN_BASE;
 
     // carrega textura de fundo
-    catcher.bg_coletar = LoadTexture("sprites/bg_coletar.png");
+    catcher.bg_coletar = LoadTexture("sprites/fundos/bg_coletar.png");
     if (catcher.bg_coletar.id != 0) {
         SetTextureFilter(catcher.bg_coletar, TEXTURE_FILTER_BILINEAR);
         catcher.bg_carregado = 1;

@@ -497,7 +497,8 @@ void tela_resultado(int venceu, ResultadoJurados *j)
     // cabecalho
     DrawRectangle(0, 0, 800, 60, (Color){30, 60, 140, 240});
     DrawRectangle(0, 55, 800, 5, COR_AMARELO);
-    const char *titulo = venceu ? "PARABENS! RECEITA CONCLUIDA!" : "RESULTADO FINAL";
+    // Sempre mostrar título genérico (remover mensagem de parabéns)
+    const char *titulo = "RESULTADO FINAL";
     int ttw = medir_txt(titulo, 26);
     txt(titulo, (800 - ttw) / 2, 14, 26, WHITE);
 
@@ -543,8 +544,12 @@ void tela_resultado(int venceu, ResultadoJurados *j)
         if (jurados[i].spr->id) {
             Texture2D t = *jurados[i].spr;
             float sc = (float)sprite_size / (float)(t.height > 0 ? t.height : 1);
-            DrawTextureEx(t, (Vector2){(float)(card_x + 8), (float)(cy + (card_h - t.height*sc)/2)}, 0.0f, sc, WHITE);
-            text_x = card_x + 8 + sprite_size + 14;
+            float draw_w = t.width * sc;
+            float draw_h = t.height * sc;
+            Rectangle src = (Rectangle){0.0f, 0.0f, (float)t.width, (float)t.height};
+            Rectangle dst = (Rectangle){ (float)(card_x + 8), (float)(cy + (card_h - draw_h)/2), draw_w, draw_h };
+            DrawTexturePro(t, src, dst, (Vector2){0,0}, 0.0f, WHITE);
+            text_x = card_x + 8 + (int)ceilf(draw_w) + 14;
         }
 
         // nome + nota
@@ -567,7 +572,8 @@ void tela_resultado(int venceu, ResultadoJurados *j)
     DrawRectangle(0, 418, 800, 4, COR_AMARELO);
 
     // resumo final
-    const char *msg = venceu ? "Voce conquistou o Marco Zero!" : "Continue praticando com Mainha!";
+    // Remover texto de vitória; manter mensagem neutra
+    const char *msg = "Continue praticando com Mainha!";
     int mw2 = medir_txt(msg, 22);
     txt(msg, (800 - mw2) / 2, 432, 22, COR_AMARELO);
 

@@ -229,17 +229,15 @@ int main(void) {
                 break;
 
             case TELA_PILHA:
-                if (cozinhar.terminou &&
-                    IsKeyPressed(KEY_ENTER) && !IsKeyDown(KEY_LEFT_ALT)) {
-                    cozinhar_limpar();
-                    
-                    // Incrementa contador de receitas completadas
-                    if (receita_selecionada != NULL) {
+                if (cozinhar.terminou) {
+                    // If final recipe (Pirão), advance immediately to jurados/result screen.
+                    if (receita_selecionada != NULL && strcmp(receita_selecionada->nome, "Pirão de Carne") == 0) {
+                        cozinhar_limpar();
+                        // Incrementa contador de receitas completadas
                         estado.receitas_completadas++;
                         printf("[PROGRESSO] Receita '%s' completada! Total: %d/4\n",
                                receita_selecionada->nome, estado.receitas_completadas);
-                        
-                        // Se completou as 3 primeiras, desbloqueia Pirão
+                        // Se completou as 3 primeiras, desbloqueia Pirão (defensivo)
                         if (estado.receitas_completadas == 3) {
                             Receita *pirao = buscar_receita(receitas_disponiveis, "Pirão de Carne");
                             if (pirao) {
@@ -247,13 +245,23 @@ int main(void) {
                                 printf("[DESBLOQUEIO] Pirão de Carne desbloqueado! Vá ao Marco Zero (TELA_RESULTADO).\n");
                             }
                         }
-                        
-                        // JURADOS SÓ NA FASE FINAL (PIRÃO)
-                        if (strcmp(receita_selecionada->nome, "Pirão de Carne") == 0) {
-                            // Fase final: chama jurados
-                            disparar_jurados();
-                            tela_atual = TELA_RESULTADO;
-                        } else {
+                        // Fase final: chama jurados e mostra resultado
+                        disparar_jurados();
+                        tela_atual = TELA_RESULTADO;
+                    } else if (IsKeyPressed(KEY_ENTER) && !IsKeyDown(KEY_LEFT_ALT)) {
+                        // Non-final recipes still require confirmation (ENTER)
+                        cozinhar_limpar();
+                        if (receita_selecionada != NULL) {
+                            estado.receitas_completadas++;
+                            printf("[PROGRESSO] Receita '%s' completada! Total: %d/4\n",
+                                   receita_selecionada->nome, estado.receitas_completadas);
+                            if (estado.receitas_completadas == 3) {
+                                Receita *pirao = buscar_receita(receitas_disponiveis, "Pirão de Carne");
+                                if (pirao) {
+                                    pirao->desbloqueada = 1;
+                                    printf("[DESBLOQUEIO] Pirão de Carne desbloqueado! Vá ao Marco Zero (TELA_RESULTADO).\n");
+                                }
+                            }
                             // Receitas normais: volta ao menu sem jurados
                             receita_selecionada = NULL;
                             tela_atual = TELA_RECEITAS;

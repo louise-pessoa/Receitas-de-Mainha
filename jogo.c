@@ -106,15 +106,15 @@ void integrar_modulos(void) {
     escondidinho->passos = push_passo(escondidinho->passos,
         "Corte a carne de sol", "Carne de sol", "WSWS", "sprites/receitas/tabua_carne.png");
     escondidinho->passos = push_passo(escondidinho->passos,
-        "Descasque a macaxeira", "Mandioca", "CASCA", "sprites/receitas/macaxeira_tabua.png");
+        "Descasque a macaxeira", "Macaxeira", "CASCA", "sprites/receitas/macaxeira_tabua.png");
     escondidinho->passos = push_passo(escondidinho->passos,
         "Corte a cebola", "Cebola", "QWER", "sprites/receitas/tabua_cebola.png");
     escondidinho->passos = push_passo(escondidinho->passos,
         "Misture macaxeira com manteiga", "Manteiga", "ADAD", "sprites/receitas/macaxeira_cozida.png");
     escondidinho->passos = push_passo(escondidinho->passos,
-        "Coloque a carne na travessa", "Carne de sol", "MNTG", "sprites/receitas/travessa_vazia.png");
+        "Coloque a carne na travessa", "Carne de sol", "TRAVESSA", "sprites/receitas/travessa_vazia.png");
     escondidinho->passos = push_passo(escondidinho->passos,
-        "Coloque a macaxeira", "Mandioca", "DDD", "sprites/receitas/travessa_carne.png");
+        "Coloque a macaxeira", "Macaxeira", "DDD", "sprites/receitas/travessa_carne.png");
     escondidinho->passos = push_passo(escondidinho->passos,
         "Coloque o queijo coalho", "Queijo coalho", "CCC", "sprites/receitas/travessa_macaxeira.png");
     escondidinho->passos = push_passo(escondidinho->passos,

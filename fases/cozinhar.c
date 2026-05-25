@@ -101,7 +101,13 @@ static void montar_grid(void) {
         int row = i / 5;
         float w = 130;
         float h = 70;
-        float gx = 30 + col * (w + 14);
+        float gap = 14;
+        // compute how many columns in this row (last row may have fewer)
+        int cols_in_row = ((row + 1) * 5 <= total) ? 5 : (total - row * 5);
+        if (cols_in_row <= 0) cols_in_row = 1;
+        int col_index = i - row * 5; // position within the row
+        float start_x = (LARG - (cols_in_row * w + (cols_in_row - 1) * gap)) / 2.0f;
+        float gx = start_x + col_index * (w + gap);
         float gy = 410 + row * (h + 10);
         cozinhar.grid[i].area = (Rectangle){ gx, gy, w, h };
         // carregar sprite do ingrediente (mapear nomes conhecidos)
@@ -518,6 +524,23 @@ static void desenhar_instrucao(void) {
                  60, 120, 14, COR_VERDE_COZ);
     }
 
+    // desenha mainha animada no canto direito do balao de instrucao
+    // NÃO desenha aqui se a reação central (mostrando_mainha/mostrando_mainha_brava) estiver ativa,
+    // para evitar duplicação da mesma sprite.
+    if (!cozinhar.mostrando_mainha && !cozinhar.mostrando_mainha_brava && cozinhar.textura_mainha_animada_carregada) {
+        Texture2D tex = cozinhar.textura_mainha_animada;
+        // escala para caber no balao (altura max ~70)
+        float max_h = 70.0f;
+        float sc = 1.0f;
+        if (tex.height > 0) sc = (max_h / (float)tex.height);
+        if (sc > 1.0f) sc = 1.0f;
+        float draw_w = tex.width * sc;
+        float draw_h = tex.height * sc;
+        Rectangle src = (Rectangle){0.0f, 0.0f, (float)tex.width, (float)tex.height};
+        Rectangle dst = (Rectangle){ 40 + 720 - 10 - draw_w, 70 + (90 - draw_h) / 2.0f, draw_w, draw_h };
+        DrawTexturePro(tex, src, dst, (Vector2){0,0}, 0.0f, WHITE);
+    }
+
 }
 
 static void desenhar_sequencia(void) {
@@ -623,8 +646,11 @@ static void desenhar_feedback(void) {
     const char *msg = cozinhar.feedback_acerto ? "ACERTOU!" : "PERDEU O TEMPO!";
     int tam = 56;
     int tw = medir_txt(msg, tam);
-    DrawRectangle(0, 220, LARG, 100, (Color){0, 0, 0, 80});
-    txt(msg, (LARG - tw) / 2, 240, tam, cor);
+    // Não desenhar a barra de fundo nem o texto de acerto; apenas mostrar mensagem de erro
+    if (!cozinhar.feedback_acerto) {
+        DrawRectangle(0, 220, LARG, 100, (Color){0, 0, 0, 80});
+        txt(msg, (LARG - tw) / 2, 240, tam, cor);
+    }
 }
 
 static void desenhar_imagem_passo(void) {
@@ -685,12 +711,16 @@ static void desenhar_fim(void) {
     // sprite mainha vitoria no canto inferior esquerdo (acima da barra)
     if (cozinhar.textura_mainha_vitoria_carregada) {
         Texture2D tex = cozinhar.textura_mainha_vitoria;
-        float altura_max = (float)(ALT - 40 - 52);  // entre as duas barras
-        float escala = altura_max / (float)tex.height;
-        if (escala > 1.0f) escala = 1.0f;
-        float larg = tex.width  * escala;
-        float alt  = tex.height * escala;
-        DrawTextureEx(tex, (Vector2){LARG - larg - 10, (float)(ALT - 40) - alt}, 0, escala, WHITE);
+        // Desenha grande e centralizada na tela de fim
+        float base_h = (float)ALT * 0.6f;
+        float sc = 1.0f;
+        if (tex.height > 0) sc = base_h / (float)tex.height;
+        if (sc > 1.0f) sc = 1.0f;
+        float larg = tex.width  * sc;
+        float alt  = tex.height * sc;
+        Rectangle src = (Rectangle){0.0f, 0.0f, (float)tex.width, (float)tex.height};
+        Rectangle dst = (Rectangle){ (LARG - larg) / 2.0f, (ALT - alt) / 2.0f, larg, alt };
+        DrawTexturePro(tex, src, dst, (Vector2){0,0}, 0.0f, WHITE);
     }
 
     // barra superior com estatísticas
@@ -723,12 +753,18 @@ static void desenhar_mainha_animada(void) {
     
     Color cor = (Color){255, 255, 255, (unsigned char)(opacidade * 255)};
     
-    // Desenha no canto superior direito
-    float tamanho = 120.0f * escala;
-    float x = LARG - tamanho - 20;
-    float y = 20;
-    
-    DrawTextureEx(tex, (Vector2){x, y}, 0, escala, cor);
+    // Desenha grande e centralizada (reação)
+    float base_h = (float)ALT * 0.6f; // ocupa até 60% da altura
+    float desired_h = base_h * escala; // anima tamanho com o progresso
+    float sc = 1.0f;
+    if (tex.height > 0) sc = desired_h / (float)tex.height;
+    float draw_w = tex.width * sc;
+    float draw_h = tex.height * sc;
+    float x = ((float)LARG - draw_w) / 2.0f;
+    float y = ((float)ALT  - draw_h) / 2.0f;
+    Rectangle src = (Rectangle){0.0f, 0.0f, (float)tex.width, (float)tex.height};
+    Rectangle dst = (Rectangle){ x, y, draw_w, draw_h };
+    DrawTexturePro(tex, src, dst, (Vector2){0,0}, 0.0f, cor);
 }
 
 // ==========================================
@@ -754,12 +790,18 @@ static void desenhar_mainha_brava(void) {
     
     Color cor = (Color){255, 255, 255, (unsigned char)(opacidade * 255)};
     
-    // Desenha no canto superior esquerdo
-    float tamanho = 120.0f * escala;
-    float x = 20;
-    float y = 20;
-    
-    DrawTextureEx(tex, (Vector2){x, y}, 0, escala, cor);
+    // Desenha grande e centralizada (reação de erro)
+    float base_h = (float)ALT * 0.55f; // um pouco menor que a animada
+    float desired_h = base_h * escala; // anima tamanho com o progresso
+    float sc = 1.0f;
+    if (tex.height > 0) sc = desired_h / (float)tex.height;
+    float draw_w = tex.width * sc;
+    float draw_h = tex.height * sc;
+    float x = ((float)LARG - draw_w) / 2.0f;
+    float y = ((float)ALT  - draw_h) / 2.0f;
+    Rectangle src = (Rectangle){0.0f, 0.0f, (float)tex.width, (float)tex.height};
+    Rectangle dst = (Rectangle){ x, y, draw_w, draw_h };
+    DrawTexturePro(tex, src, dst, (Vector2){0,0}, 0.0f, cor);
 }
 
 void tela_cozinhar(void) {
@@ -783,18 +825,8 @@ void tela_cozinhar(void) {
         }
     }
 
-    // Detecta mudancas de pontos (acerto = ganha pontos, erro = perde pontos)
-    if (cozinhar.pontos > cozinhar.pontos_anterior) {
-        // Ganhou pontos = acerto!
-        cozinhar.mostrando_mainha = 1;
-        cozinhar.timer_mainha = 1.5f;
-        cozinhar.pontos_anterior = cozinhar.pontos;
-    } else if (cozinhar.pontos < cozinhar.pontos_anterior) {
-        // Perdeu pontos = erro!
-        cozinhar.mostrando_mainha_brava = 1;
-        cozinhar.timer_mainha_brava = 1.5f;
-        cozinhar.pontos_anterior = cozinhar.pontos;
-    }
+    // Sincroniza pontos_anterior sem ativar reações automáticas aqui
+    cozinhar.pontos_anterior = cozinhar.pontos;
 
     if (!cozinhar.terminou) {
         switch (cozinhar.fase) {

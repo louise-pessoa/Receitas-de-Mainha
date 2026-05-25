@@ -5,6 +5,7 @@
 #include "raylib.h"
 #include "coleta.h"
 #include "../jogo.h"
+#include "../ui/fonte.h"
 
 // ==========================================
 // CORES
@@ -782,13 +783,13 @@ static void desenhar_item(const ItemCaindo *it) {
         // letra inicial centralizada
         char letra[2] = { (char)toupper((unsigned char)it->nome[0]), '\0' };
         int tam = 22;
-        int lw = MeasureText(letra, tam);
-        DrawText(letra, (int)it->x - lw / 2, (int)it->y - tam / 2, tam, WHITE);
+        int lw = medir_txt(letra, tam);
+        txt(letra, (int)it->x - lw / 2, (int)it->y - tam / 2, tam, WHITE);
     }
 
     // rotulo curto abaixo (sempre desenha pra dar identidade ao item)
-    int tw = MeasureText(it->nome, 12);
-    DrawText(it->nome, (int)it->x - tw / 2, (int)it->y + ITEM_RAIO + 2,
+    int tw = medir_txt(it->nome, 12);
+    txt(it->nome, (int)it->x - tw / 2, (int)it->y + ITEM_RAIO + 2,
              12, COR_TEXTO);
 }
 
@@ -801,18 +802,18 @@ static void desenhar_hud(void) {
     int elapsed = (int)catcher.tempo_decorrido;
     if (elapsed < catcher.periodo_garantido) {
         int restante = catcher.periodo_garantido - elapsed;
-        DrawText(TextFormat("Garantido: %02ds", restante), 20, 18, 28, WHITE);
+        txt(TextFormat("Garantido: %02ds", restante), 20, 18, 28, WHITE);
     } else {
         int extra = elapsed - catcher.periodo_garantido;
-        DrawText(TextFormat("+%02ds", extra), 20, 18, 28, (Color){255, 80, 80, 255});
+        txt(TextFormat("+%02ds", extra), 20, 18, 28, (Color){255, 80, 80, 255});
     }
 
     // pontos
-    DrawText(TextFormat("Pontos: %d", catcher.pontos), 240, 18, 28,
+    txt(TextFormat("Pontos: %d", catcher.pontos), 240, 18, 28,
              (Color){255, 230, 120, 255});
 
     // progresso
-    DrawText(TextFormat("Coletados: %d / %d",
+    txt(TextFormat("Coletados: %d / %d",
                         catcher.coletados, catcher.n_alvos),
              480, 18, 24, WHITE);
 }
@@ -827,14 +828,14 @@ static void desenhar_checklist(void) {
     DrawRectangleRounded((Rectangle){x, y, w, h}, 0.1f, 8,
                          (Color){255, 255, 255, 220});
     DrawRectangleRoundedLines((Rectangle){x, y, w, h}, 0.1f, 8, 2.0f, COR_HUD);
-    DrawText("Receita", x + 12, y + 8, 18, COR_TEXTO);
+    txt("Receita", x + 12, y + 8, 18, COR_TEXTO);
 
     for (int i = 0; i < catcher.n_alvos; i++) {
         int ly = y + 32 + i * 24;
         // bolinha de status
         if (catcher.alvos[i].coletado) {
             DrawCircle(x + 22, ly + 8, 7, COR_BOM);
-            DrawText("v", x + 18, ly + 1, 14, WHITE);
+            txt("v", x + 18, ly + 1, 14, WHITE);
         } else {
             DrawCircleLines(x + 22, ly + 8, 7, COR_TEXTO);
         }
@@ -843,7 +844,7 @@ static void desenhar_checklist(void) {
         // trunca nome longo
         char buf[24];
         snprintf(buf, sizeof(buf), "%.20s", catcher.alvos[i].nome);
-        DrawText(buf, x + 38, ly, 16, cor);
+        txt(buf, x + 38, ly, 16, cor);
     }
 }
 
@@ -880,19 +881,19 @@ static void desenhar_tela_fim(void) {
     const char *titulo = "RECEITA COMPLETA!";
     Color cor_titulo = COR_BOM;
     int tam = 48;
-    int tw = MeasureText(titulo, tam);
-    DrawText(titulo, (LARG_TELA - tw) / 2, 180, tam, cor_titulo);
+    int tw = medir_txt(titulo, tam);
+    txt(titulo, (LARG_TELA - tw) / 2, 180, tam, cor_titulo);
 
-    DrawText(TextFormat("Pontuacao final: %d", catcher.pontos),
+    txt(TextFormat("Pontuacao final: %d", catcher.pontos),
              260, 260, 26, WHITE);
-    DrawText(TextFormat("Coletados: %d / %d", catcher.coletados, catcher.n_alvos),
+    txt(TextFormat("Coletados: %d / %d", catcher.coletados, catcher.n_alvos),
              260, 295, 22, WHITE);
-    DrawText(TextFormat("Erros (item errado): %d", catcher.erros_distrator),
+    txt(TextFormat("Erros (item errado): %d", catcher.erros_distrator),
              260, 325, 20, (Color){255, 200, 200, 255});
-    DrawText(TextFormat("Ingredientes perdidos: %d", catcher.perdidos),
+    txt(TextFormat("Ingredientes perdidos: %d", catcher.perdidos),
              260, 350, 20, (Color){255, 200, 200, 255});
 
-    DrawText("[ENTER] Voltar ao menu  |  [R] Jogar de novo",
+    txt("[ENTER] Voltar ao menu  |  [R] Jogar de novo",
              180, 470, 20, (Color){255, 230, 120, 255});
 }
 
@@ -912,15 +913,15 @@ void tela_catcher(void) {
     desenhar_checklist();
 
     // instrucoes na base
-    DrawText("Use [<-] [->] ou [A] [D] para mover a cesta  |  [P] Pausa",
+    txt("Use [<-] [->] ou [A] [D] para mover a cesta  |  [P] Pausa",
              20, ALT_TELA - ALT_CHAO + 12, 16, WHITE);
 
     if (catcher.pausado && !catcher.terminou) {
         DrawRectangle(0, 0, LARG_TELA, ALT_TELA, (Color){0, 0, 0, 140});
         const char *t = "PAUSADO";
-        int tw = MeasureText(t, 56);
-        DrawText(t, (LARG_TELA - tw) / 2, 260, 56, WHITE);
-        DrawText("[P] retomar", 340, 330, 22, (Color){255, 230, 120, 255});
+        int tw = medir_txt(t, 56);
+        txt(t, (LARG_TELA - tw) / 2, 260, 56, WHITE);
+        txt("[P] retomar", 340, 330, 22, (Color){255, 230, 120, 255});
     }
 
     if (catcher.terminou) {

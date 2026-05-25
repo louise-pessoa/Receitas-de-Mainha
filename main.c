@@ -6,6 +6,7 @@
 #include "api/jurados.h"
 #include "jogo.h"
 #include "ui/telas.h"
+#include "ui/fonte.h"
 #include "dados/receitas.h"
 #include "fases/coleta.h"
 #include "fases/ordenacao.h"
@@ -101,6 +102,8 @@ int main(void) {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
     InitWindow(LARG_VIRTUAL, ALT_VIRTUAL, "Receitas de Mainha");
     SetTargetFPS(60);
+
+    fonte_carregar("fontes/fonte.ttf", 96);
 
     // carrega sprites depois que a janela existe (textura precisa de contexto OpenGL)
     catcher_carregar_sprites();
@@ -312,7 +315,7 @@ int main(void) {
         );
 
         if (!IsWindowFullscreen()) {
-            DrawText("[F11] Tela cheia", 10, GetScreenHeight() - 22, 14,
+            txt("[F11] Tela cheia", 10, GetScreenHeight() - 22, 14,
                      (Color){255, 255, 255, 160});
         }
         EndDrawing();
@@ -321,6 +324,7 @@ int main(void) {
     UnloadRenderTexture(alvo);
     catcher_descarregar_sprites();
     liberar_receitas(receitas_disponiveis);
+    fonte_descarregar();
     CloseWindow();
     return 0;
 }

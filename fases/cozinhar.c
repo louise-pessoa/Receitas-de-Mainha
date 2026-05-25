@@ -6,6 +6,7 @@
 #include "cozinhar.h"
 #include "../jogo.h"
 #include "../dados/pilha.h"
+#include "../ui/fonte.h"
 
 // ==========================================
 // CORES
@@ -470,8 +471,8 @@ static void desenhar_empratar(void) {
     DrawRectangleRec(btn_empratar, COR_VERDE_COZ);
         DrawRectangleRoundedLines(btn_empratar, 0.1f, 10, 2.0f, COR_AMA_COZ);
     
-    int txt_width = MeasureText("EMPRATAR", 24);
-    DrawText("EMPRATAR", 400 - txt_width/2, 18, 24, WHITE);
+    int txt_width = medir_txt("EMPRATAR", 24);
+    txt("EMPRATAR", 400 - txt_width/2, 18, 24, WHITE);
 }
 
 // ==========================================
@@ -480,19 +481,19 @@ static void desenhar_empratar(void) {
 static void desenhar_cabecalho(void) {
     DrawRectangle(0, 0, LARG, 60, COR_AZUL_COZ);
     DrawRectangle(0, 55, LARG, 5, COR_AMA_COZ);
-    DrawText(TextFormat("COZINHANDO: %s", cozinhar.receita->nome),
+    txt(TextFormat("COZINHANDO: %s", cozinhar.receita->nome),
              40, 16, 24, WHITE);
 
-    DrawText(TextFormat("Passo %d / %d",
+    txt(TextFormat("Passo %d / %d",
                         cozinhar.passo_idx + 1,
                         cozinhar.n_passos),
              580, 20, 22, WHITE);
 
     // pontos
     DrawRectangle(0, 540, LARG, 60, (Color){30, 60, 140, 255});
-    DrawText(TextFormat("Pontos: %d", cozinhar.pontos),
+    txt(TextFormat("Pontos: %d", cozinhar.pontos),
              40, 558, 22, COR_AMA_COZ);
-    DrawText(TextFormat("Acertos: %d  Erros: %d",
+    txt(TextFormat("Acertos: %d  Erros: %d",
                         cozinhar.acertos, cozinhar.erros),
              280, 558, 20, WHITE);
 }
@@ -505,14 +506,14 @@ static void desenhar_instrucao(void) {
     DrawRectangleRounded((Rectangle){40, 70, 720, 90}, 0.2f, 8, WHITE);
         DrawRectangleRoundedLines((Rectangle){40, 70, 720, 90}, 0.2f, 8, 2.0f,
                                   COR_AZUL_COZ);
-    DrawText("Instrucao:", 60, 80, 16, COR_AZUL_COZ);
-    DrawText(p->acao, 60, 98, 18, COR_TEXTO_COZ);
+    txt("Instrucao:", 60, 80, 16, COR_AZUL_COZ);
+    txt(p->acao, 60, 98, 18, COR_TEXTO_COZ);
 
     if (cozinhar.fase == COZ_FASE_CLICAR) {
-        DrawText(TextFormat("1) Clique: %s", p->ingrediente),
+        txt(TextFormat("1) Clique: %s", p->ingrediente),
                  60, 120, 14, COR_LARA_COZ);
     } else if (cozinhar.fase == COZ_FASE_TECLAS) {
-        DrawText("2) Teclas:",
+        txt("2) Teclas:",
                  60, 120, 14, COR_VERDE_COZ);
     }
 
@@ -555,8 +556,8 @@ static void desenhar_sequencia(void) {
                       2.0f, borda);
         const char *nome = nome_tecla(p->teclas[k]);
         int tam = (strlen(nome) > 1) ? 18 : 32;
-        int tw = MeasureText(nome, tam);
-        DrawText(nome, x + (box - tw) / 2, y0 + (box - tam) / 2, tam,
+        int tw = medir_txt(nome, tam);
+        txt(nome, x + (box - tw) / 2, y0 + (box - tam) / 2, tam,
                  COR_TEXTO_COZ);
     }
 }
@@ -595,13 +596,13 @@ static void desenhar_grid(void) {
             float ty = it->area.y + (it->area.height - t.height*scale)/2.0f;
             DrawTextureEx(t, (Vector2){tx, ty}, 0.0f, scale, WHITE);
         } else {
-            int tw = MeasureText(it->nome, 16);
+            int tw = medir_txt(it->nome, 16);
             if (tw > (int)it->area.width - 14) {
-                DrawText(it->nome, (int)(it->area.x + 8),
+                txt(it->nome, (int)(it->area.x + 8),
                          (int)(it->area.y + it->area.height / 2 - 8), 14,
                          COR_TEXTO_COZ);
             } else {
-                DrawText(it->nome,
+                txt(it->nome,
                          (int)(it->area.x + (it->area.width - tw) / 2),
                          (int)(it->area.y + it->area.height / 2 - 8),
                          16, COR_TEXTO_COZ);
@@ -609,7 +610,7 @@ static void desenhar_grid(void) {
         }
 
         if (it->usado) {
-            DrawText("ok", (int)(it->area.x + it->area.width - 30),
+            txt("ok", (int)(it->area.x + it->area.width - 30),
                      (int)(it->area.y + 6), 16, COR_VERDE_COZ);
         }
     }
@@ -618,11 +619,11 @@ static void desenhar_grid(void) {
 static void desenhar_feedback(void) {
     if (cozinhar.fase != COZ_FASE_FEEDBACK) return;
     Color cor = cozinhar.feedback_acerto ? COR_VERDE_COZ : COR_VERM_COZ;
-    const char *txt = cozinhar.feedback_acerto ? "ACERTOU!" : "PERDEU O TEMPO!";
+    const char *msg = cozinhar.feedback_acerto ? "ACERTOU!" : "PERDEU O TEMPO!";
     int tam = 56;
-    int tw = MeasureText(txt, tam);
+    int tw = medir_txt(msg, tam);
     DrawRectangle(0, 220, LARG, 100, (Color){0, 0, 0, 80});
-    DrawText(txt, (LARG - tw) / 2, 240, tam, cor);
+    txt(msg, (LARG - tw) / 2, 240, tam, cor);
 }
 
 static void desenhar_imagem_passo(void) {
@@ -694,13 +695,13 @@ static void desenhar_fim(void) {
     }
 
     // pontuação embaixo da imagem (texto em marrom escuro pra ler em fundo amarelo)
-    DrawText(TextFormat("Acertos: %d  Erros: %d",
+    txt(TextFormat("Acertos: %d  Erros: %d",
                         cozinhar.acertos, cozinhar.erros),
              280, 470, 22, COR_TEXTO_COZ);
-    DrawText(TextFormat("Pontos finais: %d", cozinhar.pontos),
+    txt(TextFormat("Pontos finais: %d", cozinhar.pontos),
              290, 510, 22, COR_LARA_COZ);
 
-    DrawText("[ENTER] Resultado final", 270, 550, 22, COR_LARA_COZ);
+    txt("[ENTER] Resultado final", 270, 550, 22, COR_LARA_COZ);
 }
 
 // ==========================================
@@ -767,7 +768,7 @@ static void desenhar_mainha_brava(void) {
 void tela_cozinhar(void) {
     if (cozinhar.receita == NULL) {
         ClearBackground(COR_FUNDO_COZ);
-        DrawText("Nenhuma receita carregada.", 220, 280, 22, COR_VERM_COZ);
+        txt("Nenhuma receita carregada.", 220, 280, 22, COR_VERM_COZ);
         return;
     }
 

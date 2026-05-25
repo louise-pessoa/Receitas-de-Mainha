@@ -3,6 +3,7 @@
 #include "raylib.h"
 #include "ordenacao.h"
 #include "../jogo.h"
+#include "../ui/fonte.h"
 
 // ==========================================
 // CORES
@@ -176,12 +177,12 @@ void tela_ordenacao(void) {
     DrawRectangle(0, 55, 800, 5, COR_AMARELO_ORD);
     if (!ordenacao.concluido) {
         const char *hdr = "ORGANIZANDO...";
-        int htw = MeasureText(hdr, 28);
-        DrawText(hdr, (800 - htw) / 2, 16, 28, WHITE);
+        int htw = medir_txt(hdr, 28);
+        txt(hdr, (800 - htw) / 2, 16, 28, WHITE);
     } else {
         const char *hdr_done = "Tudo organizado pra receita!";
-        int htw = MeasureText(hdr_done, 24);
-        DrawText(hdr_done, (800 - htw) / 2, 16, 24, WHITE);
+        int htw = medir_txt(hdr_done, 24);
+        txt(hdr_done, (800 - htw) / 2, 16, 24, WHITE);
     }
 
     // subtitulo pós-ordenacao (apenas quando concluido)
@@ -228,7 +229,7 @@ void tela_ordenacao(void) {
         }
 
         // numero da posicao
-        DrawText(TextFormat("%d", k + 1), x + 8, y + 6, 18, GRAY);
+        txt(TextFormat("%d", k + 1), x + 8, y + 6, 18, GRAY);
 
         // sprite do item (se carregado) ou fallback para nome
         if (ordenacao.itens[k].sprite_carregado) {
@@ -246,14 +247,14 @@ void tela_ordenacao(void) {
             DrawTextureEx(t, (Vector2){tx, ty}, 0.0f, scale, WHITE);
         } else {
             const char *nome = ordenacao.itens[k].nome;
-            int tw = MeasureText(nome, 16);
+            int tw = medir_txt(nome, 16);
             if (tw <= carta_w - 16) {
-                DrawText(nome, x + (carta_w - tw) / 2, y + 36, 16, COR_TEXTO_ORD);
+                txt(nome, x + (carta_w - tw) / 2, y + 36, 16, COR_TEXTO_ORD);
             } else {
                 // texto longo: diminui
                 int tam = 12;
-                int tw2 = MeasureText(nome, tam);
-                DrawText(nome, x + (carta_w - tw2) / 2, y + 40, tam, COR_TEXTO_ORD);
+                int tw2 = medir_txt(nome, tam);
+                txt(nome, x + (carta_w - tw2) / 2, y + 40, tam, COR_TEXTO_ORD);
             }
         }
     }
@@ -264,15 +265,15 @@ void tela_ordenacao(void) {
     } else {
         DrawRectangleRounded((Rectangle){80, 380, 640, 110}, 0.3f, 8,
                              COR_VERDE_ORD);
-        DrawText("ORDENADO!", 320, 395, 32, WHITE);
-        DrawText("Agora voce ja sabe a ordem de uso dos ingredientes.",
+        txt("ORDENADO!", 320, 395, 32, WHITE);
+        txt("Agora voce ja sabe a ordem de uso dos ingredientes.",
                  130, 440, 18, WHITE);
-        DrawText("[ENTER] Comecar a cozinhar", 250, 465, 20, COR_AMARELO_ORD);
+        txt("[ENTER] Comecar a cozinhar", 250, 465, 20, COR_AMARELO_ORD);
     }
 
     // rodape
     DrawRectangle(0, 560, 800, 40, (Color){30, 60, 140, 255});
-    DrawText(ordenacao.concluido ?
+    txt(ordenacao.concluido ?
              "[ENTER] Cozinhar  |  [ESC] Menu" :
              "Aguarde a ordenacao terminar...",
              220, 570, 20, COR_AMARELO_ORD);

@@ -7,6 +7,7 @@
 #include "../jogo.h"
 #include "../dados/receitas.h"
 #include "../dados/pilha.h"
+#include "fonte.h"
 
 // ==========================================
 // CORES DO PROJETO
@@ -165,8 +166,8 @@ static void desenhar_botao(int x, int y, int w, int h, Color cor, const char *te
     DrawRectangleRounded((Rectangle){x, y, w, h}, 0.4f, 8, cor);
     DrawRectangleRoundedLines((Rectangle){x, y, w, h}, 0.4f, 8, 2.0f, WHITE);
     int tam = 22;
-    int tw = MeasureText(texto, tam);
-    DrawText(texto, x + (w - tw) / 2, y + (h - tam) / 2, tam, WHITE);
+    int tw = medir_txt(texto, tam);
+    txt(texto, x + (w - tw) / 2, y + (h - tam) / 2, tam, WHITE);
 }
 
 // desenha barra de progresso
@@ -178,7 +179,7 @@ static void desenhar_barra_progresso(int x, int y, int w, int h, float progresso
         DrawRectangleRounded((Rectangle){x, y, preenchido, h}, 0.5f, 8, cor);
     }
     // estrela no meio
-    DrawText("*", x + w/2 - 6, y - 2, 24, COR_AMARELO);
+    txt("*", x + w/2 - 6, y - 2, 24, COR_AMARELO);
 }
 
 // desenha cabecalho com titulo do jogo
@@ -187,14 +188,14 @@ static void desenhar_cabecalho(void) {
     DrawRectangle(0, 0, 800, 60, COR_AZUL);
     DrawRectangle(0, 55, 800, 5, COR_AMARELO);
     // titulo
-    DrawText("COMIDA DE MAINHA", 220, 15, 32, WHITE);
+    txt("RECEITAS DE MAINHA", 220, 15, 32, WHITE);
 }
 
 // desenha rodape azul
 static void desenhar_rodape(const char *texto) {
     DrawRectangle(0, 560, 800, 40, COR_BARRA_FUNDO);
-    int tw = MeasureText(texto, 20);
-    DrawText(texto, (800 - tw) / 2, 570, 20, COR_AMARELO);
+    int tw = medir_txt(texto, 20);
+    txt(texto, (800 - tw) / 2, 570, 20, COR_AMARELO);
 }
 
 // ==========================================
@@ -214,13 +215,13 @@ void tela_menu(void) {
         // fallback: fundo colorido original
         DrawRectangle(0, 0, 800, 70, COR_AZUL);
         DrawRectangle(0, 65, 800, 6, COR_AMARELO);
-        DrawText("COMIDA", 260, 80, 64, COR_VERMELHO);
-        DrawText("DE", 340, 140, 48, COR_AZUL);
-        DrawText("MAINHA", 240, 185, 64, COR_AZUL);
-        DrawText("*", 210, 90, 28, COR_AMARELO);
-        DrawText("*", 570, 90, 28, COR_VERDE);
-        DrawText("*", 190, 200, 20, COR_VERMELHO);
-        DrawText("*", 590, 200, 20, COR_LARANJA);
+        txt("COMIDA", 260, 80, 64, COR_VERMELHO);
+        txt("DE", 340, 140, 48, COR_AZUL);
+        txt("MAINHA", 240, 185, 64, COR_AZUL);
+        txt("*", 210, 90, 28, COR_AMARELO);
+        txt("*", 570, 90, 28, COR_VERDE);
+        txt("*", 190, 200, 20, COR_VERMELHO);
+        txt("*", 590, 200, 20, COR_LARANJA);
     }
 
     // botoes principais
@@ -234,16 +235,16 @@ void tela_menu(void) {
     }
 
     // instrucao
-    DrawText("[2] Comecar (escolher receita)    [8] Creditos    [F11] Tela cheia",
+    txt("[2] Comecar (escolher receita)    [8] Creditos    [F11] Tela cheia",
              80, 370, 17, COR_TEXTO);
 
     // pontuacao atual
-    DrawText(TextFormat("Pontuacao: %d", estado.pontuacao), 50, 420, 22, COR_TEXTO);
+    txt(TextFormat("Pontuacao: %d", estado.pontuacao), 50, 420, 22, COR_TEXTO);
 
     // rodape
     DrawRectangle(0, 560, 800, 40, COR_BARRA_FUNDO);
-    int tw = MeasureText("* Toque para comecar *", 22);
-    DrawText("* Toque para comecar *", (800 - tw)/2, 568, 22, COR_AMARELO);
+    int tw = medir_txt("* Toque para comecar *", 22);
+    txt("* Toque para comecar *", (800 - tw)/2, 568, 22, COR_AMARELO);
 }
 
 // ==========================================
@@ -257,10 +258,10 @@ void tela_receitas(Receita *lista) {
     DrawRectangleRounded((Rectangle){30, 70, 460, 470}, 0.05f, 8, (Color){210, 170, 100, 255});
     DrawRectangleRounded((Rectangle){38, 78, 444, 454}, 0.05f, 8, (Color){255, 248, 220, 255});
 
-    DrawText("RECEITAS DISPONIVEIS", 60, 90, 22, COR_TEXTO);
+    txt("RECEITAS DISPONIVEIS", 60, 90, 22, COR_TEXTO);
 
     if (lista == NULL) {
-        DrawText("Nenhuma receita cadastrada.", 80, 200, 20, GRAY);
+        txt("Nenhuma receita cadastrada.", 80, 200, 20, GRAY);
     } else {
         Color cores[] = {COR_VERMELHO, COR_VERDE, COR_AZUL, COR_LARANJA, COR_VERMELHO, COR_VERDE, COR_AZUL, COR_LARANJA};
         Vector2 mouse = GetMousePosition();
@@ -283,15 +284,15 @@ void tela_receitas(Receita *lista) {
                 cor.b = (unsigned char)(cor.b > 30 ? cor.b - 30 : 0);
             }
             DrawRectangleRounded(card, 0.3f, 8, cor);
-            DrawText(TextFormat("[%d] %s", i + 1, aux->nome), 70, y + 8, 20, WHITE);
-            DrawText(TextFormat("Dif: %d", aux->dificuldade), 370, y + 8, 18, WHITE);
+            txt(TextFormat("[%d] %s", i + 1, aux->nome), 70, y + 8, 20, WHITE);
+            txt(TextFormat("Dif: %d", aux->dificuldade), 370, y + 8, 18, WHITE);
             if (hovered)
-                DrawText("Clique para selecionar", 70, y + 28, 13, COR_AMARELO);
+                txt("Clique para selecionar", 70, y + 28, 13, COR_AMARELO);
             else {
                 int np = 0;
                 No *tp = aux->passos;
                 while (tp) { np++; tp = tp->prox; }
-                DrawText(TextFormat("%d passos", np), 70, y + 28, 14, COR_AMARELO);
+                txt(TextFormat("%d passos", np), 70, y + 28, 14, COR_AMARELO);
             }
 
             // clique: seleciona e avanca direto para ingredientes
@@ -308,13 +309,13 @@ void tela_receitas(Receita *lista) {
 
     // lado direito - vovo
     DrawRectangleRounded((Rectangle){510, 70, 260, 470}, 0.05f, 8, (Color){255, 235, 180, 255});
-    DrawText("Escolha uma", 530, 100, 20, COR_TEXTO);
-    DrawText("receita para", 530, 125, 20, COR_TEXTO);
-    DrawText("cozinhar!", 530, 150, 20, COR_TEXTO);
+    txt("Escolha uma", 530, 100, 20, COR_TEXTO);
+    txt("receita para", 530, 125, 20, COR_TEXTO);
+    txt("cozinhar!", 530, 150, 20, COR_TEXTO);
 
     if (receita_selecionada != NULL) {
         DrawRectangleRounded((Rectangle){520, 200, 240, 110}, 0.2f, 8, COR_VERDE);
-        DrawText("Selecionada:", 535, 210, 16, WHITE);
+        txt("Selecionada:", 535, 210, 16, WHITE);
         // tentar desenhar sprite do nome da receita
         Texture2D rtex = obter_sprite_telas(receita_selecionada->nome);
         if (rtex.id != 0) {
@@ -325,22 +326,22 @@ void tela_receitas(Receita *lista) {
             float ty = 200 + (110 - rtex.height*scale)/2.0f;
             DrawTextureEx(rtex, (Vector2){tx, ty}, 0.0f, scale, WHITE);
         } else {
-            DrawText(receita_selecionada->nome, 535, 235, 18, WHITE);
+            txt(receita_selecionada->nome, 535, 235, 18, WHITE);
         }
-        DrawText(TextFormat("Dif: %d | %d min",
+        txt(TextFormat("Dif: %d | %d min",
                             receita_selecionada->dificuldade,
                             receita_selecionada->tempo),
                  535, 262, 14, WHITE);
-        DrawText("[ENTER] Continuar", 535, 285, 14, COR_AMARELO);
+        txt("[ENTER] Continuar", 535, 285, 14, COR_AMARELO);
     } else {
-        DrawText("(nenhuma selecionada)", 530, 215, 16, GRAY);
+        txt("(nenhuma selecionada)", 530, 215, 16, GRAY);
     }
 
     // instrucoes
-    DrawText("[Setas] Navegar", 530, 380, 16, COR_TEXTO);
-    DrawText("[1-3] Selecionar", 530, 400, 16, COR_TEXTO);
-    DrawText("[ENTER] Continuar", 530, 420, 16, COR_TEXTO);
-    DrawText("[1] Menu", 530, 440, 16, COR_TEXTO);
+    txt("[Setas] Navegar", 530, 380, 16, COR_TEXTO);
+    txt("[1-3] Selecionar", 530, 400, 16, COR_TEXTO);
+    txt("[ENTER] Continuar", 530, 420, 16, COR_TEXTO);
+    txt("[1] Menu", 530, 440, 16, COR_TEXTO);
 
     desenhar_rodape("[Setas/1-3] Selecionar  |  [ENTER] ou Clique para continuar");
 }
@@ -353,8 +354,8 @@ void tela_ingredientes(Receita *receita) {
     desenhar_cabecalho();
 
     if (receita == NULL) {
-        DrawText("Nenhuma receita selecionada.", 220, 280, 24, COR_VERMELHO);
-        DrawText("Volte ao menu de receitas e escolha uma.",
+        txt("Nenhuma receita selecionada.", 220, 280, 24, COR_VERMELHO);
+        txt("Volte ao menu de receitas e escolha uma.",
                  170, 320, 20, COR_TEXTO);
         desenhar_rodape("[2] Voltar para receitas");
         return;
@@ -372,36 +373,36 @@ void tela_ingredientes(Receita *receita) {
         float ty = 85 - rtex2.height*scale/2.0f;
         DrawTextureEx(rtex2, (Vector2){tx, ty}, 0.0f, scale, WHITE);
     } else {
-        int tw = MeasureText(receita->nome, 28);
-        DrawText(receita->nome, (800 - tw)/2, 85, 28, WHITE);
+        int tw = medir_txt(receita->nome, 28);
+        txt(receita->nome, (800 - tw)/2, 85, 28, WHITE);
     }
 
     // balao de instrucao
     DrawRectangleRounded((Rectangle){100, 140, 600, 110}, 0.1f, 8, WHITE);
     DrawRectangleRoundedLines((Rectangle){100, 140, 600, 110}, 0.1f, 8, 2.0f, COR_AZUL);
-    DrawText("Memorize os ingredientes abaixo!", 120, 155, 20, COR_VERDE);
-    DrawText("Eles vao cair do ceu em 25 segundos — use [<-][->] para", 120, 182, 17, COR_TEXTO);
-    DrawText("mover a cesta e coletar so os certos. Errados custam pontos!", 120, 207, 17, COR_VERMELHO);
+    txt("Memorize os ingredientes abaixo!", 120, 155, 20, COR_VERDE);
+    txt("Eles vao cair do ceu em 25 segundos, use [<-][->] para", 120, 182, 17, COR_TEXTO);
+    txt("mover a cesta e coletar apenas os certos. Errados custam pontos!", 120, 207, 17, COR_VERMELHO);
 
     // lista de ingredientes
-    DrawText("Ingredientes:", 50, 270, 22, COR_TEXTO);
+    txt("Ingredientes:", 50, 270, 22, COR_TEXTO);
     if (receita->n_ingredientes == 0) {
-        DrawText("(nenhum ingrediente cadastrado)", 70, 305, 18, GRAY);
+        txt("(nenhum ingrediente cadastrado)", 70, 305, 18, GRAY);
     } else {
         Color cores[] = {COR_VERMELHO, COR_VERDE, COR_AZUL, COR_LARANJA};
         int y = 305;
         for (int i = 0; i < receita->n_ingredientes && i < 8; i++) {
             DrawCircle(65, y + 10, 14, cores[i % 4]);
-            DrawText(TextFormat("%d", i + 1), 60, y + 3, 16, WHITE);
+            txt(TextFormat("%d", i + 1), 60, y + 3, 16, WHITE);
             // desenha apenas o nome do ingrediente (sprites removidos nesta tela)
-            DrawText(receita->ingredientes[i], 85, y, 20, COR_TEXTO);
+            txt(receita->ingredientes[i], 85, y, 20, COR_TEXTO);
             y += 30;
         }
     }
 
     // dica
     DrawRectangleRounded((Rectangle){50, 480, 700, 60}, 0.3f, 8, COR_AMARELO);
-    DrawText("Aperte [ENTER] para entrar no minigame da cesta!",
+    txt("Aperte [ENTER] para entrar no minigame da cesta!",
              80, 498, 22, COR_TEXTO);
 
     desenhar_rodape("[ENTER] Ir para o catcher  |  [2] Voltar para receitas");
@@ -423,23 +424,23 @@ void tela_pilha(const char *passo_atual, int num_passo, int total_passos, double
     // instrucao no topo
     DrawRectangleRounded((Rectangle){100, 20, 600, 60}, 0.3f, 8, (Color){255, 245, 200, 240});
     DrawRectangleRoundedLines((Rectangle){100, 20, 600, 60}, 0.3f, 8, 2.0f, COR_LARANJA);
-    DrawText("*", 115, 35, 22, COR_AMARELO);
-    int tw = MeasureText(passo_atual, 22);
-    DrawText(passo_atual, (800 - tw)/2, 35, 22, COR_TEXTO);
-    DrawText("*", 665, 35, 22, COR_AMARELO);
+    txt("*", 115, 35, 22, COR_AMARELO);
+    int tw = medir_txt(passo_atual, 22);
+    txt(passo_atual, (800 - tw)/2, 35, 22, COR_TEXTO);
+    txt("*", 665, 35, 22, COR_AMARELO);
 
     // relogio / timer
     DrawCircle(100, 200, 55, WHITE);
     DrawCircleLines(100, 200, 55, COR_VERMELHO);
     DrawCircleLines(100, 200, 50, (Color){200,200,200,255});
-    DrawText(TextFormat("%.0fs", tempo), 75, 185, 26, COR_VERMELHO);
-    DrawText("TEMPO", 68, 215, 16, GRAY);
+    txt(TextFormat("%.0fs", tempo), 75, 185, 26, COR_VERMELHO);
+    txt("TEMPO", 68, 215, 16, GRAY);
 
     // balao da vovo com dica
     DrawRectangleRounded((Rectangle){30, 320, 220, 80}, 0.2f, 8, (Color){255,220,230,255});
     DrawRectangleRoundedLines((Rectangle){30, 320, 220, 80}, 0.2f, 8, 2.0f, (Color){255,150,180,255});
-    DrawText("Siga a ordem!", 45, 335, 18, COR_TEXTO);
-    DrawText("Voce consegue!", 45, 358, 17, COR_TEXTO);
+    txt("Siga a ordem!", 45, 335, 18, COR_TEXTO);
+    txt("Voce consegue!", 45, 358, 17, COR_TEXTO);
 
     // barra de progresso na base
     DrawRectangle(0, 470, 800, 10, LIGHTGRAY);
@@ -447,13 +448,13 @@ void tela_pilha(const char *passo_atual, int num_passo, int total_passos, double
     desenhar_barra_progresso(30, 460, 740, 20, prog);
 
     // numero do passo
-    DrawText(TextFormat("Passo %d de %d", num_passo, total_passos), 310, 430, 20, COR_TEXTO);
+    txt(TextFormat("Passo %d de %d", num_passo, total_passos), 310, 430, 20, COR_TEXTO);
 
     // pontuacao
-    DrawText(TextFormat("Pontos: %d", estado.pontuacao), 600, 200, 22, COR_TEXTO);
+    txt(TextFormat("Pontos: %d", estado.pontuacao), 600, 200, 22, COR_TEXTO);
 
     // instrucao
-    DrawText("[ENTER] Confirmar passo  [ESC] Desistir", 200, 495, 18, COR_TEXTO);
+    txt("[ENTER] Confirmar passo  [ESC] Desistir", 200, 495, 18, COR_TEXTO);
 }
 
 // ==========================================
@@ -462,18 +463,18 @@ void tela_pilha(const char *passo_atual, int num_passo, int total_passos, double
 void tela_feedback(int acertou) {
     if (acertou) {
         ClearBackground((Color){200, 255, 200, 255});
-        DrawText("ACERTOU!", 250, 180, 64, COR_VERDE);
-        DrawText(":)", 360, 260, 48, COR_VERDE);
-        DrawText(TextFormat("Passo %d/%d concluido!", estado.passos_acertados, estado.passos_total), 200, 340, 24, COR_TEXTO);
+        txt("ACERTOU!", 250, 180, 64, COR_VERDE);
+        txt(":)", 360, 260, 48, COR_VERDE);
+        txt(TextFormat("Passo %d/%d concluido!", estado.passos_acertados, estado.passos_total), 200, 340, 24, COR_TEXTO);
     } else {
         ClearBackground((Color){255, 210, 210, 255});
-        DrawText("ERROU!", 270, 180, 64, COR_VERMELHO);
-        DrawText(":(", 365, 260, 48, COR_VERMELHO);
-        DrawText(TextFormat("-20 pontos | Pontuacao: %d", estado.pontuacao), 180, 340, 24, COR_TEXTO);
+        txt("ERROU!", 270, 180, 64, COR_VERMELHO);
+        txt(":(", 365, 260, 48, COR_VERMELHO);
+        txt(TextFormat("-20 pontos | Pontuacao: %d", estado.pontuacao), 180, 340, 24, COR_TEXTO);
     }
-    DrawText("Pontuacao atual:", 280, 400, 22, COR_TEXTO);
-    DrawText(TextFormat("%d", estado.pontuacao), 370, 430, 36, acertou ? COR_VERDE : COR_VERMELHO);
-    DrawText("[ENTER] Continuar", 300, 510, 20, GRAY);
+    txt("Pontuacao atual:", 280, 400, 22, COR_TEXTO);
+    txt(TextFormat("%d", estado.pontuacao), 370, 430, 36, acertou ? COR_VERDE : COR_VERMELHO);
+    txt("[ENTER] Continuar", 300, 510, 20, GRAY);
 }
 
 // ==========================================
@@ -504,22 +505,22 @@ void tela_resultado(int venceu, ResultadoJurados *j)
     if (j != NULL) {
         /* Fundo do painel (reduzido para evitar encostar na barra inferior) */
         DrawRectangleRounded((Rectangle){20, 135, 760, 350}, 0.05f, 8, (Color){255,255,255,220});
-        DrawText("JURI DA FASE FINAL", 280, 145, 24, COR_TEXTO);
+        txt("JURI DA FASE FINAL", 280, 145, 24, COR_TEXTO);
 
         /* Media e Pontuacao — centralizadas lado a lado */
         char buf_media[64];
         char buf_pts[64];
         snprintf(buf_media, sizeof(buf_media), "Media: %.1f/10", j->media_final);
         snprintf(buf_pts, sizeof(buf_pts), "Pontuacao: %d", estado.pontuacao);
-        int mw = MeasureText(buf_media, 20);
-        int pw = MeasureText(buf_pts, 20);
+        int mw = medir_txt(buf_media, 20);
+        int pw = medir_txt(buf_pts, 20);
         int gap = 24;
         int totalw = mw + pw + gap;
         int startx = (800 - totalw) / 2;
         Color cor_media = j->media_final >= 7.0f ? COR_VERDE : COR_VERMELHO;
         Color cor_pontos = estado.pontuacao >= META_FASE_FINAL ? COR_VERDE : COR_VERMELHO;
-        DrawText(buf_media, startx, 172, 20, cor_media);
-        DrawText(buf_pts, startx + mw + gap, 172, 20, cor_pontos);
+        txt(buf_media, startx, 172, 20, cor_media);
+        txt(buf_pts, startx + mw + gap, 172, 20, cor_pontos);
 
         /* Função auxiliar pequena: desenhar bloco do jurado com sprite à esquerda, texto à direita */
         const int card_w = 750;
@@ -536,8 +537,8 @@ void tela_resultado(int venceu, ResultadoJurados *j)
                 DrawTextureEx(t, (Vector2){(float)(card_x + 8), (float)(200 + 6)}, 0.0f, sc, WHITE);
                 text_x = card_x + 8 + sprite_size + 12;
             }
-            DrawText(TextFormat("Ariano Suassuna   %.1f/10", j->nota_ariano), text_x, 208, 20, COR_TEXTO);
-            DrawText(j->comentario_ariano, text_x, 232, 17, DARKGRAY);
+            txt(TextFormat("Ariano Suassuna   %.1f/10", j->nota_ariano), text_x, 208, 20, COR_TEXTO);
+            txt(j->comentario_ariano, text_x, 232, 17, DARKGRAY);
         }
 
         // Clarice
@@ -551,8 +552,8 @@ void tela_resultado(int venceu, ResultadoJurados *j)
                 DrawTextureEx(t, (Vector2){(float)(card_x + 8), (float)(292 + 6)}, 0.0f, sc, WHITE);
                 text_x = card_x + 8 + sprite_size + 12;
             }
-            DrawText(TextFormat("Clarice Lispector   %.1f/10", j->nota_clarice), text_x, 300, 20, COR_TEXTO);
-            DrawText(j->comentario_clarice, text_x, 324, 17, DARKGRAY);
+            txt(TextFormat("Clarice Lispector   %.1f/10", j->nota_clarice), text_x, 300, 20, COR_TEXTO);
+            txt(j->comentario_clarice, text_x, 324, 17, DARKGRAY);
         }
 
         // Chico
@@ -566,16 +567,16 @@ void tela_resultado(int venceu, ResultadoJurados *j)
                 DrawTextureEx(t, (Vector2){(float)(card_x + 8), (float)(384 + 6)}, 0.0f, sc, WHITE);
                 text_x = card_x + 8 + sprite_size + 12;
             }
-            DrawText(TextFormat("Chico Science   %.1f/10", j->nota_chico), text_x, 392, 20, COR_TEXTO);
-            DrawText(j->comentario_chico, text_x, 416, 17, DARKGRAY);
+            txt(TextFormat("Chico Science   %.1f/10", j->nota_chico), text_x, 392, 20, COR_TEXTO);
+            txt(j->comentario_chico, text_x, 416, 17, DARKGRAY);
         }
     }
 
     DrawRectangle(0, 498, 800, 102, COR_BARRA_FUNDO);
-    int tw = MeasureText(venceu ? "Parabens! Voce e o melhor cozinheiro!" : "Continue treinando com mainha!", 20);
-    DrawText(venceu ? "Parabens! Voce e o melhor cozinheiro!" : "Continue treinando com mainha!",
+    int tw = medir_txt(venceu ? "Parabens! Voce e o melhor cozinheiro!" : "Continue treinando com mainha!", 20);
+    txt(venceu ? "Parabens! Voce e o melhor cozinheiro!" : "Continue treinando com mainha!",
              (800-tw)/2, 508, 20, COR_AMARELO);
-    DrawText("[ESC] Voltar ao menu", 300, 540, 18, WHITE);
+    txt("[ESC] Voltar ao menu", 300, 540, 18, WHITE);
 }
 
 // ==========================================
@@ -585,7 +586,7 @@ void tela_creditos(void) {
     ClearBackground(COR_FUNDO);
     desenhar_cabecalho();
 
-    DrawText("EQUIPE", 340, 80, 28, COR_TEXTO);
+    txt("EQUIPE", 340, 80, 28, COR_TEXTO);
 
     const char *nomes[] = {"Louise Pessoa", "Marilia Liz Alves", "Mateus Lins", "Pedro David Oliveira", "Victor Martins"};
     const char *funcoes[] = {"Estruturas de Dados", "IA dos Jurados", "Gameplay / Pilha", "Interface / UI", "Integracao / Timer"};
@@ -593,12 +594,12 @@ void tela_creditos(void) {
 
     for (int i = 0; i < 5; i++) {
         DrawRectangleRounded((Rectangle){80, 130 + i*70, 640, 55}, 0.3f, 8, cores[i]);
-        DrawText(nomes[i], 110, 143 + i*70, 22, WHITE);
-        DrawText(funcoes[i], 420, 143 + i*70, 18, WHITE);
+        txt(nomes[i], 110, 143 + i*70, 22, WHITE);
+        txt(funcoes[i], 420, 143 + i*70, 18, WHITE);
     }
 
-    DrawText("Disciplina: Algoritmos e Estruturas de Dados", 150, 500, 18, COR_TEXTO);
-    DrawText("Tema: Na Vibe do Recife - Comida de Mainha", 155, 525, 18, COR_TEXTO);
+    txt("Disciplina: Algoritmos e Estruturas de Dados", 150, 500, 18, COR_TEXTO);
+    txt("Tema: Na Vibe do Recife - Receitas de Mainha", 155, 525, 18, COR_TEXTO);
 
     desenhar_rodape("[ESC] Voltar ao menu");
 }

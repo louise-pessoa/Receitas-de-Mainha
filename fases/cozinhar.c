@@ -205,11 +205,7 @@ void cozinhar_iniciar(Receita *receita) {
     }
 
     // carrega textura frigideira pronta (para empratar)
-<<<<<<< HEAD
-    Texture2D tex_frigideira = LoadTexture("sprites/receitas/frigideira_tapioca_pronta.png");
-=======
     Texture2D tex_frigideira = LoadTexture("sprites/receitas/frigideira_vazia.png");
->>>>>>> 3f8eee6227e34fd96013e7de85e3e7b786e0852d
     if (tex_frigideira.id != 0) {
         cozinhar.textura_frigideira_pronta = tex_frigideira;
         SetTextureFilter(cozinhar.textura_frigideira_pronta, TEXTURE_FILTER_BILINEAR);

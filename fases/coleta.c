@@ -175,11 +175,7 @@ void catcher_carregar_sprites(void) {
         _spr_cebola_carregado = 1;
     }
 
-<<<<<<< HEAD
     _spr_mandioca = LoadTexture("sprites/coleta/macaxeira.png");
-=======
-    _spr_mandioca = LoadTexture("sprites/coleta/mandioca.png");
->>>>>>> 3f8eee6227e34fd96013e7de85e3e7b786e0852d
     if (_spr_mandioca.id != 0) {
         SetTextureFilter(_spr_mandioca, TEXTURE_FILTER_BILINEAR);
         _spr_mandioca_carregado = 1;

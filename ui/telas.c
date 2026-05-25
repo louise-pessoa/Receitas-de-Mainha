@@ -31,6 +31,8 @@ typedef struct {
     Texture2D jurado_clarice;
     Texture2D jurado_chico;
     int jurados_carregados;
+    Texture2D tela_inicial;
+    int tela_inicial_carregada;
 } EstadoTelas;
 
 static EstadoTelas telas_estado = {0};
@@ -109,6 +111,12 @@ static Texture2D obter_sprite_telas(const char *nome) {
 
 // carrega texturas das telas
 void telas_carregar_sprites(void) {
+    telas_estado.tela_inicial = LoadTexture("sprites/tela_inicial.png");
+    if (telas_estado.tela_inicial.id != 0) {
+        SetTextureFilter(telas_estado.tela_inicial, TEXTURE_FILTER_BILINEAR);
+        telas_estado.tela_inicial_carregada = 1;
+    }
+
     telas_estado.bg_jurados = LoadTexture("sprites/jurados_nota.png");
     if (telas_estado.bg_jurados.id != 0) {
         SetTextureFilter(telas_estado.bg_jurados, TEXTURE_FILTER_BILINEAR);
@@ -126,6 +134,10 @@ void telas_carregar_sprites(void) {
 
 // descarrega texturas das telas
 void telas_limpar(void) {
+    if (telas_estado.tela_inicial_carregada) {
+        UnloadTexture(telas_estado.tela_inicial);
+        telas_estado.tela_inicial_carregada = 0;
+    }
     if (telas_estado.bg_carregado) {
         UnloadTexture(telas_estado.bg_jurados);
         telas_estado.bg_carregado = 0;
@@ -189,23 +201,27 @@ static void desenhar_rodape(const char *texto) {
 // TELA: MENU PRINCIPAL
 // ==========================================
 void tela_menu(void) {
-    // fundo cozinha (cor quente)
     ClearBackground(COR_FUNDO);
 
-    // cabecalho
-    DrawRectangle(0, 0, 800, 70, COR_AZUL);
-    DrawRectangle(0, 65, 800, 6, COR_AMARELO);
-
-    // titulo principal
-    DrawText("COMIDA", 260, 80, 64, COR_VERMELHO);
-    DrawText("DE", 340, 140, 48, COR_AZUL);
-    DrawText("MAINHA", 240, 185, 64, COR_AZUL);
-
-    // estrelinhas decorativas
-    DrawText("*", 210, 90, 28, COR_AMARELO);
-    DrawText("*", 570, 90, 28, COR_VERDE);
-    DrawText("*", 190, 200, 20, COR_VERMELHO);
-    DrawText("*", 590, 200, 20, COR_LARANJA);
+    // imagem de capa (ocupa a tela inteira)
+    if (telas_estado.tela_inicial_carregada) {
+        Texture2D t = telas_estado.tela_inicial;
+        DrawTexturePro(t,
+            (Rectangle){0, 0, (float)t.width, (float)t.height},
+            (Rectangle){0, 0, 800, 600},
+            (Vector2){0, 0}, 0.0f, WHITE);
+    } else {
+        // fallback: fundo colorido original
+        DrawRectangle(0, 0, 800, 70, COR_AZUL);
+        DrawRectangle(0, 65, 800, 6, COR_AMARELO);
+        DrawText("COMIDA", 260, 80, 64, COR_VERMELHO);
+        DrawText("DE", 340, 140, 48, COR_AZUL);
+        DrawText("MAINHA", 240, 185, 64, COR_AZUL);
+        DrawText("*", 210, 90, 28, COR_AMARELO);
+        DrawText("*", 570, 90, 28, COR_VERDE);
+        DrawText("*", 190, 200, 20, COR_VERMELHO);
+        DrawText("*", 590, 200, 20, COR_LARANJA);
+    }
 
     // botoes principais
     desenhar_botao(200, 290, 180, 55, COR_VERMELHO, "Receitas");

@@ -307,6 +307,12 @@ static void avancar_passo(int acertou) {
     }
 }
 
+static void ativar_feedback_erro(void) {
+    cozinhar.feedback_acerto = 0;
+    cozinhar.fase = COZ_FASE_FEEDBACK;
+    cozinhar.feedback_timer = 0.0f;
+}
+
 static void fase_clicar(void) {
     cozinhar.tempo_passo += GetFrameTime();
 
@@ -336,6 +342,7 @@ static void fase_clicar(void) {
                 cozinhar.pontos -= 2;
                 if (cozinhar.pontos < 0) cozinhar.pontos = 0;
                 estado.erro_passo++;
+                ativar_feedback_erro();
             }
             return;
         }
@@ -379,6 +386,7 @@ static void fase_teclas(void) {
             cozinhar.pontos -= 1;
             if (cozinhar.pontos < 0) cozinhar.pontos = 0;
             estado.erro_passo++;
+            ativar_feedback_erro();
         }
         tecla = GetKeyPressed();
     }
@@ -388,7 +396,9 @@ static void fase_feedback(void) {
     cozinhar.feedback_timer += GetFrameTime();
     
     // Se está no forno, usa delay maior
-    float tempo_minimo = (cozinhar.delay_forno > 0) ? cozinhar.delay_forno : 1.0f;
+    float tempo_minimo = (cozinhar.delay_forno > 0)
+                             ? cozinhar.delay_forno
+                             : (cozinhar.feedback_acerto ? 1.0f : 0.15f);
     
     if (cozinhar.feedback_timer >= tempo_minimo) {
         if (cozinhar.feedback_acerto) {
@@ -408,7 +418,7 @@ static void fase_feedback(void) {
         } else {
             // Ativa sticker de erro (mainha brava)
             cozinhar.mostrando_mainha_brava = 1;
-            cozinhar.timer_mainha_brava = 1.5f;  // 1.5 segundos de exibição
+            cozinhar.timer_mainha_brava = 0.9f;  // exibição mais rápida
         }
         // se errou, reinicia o mesmo passo; se acertou, ja avancou o idx acima
         cozinhar.fase = COZ_FASE_CLICAR;
@@ -642,15 +652,7 @@ static void desenhar_grid(void) {
 
 static void desenhar_feedback(void) {
     if (cozinhar.fase != COZ_FASE_FEEDBACK) return;
-    Color cor = cozinhar.feedback_acerto ? COR_VERDE_COZ : COR_VERM_COZ;
-    const char *msg = cozinhar.feedback_acerto ? "ACERTOU!" : "PERDEU O TEMPO!";
-    int tam = 56;
-    int tw = medir_txt(msg, tam);
-    // Não desenhar a barra de fundo nem o texto de acerto; apenas mostrar mensagem de erro
-    if (!cozinhar.feedback_acerto) {
-        DrawRectangle(0, 220, LARG, 100, (Color){0, 0, 0, 80});
-        txt(msg, (LARG - tw) / 2, 240, tam, cor);
-    }
+    (void)cozinhar;
 }
 
 static void desenhar_imagem_passo(void) {
@@ -784,7 +786,7 @@ static void desenhar_mainha_brava(void) {
     
     // Anima tamanho e opacidade com base no tempo restante
     // Mesmo efeito que mainha_animada
-    float progresso = cozinhar.timer_mainha_brava / 1.5f;  // 0 a 1
+    float progresso = cozinhar.timer_mainha_brava / 0.9f;   // 0 a 1
     float escala = 0.7f + (progresso * 0.3f);             // 0.7 a 1.0
     float opacidade = 0.3f + (progresso * 0.7f);          // 0.3 a 1.0 
     

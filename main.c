@@ -16,6 +16,19 @@
 #define LARG_VIRTUAL 800
 #define ALT_VIRTUAL  600
 
+typedef enum {
+    MUSICA_NENHUMA = 0,
+    MUSICA_PRAIEIRA,
+    MUSICA_VOLTEI_RECIFE,
+    MUSICA_MEU_ESQUEMA,
+} TipoMusica;
+
+static Music musica_a_praieira = {0};
+static Music musica_voltei_recife = {0};
+static Music musica_meu_esquema = {0};
+static TipoMusica musica_ativa = MUSICA_NENHUMA;
+static int musicas_carregadas = 0;
+
 static void alternar_fullscreen(void) {
     int monitor = GetCurrentMonitor();
     int mw = GetMonitorWidth(monitor);
@@ -95,12 +108,82 @@ static void disparar_jurados(void) {
     pthread_detach(_thread_jurados_id);
 }
 
+static void carregar_musicas(void) {
+    if (musicas_carregadas) return;
+
+    musica_a_praieira = LoadMusicStream("musicas/a_praieira.mp3");
+    musica_voltei_recife = LoadMusicStream("musicas/voltei_recife.mp3");
+    musica_meu_esquema = LoadMusicStream("musicas/meu_esquema.mp3");
+
+    musica_a_praieira.looping = true;
+    musica_voltei_recife.looping = true;
+    musica_meu_esquema.looping = true;
+
+    SetMusicVolume(musica_a_praieira, 0.55f);
+    SetMusicVolume(musica_voltei_recife, 0.55f);
+    SetMusicVolume(musica_meu_esquema, 0.55f);
+
+    musicas_carregadas = 1;
+}
+
+static void liberar_musicas(void) {
+    if (!musicas_carregadas) return;
+
+    StopMusicStream(musica_a_praieira);
+    StopMusicStream(musica_voltei_recife);
+    StopMusicStream(musica_meu_esquema);
+    UnloadMusicStream(musica_a_praieira);
+    UnloadMusicStream(musica_voltei_recife);
+    UnloadMusicStream(musica_meu_esquema);
+    musicas_carregadas = 0;
+    musica_ativa = MUSICA_NENHUMA;
+}
+
+static TipoMusica musica_para_tela(void) {
+    switch (tela_atual) {
+        case TELA_MENU:
+        case TELA_RECEITAS:
+        case TELA_INGREDIENTES:
+            return MUSICA_PRAIEIRA;
+        case TELA_CATCHER:
+        case TELA_ORDENACAO:
+            return MUSICA_VOLTEI_RECIFE;
+        case TELA_PILHA:
+        case TELA_FEEDBACK:
+        case TELA_RESULTADO:
+            return MUSICA_MEU_ESQUEMA;
+        default:
+            return MUSICA_NENHUMA;
+    }
+}
+
+static void atualizar_musica(void) {
+    if (!musicas_carregadas) return;
+
+    TipoMusica desejada = musica_para_tela();
+    if (desejada != musica_ativa) {
+        if (musica_ativa == MUSICA_PRAIEIRA) StopMusicStream(musica_a_praieira);
+        else if (musica_ativa == MUSICA_VOLTEI_RECIFE) StopMusicStream(musica_voltei_recife);
+        else if (musica_ativa == MUSICA_MEU_ESQUEMA) StopMusicStream(musica_meu_esquema);
+
+        musica_ativa = desejada;
+        if (musica_ativa == MUSICA_PRAIEIRA) PlayMusicStream(musica_a_praieira);
+        else if (musica_ativa == MUSICA_VOLTEI_RECIFE) PlayMusicStream(musica_voltei_recife);
+        else if (musica_ativa == MUSICA_MEU_ESQUEMA) PlayMusicStream(musica_meu_esquema);
+    }
+
+    if (musica_ativa == MUSICA_PRAIEIRA) UpdateMusicStream(musica_a_praieira);
+    else if (musica_ativa == MUSICA_VOLTEI_RECIFE) UpdateMusicStream(musica_voltei_recife);
+    else if (musica_ativa == MUSICA_MEU_ESQUEMA) UpdateMusicStream(musica_meu_esquema);
+}
+
 int main(void) {
     iniciar_jogo();
     integrar_modulos();
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
     InitWindow(LARG_VIRTUAL, ALT_VIRTUAL, "Receitas de Mainha");
+    InitAudioDevice();
     SetTargetFPS(60);
 
     fonte_carregar("fontes/fonte.ttf", 96);
@@ -108,12 +191,15 @@ int main(void) {
     // carrega sprites depois que a janela existe (textura precisa de contexto OpenGL)
     catcher_carregar_sprites();
     telas_carregar_sprites();
+    carregar_musicas();
 
     RenderTexture2D alvo = LoadRenderTexture(LARG_VIRTUAL, ALT_VIRTUAL);
     SetTextureFilter(alvo.texture, TEXTURE_FILTER_BILINEAR);
     SetExitKey(0);
 
     while (!WindowShouldClose()) {
+        atualizar_musica();
+
         if (IsKeyPressed(KEY_ESCAPE)) {
             if (tela_atual == TELA_MENU) break;
             if (tela_atual == TELA_RESULTADO) {
@@ -330,9 +416,11 @@ int main(void) {
     }
 
     UnloadRenderTexture(alvo);
+    liberar_musicas();
     catcher_descarregar_sprites();
     liberar_receitas(receitas_disponiveis);
     fonte_descarregar();
+    CloseAudioDevice();
     CloseWindow();
     return 0;
 }

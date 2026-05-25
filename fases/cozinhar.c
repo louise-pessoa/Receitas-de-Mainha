@@ -237,9 +237,18 @@ void cozinhar_iniciar(Receita *receita) {
         }
     }
 
+    // carrega mainha neutra (canto do balao de instrucao)
+    cozinhar.textura_mainha_carregada = 0;
+    Texture2D tex_mainha_neutra = LoadTexture("sprites/mainhas/mainha.png");
+    if (tex_mainha_neutra.id != 0) {
+        cozinhar.textura_mainha = tex_mainha_neutra;
+        SetTextureFilter(cozinhar.textura_mainha, TEXTURE_FILTER_BILINEAR);
+        cozinhar.textura_mainha_carregada = 1;
+    }
+
     // carrega sticker de bom trabalho (mainha animada)
     cozinhar.textura_mainha_animada_carregada = 0;
-    Texture2D tex_mainha = LoadTexture("sprites/mainhas/mainha_animada.png");
+    Texture2D tex_mainha = LoadTexture("sprites/mainhas/mainha.png");
     if (tex_mainha.id != 0) {
         cozinhar.textura_mainha_animada = tex_mainha;
         SetTextureFilter(cozinhar.textura_mainha_animada, TEXTURE_FILTER_BILINEAR);
@@ -537,17 +546,20 @@ static void desenhar_instrucao(void) {
     // desenha mainha animada no canto direito do balao de instrucao
     // NÃO desenha aqui se a reação central (mostrando_mainha/mostrando_mainha_brava) estiver ativa,
     // para evitar duplicação da mesma sprite.
-    if (!cozinhar.mostrando_mainha && !cozinhar.mostrando_mainha_brava && cozinhar.textura_mainha_animada_carregada) {
-        Texture2D tex = cozinhar.textura_mainha_animada;
-        // escala para caber no balao (altura max ~70)
-        float max_h = 70.0f;
-        float sc = 1.0f;
-        if (tex.height > 0) sc = (max_h / (float)tex.height);
-        if (sc > 1.0f) sc = 1.0f;
-        float draw_w = tex.width * sc;
-        float draw_h = tex.height * sc;
-        Rectangle src = (Rectangle){0.0f, 0.0f, (float)tex.width, (float)tex.height};
-        Rectangle dst = (Rectangle){ 40 + 720 - 10 - draw_w, 70 + (90 - draw_h) / 2.0f, draw_w, draw_h };
+    if (!cozinhar.mostrando_mainha && !cozinhar.mostrando_mainha_brava && cozinhar.textura_mainha_carregada) {
+        Texture2D tex = cozinhar.textura_mainha;
+
+        // Sprite neutro (612x408, mainha ocupando bem o canvas)
+        float max_h = 100.0f;
+        float sc = max_h / (float)tex.height;
+        float draw_w = (float)tex.width * sc;
+        float draw_h = (float)tex.height * sc;
+
+        // posiciona no canto direito do balao
+        float pos_x = 40.0f + 720.0f - draw_w - 5.0f;
+        float pos_y = 70.0f + (90.0f - draw_h) / 2.0f;
+        Rectangle src = { 0, 0, (float)tex.width, (float)tex.height };
+        Rectangle dst = { pos_x, pos_y, draw_w, draw_h };
         DrawTexturePro(tex, src, dst, (Vector2){0,0}, 0.0f, WHITE);
     }
 
@@ -896,6 +908,12 @@ void cozinhar_limpar(void) {
         cozinhar.textura_frigideira_pronta_carregada = 0;
     }
     
+    // libera textura mainha neutra
+    if (cozinhar.textura_mainha_carregada) {
+        UnloadTexture(cozinhar.textura_mainha);
+        cozinhar.textura_mainha_carregada = 0;
+    }
+
     // libera textura mainha animada (sticker de bom trabalho)
     if (cozinhar.textura_mainha_animada_carregada) {
         UnloadTexture(cozinhar.textura_mainha_animada);

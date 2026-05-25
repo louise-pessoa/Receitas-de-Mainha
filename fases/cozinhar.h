@@ -62,6 +62,10 @@ typedef struct {
     Texture2D textura_pronta;     // textura da receita pronta
     int textura_pronta_carregada; // flag se foi carregada
     
+    // Mainha "neutra" exibida sempre no canto do balao de instrucao
+    Texture2D textura_mainha;
+    int textura_mainha_carregada;
+
     // Sticker de bom trabalho (mainha animada)
     Texture2D textura_mainha_animada;
     int textura_mainha_animada_carregada;

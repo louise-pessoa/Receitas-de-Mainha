@@ -163,10 +163,17 @@ void telas_limpar(void) {
 
 // desenha botao colorido com texto centralizado
 static void desenhar_botao(int x, int y, int w, int h, Color cor, const char *texto) {
+    // sombra
+    DrawRectangleRounded((Rectangle){x + 4, y + 5, w, h}, 0.4f, 8, (Color){0, 0, 0, 100});
+    // corpo
     DrawRectangleRounded((Rectangle){x, y, w, h}, 0.4f, 8, cor);
-    DrawRectangleRoundedLines((Rectangle){x, y, w, h}, 0.4f, 8, 2.0f, WHITE);
-    int tam = 22;
+    // borda branca fina
+    DrawRectangleRoundedLines((Rectangle){x, y, w, h}, 0.4f, 8, 1.5f, (Color){255, 255, 255, 180});
+    // texto
+    int tam = 24;
     int tw = medir_txt(texto, tam);
+    // sombra do texto
+    txt(texto, x + (w - tw) / 2 + 1, y + (h - tam) / 2 + 2, tam, (Color){0, 0, 0, 120});
     txt(texto, x + (w - tw) / 2, y + (h - tam) / 2, tam, WHITE);
 }
 
@@ -224,22 +231,15 @@ void tela_menu(void) {
         txt("*", 590, 200, 20, COR_LARANJA);
     }
 
-    // botoes principais
-    desenhar_botao(200, 290, 180, 55, COR_VERMELHO, "Receitas");
-    desenhar_botao(430, 290, 160, 55, COR_AZUL,     "Colecao");
+    // botoes principais (parte inferior, centralizados)
+    desenhar_botao(200, 490, 180, 55, COR_VERMELHO, "Receitas");
+    desenhar_botao(430, 490, 160, 55, COR_AZUL,     "Colecao");
 
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         Vector2 m = GetMousePosition();
-        if (CheckCollisionPointRec(m, (Rectangle){200, 290, 180, 55})) tela_atual = TELA_RECEITAS;
-        if (CheckCollisionPointRec(m, (Rectangle){430, 290, 160, 55})) tela_atual = TELA_CREDITOS;
+        if (CheckCollisionPointRec(m, (Rectangle){200, 490, 180, 55})) tela_atual = TELA_RECEITAS;
+        if (CheckCollisionPointRec(m, (Rectangle){430, 490, 160, 55})) tela_atual = TELA_CREDITOS;
     }
-
-    // instrucao
-    txt("[2] Comecar (escolher receita)    [8] Creditos    [F11] Tela cheia",
-             80, 370, 17, COR_TEXTO);
-
-    // pontuacao atual
-    txt(TextFormat("Pontuacao: %d", estado.pontuacao), 50, 420, 22, COR_TEXTO);
 
     // rodape
     DrawRectangle(0, 560, 800, 40, COR_BARRA_FUNDO);

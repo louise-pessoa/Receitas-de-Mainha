@@ -61,13 +61,13 @@ static void construir_caminho_sprite_telas(const char *nome, char *caminho, int 
     };
     for (size_t i = 0; i < sizeof(map)/sizeof(map[0]); i++) {
         if (strcasecmp(nome, map[i].nome) == 0) {
-            snprintf(caminho, tam, "sprites/%s", map[i].file);
+            snprintf(caminho, tam, "sprites/coleta/%s", map[i].file);
             return;
         }
     }
 
     // Fallback: lowercase + underscores
-    snprintf(caminho, tam, "sprites/");
+    snprintf(caminho, tam, "sprites/coleta/");
     int len = strlen(caminho);
     for (int i = 0; i < (int)strlen(nome) && len < tam - 5; i++) {
         char c = nome[i];
@@ -163,10 +163,17 @@ void telas_limpar(void) {
 
 // desenha botao colorido com texto centralizado
 static void desenhar_botao(int x, int y, int w, int h, Color cor, const char *texto) {
+    // sombra
+    DrawRectangleRounded((Rectangle){x + 4, y + 5, w, h}, 0.4f, 8, (Color){0, 0, 0, 100});
+    // corpo
     DrawRectangleRounded((Rectangle){x, y, w, h}, 0.4f, 8, cor);
-    DrawRectangleRoundedLines((Rectangle){x, y, w, h}, 0.4f, 8, 2.0f, WHITE);
-    int tam = 22;
+    // borda branca fina
+    DrawRectangleRoundedLines((Rectangle){x, y, w, h}, 0.4f, 8, 1.5f, (Color){255, 255, 255, 180});
+    // texto
+    int tam = 24;
     int tw = medir_txt(texto, tam);
+    // sombra do texto
+    txt(texto, x + (w - tw) / 2 + 1, y + (h - tam) / 2 + 2, tam, (Color){0, 0, 0, 120});
     txt(texto, x + (w - tw) / 2, y + (h - tam) / 2, tam, WHITE);
 }
 
@@ -224,22 +231,15 @@ void tela_menu(void) {
         txt("*", 590, 200, 20, COR_LARANJA);
     }
 
-    // botoes principais
-    desenhar_botao(200, 290, 180, 55, COR_VERMELHO, "Receitas");
-    desenhar_botao(430, 290, 160, 55, COR_AZUL,     "Colecao");
+    // botoes principais (parte inferior, centralizados)
+    desenhar_botao(200, 490, 180, 55, COR_VERMELHO, "Receitas");
+    desenhar_botao(430, 490, 160, 55, COR_AZUL,     "Colecao");
 
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         Vector2 m = GetMousePosition();
-        if (CheckCollisionPointRec(m, (Rectangle){200, 290, 180, 55})) tela_atual = TELA_RECEITAS;
-        if (CheckCollisionPointRec(m, (Rectangle){430, 290, 160, 55})) tela_atual = TELA_CREDITOS;
+        if (CheckCollisionPointRec(m, (Rectangle){200, 490, 180, 55})) tela_atual = TELA_RECEITAS;
+        if (CheckCollisionPointRec(m, (Rectangle){430, 490, 160, 55})) tela_atual = TELA_CREDITOS;
     }
-
-    // instrucao
-    txt("[2] Comecar (escolher receita)    [8] Creditos    [F11] Tela cheia",
-             80, 370, 17, COR_TEXTO);
-
-    // pontuacao atual
-    txt(TextFormat("Pontuacao: %d", estado.pontuacao), 50, 420, 22, COR_TEXTO);
 
     // rodape
     DrawRectangle(0, 560, 800, 40, COR_BARRA_FUNDO);
@@ -482,101 +482,101 @@ void tela_feedback(int acertou) {
 // ==========================================
 void tela_resultado(int venceu, ResultadoJurados *j)
 {
-    // desenha fundo
+    // fundo
     if (telas_estado.bg_carregado) {
         DrawTexturePro(telas_estado.bg_jurados,
                        (Rectangle){0, 0, telas_estado.bg_jurados.width, telas_estado.bg_jurados.height},
                        (Rectangle){0, 0, 800, 600},
                        (Vector2){0, 0}, 0.0f, WHITE);
     } else {
-        ClearBackground(COR_FUNDO);
-        DrawRectangle(0, 0, 800, 600, venceu ? (Color){220,255,220,255} : (Color){255,220,220,255});
+        ClearBackground((Color){240, 235, 220, 255});
+    }
+    // overlay escuro para garantir legibilidade
+    DrawRectangle(0, 0, 800, 600, (Color){0, 0, 0, 120});
+
+    // cabecalho
+    DrawRectangle(0, 0, 800, 60, (Color){30, 60, 140, 240});
+    DrawRectangle(0, 55, 800, 5, COR_AMARELO);
+    const char *titulo = venceu ? "PARABENS! RECEITA CONCLUIDA!" : "RESULTADO FINAL";
+    int ttw = medir_txt(titulo, 26);
+    txt(titulo, (800 - ttw) / 2, 14, 26, WHITE);
+
+    if (j == NULL) {
+        // aguardando jurados
+        txt("Avaliando sua performance...", 240, 280, 24, WHITE);
+        txt("[ESC] Voltar ao menu", 290, 540, 18, (Color){255, 220, 80, 255});
+        return;
     }
 
-    for (int i = 0; i < 8; i++) {
-        DrawRectangle(i*100, 0, 100, 50, (Color){200,230,255,180});
-        DrawRectangleLines(i*100, 0, 100, 50, (Color){150,200,255,200});
+    // media e pontuacao em destaque
+    char buf_media[64], buf_pts[64];
+    snprintf(buf_media, sizeof(buf_media), "Media: %.1f / 10", j->media_final);
+    snprintf(buf_pts,   sizeof(buf_pts),   "Pontuacao: %d",    estado.pontuacao);
+    Color cor_media  = j->media_final   >= 7.0f            ? COR_VERDE : COR_VERMELHO;
+    Color cor_pontos = estado.pontuacao >= META_FASE_FINAL  ? COR_VERDE : COR_VERMELHO;
+
+    DrawRectangleRounded((Rectangle){20, 68, 370, 52}, 0.2f, 8, (Color){0,0,0,160});
+    DrawRectangleRounded((Rectangle){410, 68, 370, 52}, 0.2f, 8, (Color){0,0,0,160});
+    int mw = medir_txt(buf_media, 26);
+    int pw = medir_txt(buf_pts,   26);
+    txt(buf_media, 20  + (370 - mw) / 2, 80, 26, cor_media);
+    txt(buf_pts,   410 + (370 - pw) / 2, 80, 26, cor_pontos);
+
+    // cards dos jurados
+    const int card_x = 20;
+    const int card_w = 760;
+    const int card_h = 88;
+    const int sprite_size = 68;
+
+    struct { int y; Color cor; Texture2D *spr; const char *nome; float nota; const char *comentario; } jurados[] = {
+        { 130, (Color){255, 243, 210, 230}, &telas_estado.jurado_ariano,  "Ariano Suassuna",  j->nota_ariano,  j->comentario_ariano  },
+        { 226, (Color){220, 235, 255, 230}, &telas_estado.jurado_clarice, "Clarice Lispector",j->nota_clarice, j->comentario_clarice },
+        { 322, (Color){215, 255, 220, 230}, &telas_estado.jurado_chico,   "Chico Science",    j->nota_chico,   j->comentario_chico   },
+    };
+
+    for (int i = 0; i < 3; i++) {
+        int cy = jurados[i].y;
+        DrawRectangleRounded((Rectangle){card_x, cy, card_w, card_h}, 0.12f, 8, jurados[i].cor);
+        DrawRectangleRoundedLines((Rectangle){card_x, cy, card_w, card_h}, 0.12f, 8, 1.5f, (Color){0,0,0,60});
+
+        int text_x = card_x + 12;
+        if (jurados[i].spr->id) {
+            Texture2D t = *jurados[i].spr;
+            float sc = (float)sprite_size / (float)(t.height > 0 ? t.height : 1);
+            DrawTextureEx(t, (Vector2){(float)(card_x + 8), (float)(cy + (card_h - t.height*sc)/2)}, 0.0f, sc, WHITE);
+            text_x = card_x + 8 + sprite_size + 14;
+        }
+
+        // nome + nota
+        char buf_nome[64];
+        snprintf(buf_nome, sizeof(buf_nome), "%s", jurados[i].nome);
+        txt(buf_nome, text_x, cy + 10, 20, COR_TEXTO);
+
+        char buf_nota[16];
+        snprintf(buf_nota, sizeof(buf_nota), "%.1f/10", jurados[i].nota);
+        Color cor_nota = jurados[i].nota >= 7.0f ? (Color){30,130,60,255} : (Color){180,30,30,255};
+        int nw = medir_txt(buf_nota, 22);
+        txt(buf_nota, card_x + card_w - nw - 14, cy + 10, 22, cor_nota);
+
+        // comentario com texto escuro sobre fundo claro
+        txt(jurados[i].comentario, text_x, cy + 36, 16, (Color){40, 20, 10, 255});
     }
 
-    // removido texto grande no topo (congrats/try again) — informações estão no painel dos jurados
-    (void)venceu; // variável mantida para compatibilidade futuro
+    // rodape
+    DrawRectangle(0, 418, 800, 182, (Color){20, 45, 110, 220});
+    DrawRectangle(0, 418, 800, 4, COR_AMARELO);
 
-    /* Painel dos jurados */
-    if (j != NULL) {
-        /* Fundo do painel (reduzido para evitar encostar na barra inferior) */
-        DrawRectangleRounded((Rectangle){20, 135, 760, 350}, 0.05f, 8, (Color){255,255,255,220});
-        txt("JURI DA FASE FINAL", 280, 145, 24, COR_TEXTO);
+    // resumo final
+    const char *msg = venceu ? "Voce conquistou o Marco Zero!" : "Continue praticando com Mainha!";
+    int mw2 = medir_txt(msg, 22);
+    txt(msg, (800 - mw2) / 2, 432, 22, COR_AMARELO);
 
-        /* Media e Pontuacao — centralizadas lado a lado */
-        char buf_media[64];
-        char buf_pts[64];
-        snprintf(buf_media, sizeof(buf_media), "Media: %.1f/10", j->media_final);
-        snprintf(buf_pts, sizeof(buf_pts), "Pontuacao: %d", estado.pontuacao);
-        int mw = medir_txt(buf_media, 20);
-        int pw = medir_txt(buf_pts, 20);
-        int gap = 24;
-        int totalw = mw + pw + gap;
-        int startx = (800 - totalw) / 2;
-        Color cor_media = j->media_final >= 7.0f ? COR_VERDE : COR_VERMELHO;
-        Color cor_pontos = estado.pontuacao >= META_FASE_FINAL ? COR_VERDE : COR_VERMELHO;
-        txt(buf_media, startx, 172, 20, cor_media);
-        txt(buf_pts, startx + mw + gap, 172, 20, cor_pontos);
+    char buf_r[128];
+    snprintf(buf_r, sizeof(buf_r), "Pontos: %d   |   Media: %.1f/10", estado.pontuacao, j->media_final);
+    int rw = medir_txt(buf_r, 19);
+    txt(buf_r, (800 - rw) / 2, 462, 19, WHITE);
 
-        /* Função auxiliar pequena: desenhar bloco do jurado com sprite à esquerda, texto à direita */
-        const int card_w = 750;
-        const int card_h = 85;
-        const int card_x = 25;
-        // Ariano
-        DrawRectangleRounded((Rectangle){card_x, 200, card_w, card_h}, 0.1f, 8, (Color){255,230,180,255});
-        {
-            int sprite_size = 72;
-            int text_x = card_x + 10;
-            if (telas_estado.jurado_ariano.id) {
-                Texture2D t = telas_estado.jurado_ariano;
-                float sc = (float)sprite_size / (float)t.width;
-                DrawTextureEx(t, (Vector2){(float)(card_x + 8), (float)(200 + 6)}, 0.0f, sc, WHITE);
-                text_x = card_x + 8 + sprite_size + 12;
-            }
-            txt(TextFormat("Ariano Suassuna   %.1f/10", j->nota_ariano), text_x, 208, 20, COR_TEXTO);
-            txt(j->comentario_ariano, text_x, 232, 17, DARKGRAY);
-        }
-
-        // Clarice
-        DrawRectangleRounded((Rectangle){card_x, 292, card_w, card_h}, 0.1f, 8, (Color){210,230,255,255});
-        {
-            int sprite_size = 72;
-            int text_x = card_x + 10;
-            if (telas_estado.jurado_clarice.id) {
-                Texture2D t = telas_estado.jurado_clarice;
-                float sc = (float)sprite_size / (float)t.width;
-                DrawTextureEx(t, (Vector2){(float)(card_x + 8), (float)(292 + 6)}, 0.0f, sc, WHITE);
-                text_x = card_x + 8 + sprite_size + 12;
-            }
-            txt(TextFormat("Clarice Lispector   %.1f/10", j->nota_clarice), text_x, 300, 20, COR_TEXTO);
-            txt(j->comentario_clarice, text_x, 324, 17, DARKGRAY);
-        }
-
-        // Chico
-        DrawRectangleRounded((Rectangle){card_x, 384, card_w, card_h}, 0.1f, 8, (Color){210,255,220,255});
-        {
-            int sprite_size = 72;
-            int text_x = card_x + 10;
-            if (telas_estado.jurado_chico.id) {
-                Texture2D t = telas_estado.jurado_chico;
-                float sc = (float)sprite_size / (float)t.width;
-                DrawTextureEx(t, (Vector2){(float)(card_x + 8), (float)(384 + 6)}, 0.0f, sc, WHITE);
-                text_x = card_x + 8 + sprite_size + 12;
-            }
-            txt(TextFormat("Chico Science   %.1f/10", j->nota_chico), text_x, 392, 20, COR_TEXTO);
-            txt(j->comentario_chico, text_x, 416, 17, DARKGRAY);
-        }
-    }
-
-    DrawRectangle(0, 498, 800, 102, COR_BARRA_FUNDO);
-    int tw = medir_txt(venceu ? "Parabens! Voce e o melhor cozinheiro!" : "Continue treinando com mainha!", 20);
-    txt(venceu ? "Parabens! Voce e o melhor cozinheiro!" : "Continue treinando com mainha!",
-             (800-tw)/2, 508, 20, COR_AMARELO);
-    txt("[ESC] Voltar ao menu", 300, 540, 18, WHITE);
+    txt("[ESC] Voltar ao menu", 300, 500, 18, (Color){200, 200, 200, 255});
 }
 
 // ==========================================

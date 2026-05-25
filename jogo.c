@@ -106,7 +106,11 @@ void integrar_modulos(void) {
     escondidinho->passos = push_passo(escondidinho->passos,
         "Corte a carne de sol", "Carne de sol", "WSWS", "sprites/receitas/tabua_carne.png");
     escondidinho->passos = push_passo(escondidinho->passos,
+<<<<<<< HEAD
         "Descasque a macaxeira", "Macaxeira","SSSS", "sprites/receitas/macaxeira_tabua.png");
+=======
+        "Descasque a macaxeira", "Mandioca", "SSSS", "sprites/receitas/macaxeira_tabua.png");
+>>>>>>> 3f8eee6227e34fd96013e7de85e3e7b786e0852d
     escondidinho->passos = push_passo(escondidinho->passos,
         "Corte a cebola", "Cebola", "QWER", "sprites/receitas/tabua_cebola.png");
     escondidinho->passos = push_passo(escondidinho->passos,
@@ -114,7 +118,11 @@ void integrar_modulos(void) {
     escondidinho->passos = push_passo(escondidinho->passos,
         "Coloque a carne na travessa", "Carne de sol", "SPACE", "sprites/receitas/travessa_vazia.png");
     escondidinho->passos = push_passo(escondidinho->passos,
+<<<<<<< HEAD
         "Coloque a macaxeira", "Macaxeira","DDD", "sprites/receitas/travessa_carne.png");
+=======
+        "Coloque a macaxeira", "Mandioca", "DDD", "sprites/receitas/travessa_carne.png");
+>>>>>>> 3f8eee6227e34fd96013e7de85e3e7b786e0852d
     escondidinho->passos = push_passo(escondidinho->passos,
         "Coloque o queijo coalho", "Queijo coalho", "CCC", "sprites/receitas/travessa_macaxeira.png");
     escondidinho->passos = push_passo(escondidinho->passos,

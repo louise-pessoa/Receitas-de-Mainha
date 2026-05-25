@@ -39,7 +39,7 @@ static void construir_caminho_sprite(const char *nome, char *caminho, int tam_ca
     }
 
     // Fallback: converte para lowercase e substitui espacos por underscore
-    snprintf(caminho, tam_caminho, "sprites/");
+    snprintf(caminho, tam_caminho, "sprites/coleta/");
     int len = strlen(caminho);
     for (int i = 0; i < (int)strlen(nome) && len < tam_caminho - 5; i++) {
         char c = nome[i];

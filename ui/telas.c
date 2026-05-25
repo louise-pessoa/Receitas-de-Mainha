@@ -112,7 +112,7 @@ static Texture2D obter_sprite_telas(const char *nome) {
 
 // carrega texturas das telas
 void telas_carregar_sprites(void) {
-    telas_estado.tela_inicial = LoadTexture("sprites/fundos/tela_inicial.png");
+    telas_estado.tela_inicial = LoadTexture("sprites/fundos/tela_inicial_titulo.png");
     if (telas_estado.tela_inicial.id != 0) {
         SetTextureFilter(telas_estado.tela_inicial, TEXTURE_FILTER_BILINEAR);
         telas_estado.tela_inicial_carregada = 1;

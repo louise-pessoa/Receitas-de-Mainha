@@ -668,40 +668,41 @@ static void desenhar_imagem_passo(void) {
 }
 
 static void desenhar_fim(void) {
-    // desenha a imagem pronta (pré-carregada)
+    // imagem pronta ocupa a tela toda
     if (cozinhar.venceu && cozinhar.textura_pronta_carregada) {
         Texture2D tex_pronta = cozinhar.textura_pronta;
-        float max_altura = (float)(ALT - 150);
-        float escala_altura = max_altura / (float)tex_pronta.height;
-        float escala_largura = (float)(LARG - 40) / (float)tex_pronta.width;
-        float escala = (escala_altura < escala_largura) ? escala_altura : escala_largura;
-
-        float largura = (float)tex_pronta.width * escala;
-        float altura = (float)tex_pronta.height * escala;
+        float escala_h = (float)ALT / (float)tex_pronta.height;
+        float escala_w = (float)LARG / (float)tex_pronta.width;
+        float escala = (escala_h < escala_w) ? escala_h : escala_w;
+        float largura = (float)tex_pronta.width  * escala;
+        float altura  = (float)tex_pronta.height * escala;
         float x = ((float)LARG - largura) / 2.0f;
-        float y = 20;
+        float y = ((float)ALT  - altura)  / 2.0f;
         DrawTextureEx(tex_pronta, (Vector2){x, y}, 0, escala, WHITE);
     }
-    
-    // desenha sprite mainha vitória no canto inferior direito
+
+    // sprite mainha vitoria no canto inferior esquerdo (acima da barra)
     if (cozinhar.textura_mainha_vitoria_carregada) {
         Texture2D tex = cozinhar.textura_mainha_vitoria;
-        float escala = 0.55f;  // tamanho do sprite de vitória
-        float largura = tex.width * escala;
-        float altura = tex.height * escala;
-        float x = LARG - largura - 20;  // canto inferior direito
-        float y = ALT - altura - 20;
-        DrawTextureEx(tex, (Vector2){x, y}, 0, escala, WHITE);
+        float altura_max = (float)(ALT - 40 - 52);  // entre as duas barras
+        float escala = altura_max / (float)tex.height;
+        if (escala > 1.0f) escala = 1.0f;
+        float larg = tex.width  * escala;
+        float alt  = tex.height * escala;
+        DrawTextureEx(tex, (Vector2){LARG - larg - 10, (float)(ALT - 40) - alt}, 0, escala, WHITE);
     }
 
-    // pontuação embaixo da imagem (texto em marrom escuro pra ler em fundo amarelo)
-    txt(TextFormat("Acertos: %d  Erros: %d",
-                        cozinhar.acertos, cozinhar.erros),
-             280, 470, 22, COR_TEXTO_COZ);
-    txt(TextFormat("Pontos finais: %d", cozinhar.pontos),
-             290, 510, 22, COR_LARA_COZ);
+    // barra superior com estatísticas
+    DrawRectangle(0, 0, LARG, 52, (Color){0, 0, 0, 170});
+    txt(TextFormat("Acertos: %d   Erros: %d   Pontos: %d",
+                   cozinhar.acertos, cozinhar.erros, cozinhar.pontos),
+        40, 14, 22, WHITE);
 
-    txt("[ENTER] Resultado final", 270, 550, 22, COR_LARA_COZ);
+    // barra inferior com instrução
+    DrawRectangle(0, ALT - 40, LARG, 40, (Color){0, 0, 0, 170});
+    int tw = medir_txt("[ENTER] Ver resultado final", 20);
+    txt("[ENTER] Ver resultado final", (LARG - tw) / 2, ALT - 28, 20,
+        COR_AMA_COZ);
 }
 
 // ==========================================

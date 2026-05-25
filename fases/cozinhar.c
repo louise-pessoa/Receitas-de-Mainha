@@ -30,7 +30,7 @@ EstadoCozinhar cozinhar;
 static const char *nome_tecla(char c) {
     static char buf[12];
     c = (char)toupper((unsigned char)c);
-    if (c == ' ' || c == '_') return "SPACE";
+    if (c == ' ' || c == '_') return "BARRA";
     buf[0] = c; buf[1] = '\0';
     return buf;
 }
@@ -373,6 +373,7 @@ static void fase_teclas(void) {
                    tecla != KEY_RIGHT_ALT) {
             // tecla errada zera progresso e penaliza pouco
             cozinhar.pos_tecla = 0;
+            cozinhar.erros++;
             cozinhar.pontos -= 1;
             if (cozinhar.pontos < 0) cozinhar.pontos = 0;
             estado.erro_passo++;
@@ -702,11 +703,6 @@ static void desenhar_fim(void) {
                    cozinhar.acertos, cozinhar.erros, cozinhar.pontos),
         40, 14, 22, WHITE);
 
-    // barra inferior com instrução
-    DrawRectangle(0, ALT - 40, LARG, 40, (Color){0, 0, 0, 170});
-    int tw = medir_txt("[ENTER] Ver resultado final", 20);
-    txt("[ENTER] Ver resultado final", (LARG - tw) / 2, ALT - 28, 20,
-        COR_AMA_COZ);
 }
 
 // ==========================================

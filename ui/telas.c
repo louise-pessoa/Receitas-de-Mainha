@@ -231,20 +231,29 @@ void tela_menu(void) {
         txt("*", 590, 200, 20, COR_LARANJA);
     }
 
-    // botoes principais (parte inferior, centralizados)
-    desenhar_botao(200, 490, 180, 55, COR_VERMELHO, "Receitas");
-    desenhar_botao(430, 490, 160, 55, COR_AZUL,     "Colecao");
+    // botoes principais (parte inferior, centralizados e com largura dinamica)
+    int botao_h = 55;
+    int botao_y = 490;
+    int botao_tam = 24;
+    int botao_padding = 30;
+    int botao_gap = 30;
+    int botao_w_receitas = medir_txt("Receitas", botao_tam) + botao_padding * 2;
+    int botao_w_creditos = medir_txt("Créditos", botao_tam) + botao_padding * 2;
+    int botoes_total = botao_w_receitas + botao_w_creditos + botao_gap;
+    int botoes_x0 = (800 - botoes_total) / 2;
+    int botao_x_receitas = botoes_x0;
+    int botao_x_creditos = botoes_x0 + botao_w_receitas + botao_gap;
+
+    desenhar_botao(botao_x_receitas, botao_y, botao_w_receitas, botao_h, COR_VERMELHO, "Receitas");
+    desenhar_botao(botao_x_creditos, botao_y, botao_w_creditos, botao_h, COR_AZUL,     "Créditos");
 
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         Vector2 m = GetMousePosition();
-        if (CheckCollisionPointRec(m, (Rectangle){200, 490, 180, 55})) tela_atual = TELA_RECEITAS;
-        if (CheckCollisionPointRec(m, (Rectangle){430, 490, 160, 55})) tela_atual = TELA_CREDITOS;
+        if (CheckCollisionPointRec(m, (Rectangle){botao_x_receitas, botao_y, botao_w_receitas, botao_h})) tela_atual = TELA_RECEITAS;
+        if (CheckCollisionPointRec(m, (Rectangle){botao_x_creditos, botao_y, botao_w_creditos, botao_h})) tela_atual = TELA_CREDITOS;
     }
 
-    // rodape
-    DrawRectangle(0, 560, 800, 40, COR_BARRA_FUNDO);
-    int tw = medir_txt("* Toque para comecar *", 22);
-    txt("* Toque para comecar *", (800 - tw)/2, 568, 22, COR_AMARELO);
+    // rodape removido
 }
 
 // ==========================================
@@ -592,20 +601,33 @@ void tela_creditos(void) {
     ClearBackground(COR_FUNDO);
     desenhar_cabecalho();
 
-    txt("EQUIPE", 340, 80, 28, COR_TEXTO);
+    int largura_virtual = 800;
+    const char *titulo = "EQUIPE";
+    int tw_titulo = medir_txt(titulo, 28);
+    txt(titulo, (largura_virtual - tw_titulo) / 2, 80, 28, COR_TEXTO);
 
     const char *nomes[] = {"Louise Pessoa", "Marilia Liz Alves", "Mateus Lins", "Pedro David Oliveira", "Victor Martins"};
-    const char *funcoes[] = {"Estruturas de Dados", "IA dos Jurados", "Gameplay / Pilha", "Interface / UI", "Integracao / Timer"};
     Color cores[] = {COR_VERMELHO, COR_VERDE, COR_AZUL, COR_LARANJA, COR_VERDE};
 
     for (int i = 0; i < 5; i++) {
-        DrawRectangleRounded((Rectangle){80, 130 + i*70, 640, 55}, 0.3f, 8, cores[i]);
-        txt(nomes[i], 110, 143 + i*70, 22, WHITE);
-        txt(funcoes[i], 420, 143 + i*70, 18, WHITE);
+        int card_x = 80;
+        int card_y = 130 + i * 70;
+        int card_w = 640;
+        int card_h = 55;
+        int nome_tam = 22;
+        int tw_nome = medir_txt(nomes[i], nome_tam);
+        int nome_x = card_x + (card_w - tw_nome) / 2;
+        int nome_y = card_y + (card_h - nome_tam) / 2 + 2;
+        DrawRectangleRounded((Rectangle){card_x, card_y, card_w, card_h}, 0.3f, 8, cores[i]);
+        txt(nomes[i], nome_x, nome_y, nome_tam, WHITE);
     }
 
-    txt("Disciplina: Algoritmos e Estruturas de Dados", 150, 500, 18, COR_TEXTO);
-    txt("Tema: Na Vibe do Recife - Receitas de Mainha", 155, 525, 18, COR_TEXTO);
+    const char *linha_disciplina = "Disciplina: Algoritmos e Estruturas de Dados";
+    const char *linha_tema = "Tema: Na Vibe do Recife - Receitas de Mainha";
+    int tw_disc = medir_txt(linha_disciplina, 18);
+    int tw_tema = medir_txt(linha_tema, 18);
+    txt(linha_disciplina, (largura_virtual - tw_disc) / 2, 500, 18, COR_TEXTO);
+    txt(linha_tema, (largura_virtual - tw_tema) / 2, 525, 18, COR_TEXTO);
 
     desenhar_rodape("[ESC] Voltar ao menu");
 }

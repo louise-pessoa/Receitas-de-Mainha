@@ -112,21 +112,21 @@ static Texture2D obter_sprite_telas(const char *nome) {
 
 // carrega texturas das telas
 void telas_carregar_sprites(void) {
-    telas_estado.tela_inicial = LoadTexture("sprites/tela_inicial.png");
+    telas_estado.tela_inicial = LoadTexture("sprites/fundos/tela_inicial.png");
     if (telas_estado.tela_inicial.id != 0) {
         SetTextureFilter(telas_estado.tela_inicial, TEXTURE_FILTER_BILINEAR);
         telas_estado.tela_inicial_carregada = 1;
     }
 
-    telas_estado.bg_jurados = LoadTexture("sprites/jurados_nota.png");
+    telas_estado.bg_jurados = LoadTexture("sprites/jurados/jurados_nota.png");
     if (telas_estado.bg_jurados.id != 0) {
         SetTextureFilter(telas_estado.bg_jurados, TEXTURE_FILTER_BILINEAR);
         telas_estado.bg_carregado = 1;
     }
     // carregar sprites dos jurados (se existirem)
-    telas_estado.jurado_ariano = LoadTexture("sprites/jurado_ariano.png");
-    telas_estado.jurado_clarice = LoadTexture("sprites/jurado_clarice.png");
-    telas_estado.jurado_chico   = LoadTexture("sprites/jurado_chico.png");
+    telas_estado.jurado_ariano = LoadTexture("sprites/jurados/jurado_ariano.png");
+    telas_estado.jurado_clarice = LoadTexture("sprites/jurados/jurado_clarice.png");
+    telas_estado.jurado_chico   = LoadTexture("sprites/jurados/jurado_chico.png");
     if (telas_estado.jurado_ariano.id) SetTextureFilter(telas_estado.jurado_ariano, TEXTURE_FILTER_BILINEAR);
     if (telas_estado.jurado_clarice.id) SetTextureFilter(telas_estado.jurado_clarice, TEXTURE_FILTER_BILINEAR);
     if (telas_estado.jurado_chico.id)   SetTextureFilter(telas_estado.jurado_chico, TEXTURE_FILTER_BILINEAR);

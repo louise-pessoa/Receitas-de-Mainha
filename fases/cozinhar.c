@@ -77,7 +77,7 @@ static void montar_grid(void) {
         // tentar carregar sprite do forno
         char path[256] = {0};
         // mapeamento explicito
-        snprintf(path, sizeof(path), "sprites/travessa_forno.png");
+        snprintf(path, sizeof(path), "sprites/receitas/travessa_forno.png");
         cozinhar.grid[0].sprite = LoadTexture(path);
         if (cozinhar.grid[0].sprite.id != 0) {
             SetTextureFilter(cozinhar.grid[0].sprite, TEXTURE_FILTER_BILINEAR);
@@ -107,12 +107,12 @@ static void montar_grid(void) {
         // carregar sprite do ingrediente (mapear nomes conhecidos)
         char path[256] = {0};
         // mapeamentos do jogo (mesmos que telas/ordenacao)
-        if (strcasecmp(cozinhar.grid[i].nome, "Tapioca granulada") == 0) snprintf(path, sizeof(path), "sprites/massa_tapioca.png");
-        else if (strcasecmp(cozinhar.grid[i].nome, "Carne de sol") == 0) snprintf(path, sizeof(path), "sprites/carne.png");
-        else if (strcasecmp(cozinhar.grid[i].nome, "Farinha de mandioca") == 0) snprintf(path, sizeof(path), "sprites/farinha.png");
-        else if (strcasecmp(cozinhar.grid[i].nome, "Farinha de trigo") == 0) snprintf(path, sizeof(path), "sprites/farinha.png");
-        else if (strcasecmp(cozinhar.grid[i].nome, "Queijo coalho") == 0) snprintf(path, sizeof(path), "sprites/queijo.png");
-        else if (strcasecmp(cozinhar.grid[i].nome, "Ovos") == 0) snprintf(path, sizeof(path), "sprites/ovo.png");
+        if (strcasecmp(cozinhar.grid[i].nome, "Tapioca granulada") == 0) snprintf(path, sizeof(path), "sprites/coleta/massa_tapioca.png");
+        else if (strcasecmp(cozinhar.grid[i].nome, "Carne de sol") == 0) snprintf(path, sizeof(path), "sprites/coleta/carne.png");
+        else if (strcasecmp(cozinhar.grid[i].nome, "Farinha de mandioca") == 0) snprintf(path, sizeof(path), "sprites/coleta/farinha.png");
+        else if (strcasecmp(cozinhar.grid[i].nome, "Farinha de trigo") == 0) snprintf(path, sizeof(path), "sprites/coleta/farinha.png");
+        else if (strcasecmp(cozinhar.grid[i].nome, "Queijo coalho") == 0) snprintf(path, sizeof(path), "sprites/coleta/queijo.png");
+        else if (strcasecmp(cozinhar.grid[i].nome, "Ovos") == 0) snprintf(path, sizeof(path), "sprites/coleta/ovo.png");
         else {
             // fallback: lowercase + underscore
             char namebuf[128] = {0};
@@ -124,7 +124,7 @@ static void montar_grid(void) {
                 namebuf[p++] = c;
             }
             namebuf[p] = '\0';
-            snprintf(path, sizeof(path), "sprites/%s.png", namebuf);
+            snprintf(path, sizeof(path), "sprites/coleta/%s.png", namebuf);
         }
         if (path[0] != '\0') {
             cozinhar.grid[i].sprite = LoadTexture(path);
@@ -205,7 +205,7 @@ void cozinhar_iniciar(Receita *receita) {
     }
 
     // carrega textura frigideira pronta (para empratar)
-    Texture2D tex_frigideira = LoadTexture("sprites/frigideira_pronta.png");
+    Texture2D tex_frigideira = LoadTexture("sprites/receitas/frigideira_tapioca_pronta.png");
     if (tex_frigideira.id != 0) {
         cozinhar.textura_frigideira_pronta = tex_frigideira;
         SetTextureFilter(cozinhar.textura_frigideira_pronta, TEXTURE_FILTER_BILINEAR);
@@ -233,7 +233,7 @@ void cozinhar_iniciar(Receita *receita) {
 
     // carrega sticker de bom trabalho (mainha animada)
     cozinhar.textura_mainha_animada_carregada = 0;
-    Texture2D tex_mainha = LoadTexture("sprites/mainha_animada.png");
+    Texture2D tex_mainha = LoadTexture("sprites/mainhas/mainha_animada.png");
     if (tex_mainha.id != 0) {
         cozinhar.textura_mainha_animada = tex_mainha;
         SetTextureFilter(cozinhar.textura_mainha_animada, TEXTURE_FILTER_BILINEAR);
@@ -244,7 +244,7 @@ void cozinhar_iniciar(Receita *receita) {
     
     // carrega sticker de erro (mainha brava)
     cozinhar.textura_mainha_brava_carregada = 0;
-    Texture2D tex_brava = LoadTexture("sprites/mainha_brava.png");
+    Texture2D tex_brava = LoadTexture("sprites/mainhas/mainha_brava.png");
     if (tex_brava.id != 0) {
         cozinhar.textura_mainha_brava = tex_brava;
         SetTextureFilter(cozinhar.textura_mainha_brava, TEXTURE_FILTER_BILINEAR);
@@ -255,7 +255,7 @@ void cozinhar_iniciar(Receita *receita) {
     
     // carrega sprite de vitória (mainha vitória)
     cozinhar.textura_mainha_vitoria_carregada = 0;
-    Texture2D tex_vitoria = LoadTexture("sprites/mainha_vitoria.png");
+    Texture2D tex_vitoria = LoadTexture("sprites/mainhas/mainha_vitoria.png");
     if (tex_vitoria.id != 0) {
         cozinhar.textura_mainha_vitoria = tex_vitoria;
         SetTextureFilter(cozinhar.textura_mainha_vitoria, TEXTURE_FILTER_BILINEAR);

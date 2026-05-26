@@ -269,6 +269,10 @@ void tela_receitas(Receita *lista) {
 
     txt("RECEITAS DISPONIVEIS", 60, 90, 22, COR_TEXTO);
 
+    // mensagem de bloqueio temporaria
+    static float timer_bloqueio = 0.0f;
+    if (timer_bloqueio > 0.0f) timer_bloqueio -= GetFrameTime();
+
     if (lista == NULL) {
         txt("Nenhuma receita cadastrada.", 80, 200, 20, GRAY);
     } else {
@@ -278,41 +282,89 @@ void tela_receitas(Receita *lista) {
         int i = 0, y = 120;
         while (aux != NULL && i < 8) {
             Rectangle card = {50, y, 420, 48};
-            int eh_sel   = (receita_selecionada == aux);
-            int hovered  = CheckCollisionPointRec(mouse, card);
+            int bloqueada = !aux->desbloqueada;
+            int eh_sel    = (!bloqueada && receita_selecionada == aux);
+            int hovered   = CheckCollisionPointRec(mouse, card);
 
             // borda amarela se selecionado
             if (eh_sel)
                 DrawRectangleRounded((Rectangle){46, y - 4, 428, 56}, 0.3f, 8, COR_AMARELO);
 
-            // card — um pouco mais escuro se hover
-            Color cor = cores[i];
-            if (hovered && !eh_sel) {
-                cor.r = (unsigned char)(cor.r > 30 ? cor.r - 30 : 0);
-                cor.g = (unsigned char)(cor.g > 30 ? cor.g - 30 : 0);
-                cor.b = (unsigned char)(cor.b > 30 ? cor.b - 30 : 0);
+            // card bloqueado: cinza escuro; desbloqueado: cor normal com hover
+            Color cor;
+            if (bloqueada) {
+                cor = (Color){80, 80, 80, 255};
+            } else {
+                cor = cores[i];
+                if (hovered && !eh_sel) {
+                    cor.r = (unsigned char)(cor.r > 30 ? cor.r - 30 : 0);
+                    cor.g = (unsigned char)(cor.g > 30 ? cor.g - 30 : 0);
+                    cor.b = (unsigned char)(cor.b > 30 ? cor.b - 30 : 0);
+                }
             }
             DrawRectangleRounded(card, 0.3f, 8, cor);
-            txt(TextFormat("[%d] %s", i + 1, aux->nome), 70, y + 8, 20, WHITE);
-            txt(TextFormat("Dif: %d", aux->dificuldade), 370, y + 8, 18, WHITE);
-            if (hovered)
+
+            // nome e dificuldade
+            Color cor_txt = bloqueada ? (Color){180, 180, 180, 255} : WHITE;
+            txt(TextFormat("[%d] %s", i + 1, aux->nome), 70, y + 8, 20, cor_txt);
+            txt(TextFormat("Dif: %d", aux->dificuldade), 370, y + 8, 18, cor_txt);
+
+            if (bloqueada) {
+                // cadeado trancado
+                float px = 53, sh = (float)y + 26;  // sh = topo do corpo
+                float bw = 20, bh = 14;
+                float cx = px + bw / 2.0f;
+                // centro da argola EM sh: corpo cobre metade inferior → arco D visível
+                float ring_cy = sh;
+
+                // sombra
+                Color sombra = (Color){0, 0, 0, 90};
+                DrawRing((Vector2){cx+2, ring_cy+2}, 5.5f, 10.0f, 0, 360, 30, sombra);
+                DrawRectangleRounded((Rectangle){px+2, sh+2, bw, bh}, 0.35f, 8, sombra);
+
+                // argola - ouro escuro (metade superior visível acima do corpo)
+                DrawRing((Vector2){cx, ring_cy}, 5.5f, 10.0f, 0, 360, 30, (Color){160,115,10,255});
+
+                // corpo cobre metade inferior da argola
+                DrawRectangleRounded((Rectangle){px, sh, bw, bh}, 0.35f, 8, (Color){230,180,30,255});
+
+                // destaque no topo do corpo
+                DrawRectangleRounded((Rectangle){px+3, sh+2, bw-6, 4}, 0.6f, 4, (Color){255,225,90,150});
+
+                // buraco de fechadura
+                DrawCircleV((Vector2){cx, sh + bh * 0.40f}, 2.5f, (Color){100,65,5,230});
+                DrawRectangle((int)(cx - 1.5f), (int)(sh + bh * 0.40f), 3, 5, (Color){100,65,5,230});
+
+                // texto bloqueado
+                txt("Complete as 3 receitas para desbloquear", 82, y + 28, 12, (Color){200, 200, 100, 255});
+            } else if (hovered) {
                 txt("Clique para selecionar", 70, y + 28, 13, COR_AMARELO);
-            else {
+            } else {
                 int np = 0;
                 No *tp = aux->passos;
                 while (tp) { np++; tp = tp->prox; }
                 txt(TextFormat("%d passos", np), 70, y + 28, 14, COR_AMARELO);
             }
 
-            // clique: seleciona e avanca direto para ingredientes
+            // clique
             if (hovered && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                receita_selecionada = aux;
-                tela_atual = TELA_INGREDIENTES;
+                if (bloqueada) {
+                    timer_bloqueio = 3.0f;
+                } else {
+                    receita_selecionada = aux;
+                    tela_atual = TELA_INGREDIENTES;
+                }
             }
 
             aux = aux->prox;
             y += 56;
             i++;
+        }
+
+        // mensagem de bloqueio no topo do painel
+        if (timer_bloqueio > 0.0f) {
+            DrawRectangleRounded((Rectangle){38, 78, 444, 36}, 0.2f, 8, (Color){180, 30, 30, 230});
+            txt("Complete as 3 receitas primeiro para desbloquear o Pirao!", 48, 88, 13, WHITE);
         }
     }
 

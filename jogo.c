@@ -154,19 +154,19 @@ void integrar_modulos(void) {
 
     // === passos do Pirão de Carne (7 passos) ===
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Desfie a carne", "Carne", "DDDD", "sprites/receitas/pirao/tabua_carne_crua.png");
+        "Corte a carne em pedacos", "Carne", "CCCC", "sprites/receitas/pirao/tabua_carne_crua.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Aqueca o caldo", "Caldo de carne", "SSSS", "sprites/receitas/pirao/tabua_carne_cortada.png");
+        "Desfie a carne cortada", "Carne", "DDDD", "sprites/receitas/pirao/tabua_carne_cortada.png");
+    pirao_carne->passos = push_passo(pirao_carne->passos,
+        "Aqueca o caldo na panela", "Caldo de carne", "SSSS", "sprites/receitas/pirao/caldo_sem_carne_pirao.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
         "Adicione a carne ao caldo", "Carne", "AAAA", "sprites/receitas/pirao/caldo_com_carne_pirao.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Derreta manteiga e frite alho", "Manteiga", "MMMM", "sprites/receitas/pirao/caldo_legumes_pirao.png");
-    pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Despeje o refogado na panela", "Alho", "RRRR", "sprites/receitas/pirao/caldo_sem_carne_pirao.png");
+        "Derreta manteiga e refogue o alho", "Manteiga", "MMMM", "sprites/receitas/pirao/caldo_legumes_pirao.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
         "Adicione a farinha de mandioca", "Farinha de mandioca", "FFFF", "sprites/receitas/pirao/caldo_farinha_pirao.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Pirao pronto", "", "PPPP", "sprites/receitas/pirao/pirao_pronto.png");
+        "Pirao pronto!", "", "PPPP", "sprites/receitas/pirao/pirao_pronto.png");
 
     // Define imagens de inicio e pronta do Pirão
     strncpy(pirao_carne->img_inicio, "sprites/receitas/pirao/tabua_carne_crua.png", sizeof(pirao_carne->img_inicio) - 1);

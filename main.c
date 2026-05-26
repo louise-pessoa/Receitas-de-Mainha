@@ -21,17 +21,17 @@ typedef enum {
     MUSICA_NENHUMA = 0,
     MUSICA_PRAIEIRA,
     MUSICA_VOLTEI_RECIFE,
-    MUSICA_MEU_ESQUEMA,
+    MUSICA_MARACATU,
 } TipoMusica;
 
 static Music musica_a_praieira = {0};
 static Music musica_voltei_recife = {0};
-static Music musica_meu_esquema = {0};
+static Music musica_maracatu = {0};
 static TipoMusica musica_ativa = MUSICA_NENHUMA;
 static int musicas_carregadas = 0;
 static int musica_a_praieira_ok = 0;
 static int musica_voltei_recife_ok = 0;
-static int musica_meu_esquema_ok = 0;
+static int musica_maracatu_ok = 0;
 
 static void alternar_fullscreen(void) {
     int monitor = GetCurrentMonitor();
@@ -127,14 +127,14 @@ static void carregar_musicas(void) {
         SetMusicVolume(musica_voltei_recife, 0.55f);
         musica_voltei_recife_ok = 1;
     }
-    if (access("musicas/meu_esquema.mp3", F_OK) == 0) {
-        musica_meu_esquema = LoadMusicStream("musicas/meu_esquema.mp3");
-        musica_meu_esquema.looping = true;
-        SetMusicVolume(musica_meu_esquema, 0.55f);
-        musica_meu_esquema_ok = 1;
+    if (access("musicas/maracatu_atomico.mp3", F_OK) == 0) {
+        musica_maracatu = LoadMusicStream("musicas/maracatu_atomico.mp3");
+        musica_maracatu.looping = true;
+        SetMusicVolume(musica_maracatu, 0.55f);
+        musica_maracatu_ok = 1;
     }
 
-    musicas_carregadas = (musica_a_praieira_ok || musica_voltei_recife_ok || musica_meu_esquema_ok);
+    musicas_carregadas = (musica_a_praieira_ok || musica_voltei_recife_ok || musica_maracatu_ok);
 }
 
 static void liberar_musicas(void) {
@@ -143,16 +143,16 @@ static void liberar_musicas(void) {
     // Pare apenas a música que estiver ativa para evitar asserts internos
     if (musica_ativa == MUSICA_PRAIEIRA && musica_a_praieira_ok) StopMusicStream(musica_a_praieira);
     else if (musica_ativa == MUSICA_VOLTEI_RECIFE && musica_voltei_recife_ok) StopMusicStream(musica_voltei_recife);
-    else if (musica_ativa == MUSICA_MEU_ESQUEMA && musica_meu_esquema_ok) StopMusicStream(musica_meu_esquema);
+    else if (musica_ativa == MUSICA_MARACATU && musica_maracatu_ok) StopMusicStream(musica_maracatu);
 
     // Descarregar apenas se o arquivo existir (carregamento pode ter falhado)
     if (access("musicas/a_praieira.mp3", F_OK) == 0) UnloadMusicStream(musica_a_praieira);
     if (access("musicas/voltei_recife.mp3", F_OK) == 0) UnloadMusicStream(musica_voltei_recife);
-    if (access("musicas/meu_esquema.mp3", F_OK) == 0) UnloadMusicStream(musica_meu_esquema);
+    if (access("musicas/maracatu_atomico.mp3", F_OK) == 0) UnloadMusicStream(musica_maracatu);
 
     musicas_carregadas = 0;
     musica_ativa = MUSICA_NENHUMA;
-    musica_a_praieira_ok = musica_voltei_recife_ok = musica_meu_esquema_ok = 0;
+    musica_a_praieira_ok = musica_voltei_recife_ok = musica_maracatu_ok = 0;
 }
 
 static TipoMusica musica_para_tela(void) {
@@ -167,7 +167,7 @@ static TipoMusica musica_para_tela(void) {
         case TELA_PILHA:
         case TELA_FEEDBACK:
         case TELA_RESULTADO:
-            return MUSICA_MEU_ESQUEMA;
+            return MUSICA_MARACATU;
         default:
             return MUSICA_NENHUMA;
     }
@@ -184,17 +184,21 @@ static void atualizar_musica(void) {
     if (desejada != musica_ativa) {
         if (musica_ativa == MUSICA_PRAIEIRA) StopMusicStream(musica_a_praieira);
         else if (musica_ativa == MUSICA_VOLTEI_RECIFE) StopMusicStream(musica_voltei_recife);
-        else if (musica_ativa == MUSICA_MEU_ESQUEMA) StopMusicStream(musica_meu_esquema);
+        else if (musica_ativa == MUSICA_MARACATU) StopMusicStream(musica_maracatu);
 
         musica_ativa = desejada;
         if (musica_ativa == MUSICA_PRAIEIRA) PlayMusicStream(musica_a_praieira);
         else if (musica_ativa == MUSICA_VOLTEI_RECIFE) PlayMusicStream(musica_voltei_recife);
-        else if (musica_ativa == MUSICA_MEU_ESQUEMA) PlayMusicStream(musica_meu_esquema);
+        else if (musica_ativa == MUSICA_MARACATU && musica_maracatu_ok) {
+            // iniciar a música a partir de 29 segundos
+            SeekMusicStream(musica_maracatu, 29.0f);
+            PlayMusicStream(musica_maracatu);
+        }
     }
 
     if (musica_ativa == MUSICA_PRAIEIRA && musica_a_praieira_ok) UpdateMusicStream(musica_a_praieira);
     else if (musica_ativa == MUSICA_VOLTEI_RECIFE && musica_voltei_recife_ok) UpdateMusicStream(musica_voltei_recife);
-    else if (musica_ativa == MUSICA_MEU_ESQUEMA && musica_meu_esquema_ok) UpdateMusicStream(musica_meu_esquema);
+    else if (musica_ativa == MUSICA_MARACATU && musica_maracatu_ok) UpdateMusicStream(musica_maracatu);
 }
 
 int main(void) {

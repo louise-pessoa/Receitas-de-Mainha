@@ -77,12 +77,13 @@ void integrar_modulos(void) {
     inserir_ingrediente(escondidinho, "Manteiga");
     inserir_ingrediente(escondidinho, "Queijo coalho");
 
-    // === ingredientes do Bolo de Rolo (ordem de uso: manteiga, acucar, ovos, farinha, goiabada) ===
+    // === ingredientes do Bolo de Rolo (ordem de uso: farinha, acucar, ovo, fermento, manteiga, goiabada) ===
     Receita *bolo = buscar_receita(receitas_disponiveis, "Bolo de Rolo");
+    inserir_ingrediente(bolo, "Farinha");
+    inserir_ingrediente(bolo, "Açúcar");
+    inserir_ingrediente(bolo, "Ovo");
+    inserir_ingrediente(bolo, "Fermento");
     inserir_ingrediente(bolo, "Manteiga");
-    inserir_ingrediente(bolo, "Acucar");
-    inserir_ingrediente(bolo, "Ovos");
-    inserir_ingrediente(bolo, "Farinha de trigo");
     inserir_ingrediente(bolo, "Goiabada");
 
     // === passos jogaveis (push em ordem de execucao: passo 1 primeiro) ===

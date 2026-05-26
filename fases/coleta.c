@@ -132,6 +132,12 @@ static int _spr_feijao_carregado = 0;
 static Texture2D _spr_chocolate;
 static int _spr_chocolate_carregado = 0;
 
+static Texture2D _spr_agua;
+static int _spr_agua_carregado = 0;
+
+static Texture2D _spr_legumes;
+static int _spr_legumes_carregado = 0;
+
 void catcher_carregar_sprites(void) {
     _spr_cesta = LoadTexture("sprites/coleta/cesta.png");
     if (_spr_cesta.id != 0) {
@@ -306,6 +312,18 @@ void catcher_carregar_sprites(void) {
         SetTextureFilter(_spr_chocolate, TEXTURE_FILTER_BILINEAR);
         _spr_chocolate_carregado = 1;
     }
+
+    _spr_agua = LoadTexture("sprites/coleta/agua.png");
+    if (_spr_agua.id != 0) {
+        SetTextureFilter(_spr_agua, TEXTURE_FILTER_BILINEAR);
+        _spr_agua_carregado = 1;
+    }
+
+    _spr_legumes = LoadTexture("sprites/coleta/legumes.png");
+    if (_spr_legumes.id != 0) {
+        SetTextureFilter(_spr_legumes, TEXTURE_FILTER_BILINEAR);
+        _spr_legumes_carregado = 1;
+    }
 }
 
 void catcher_descarregar_sprites(void) {
@@ -362,6 +380,8 @@ void catcher_descarregar_sprites(void) {
     if (_spr_sapato_carregado)    { UnloadTexture(_spr_sapato);    _spr_sapato_carregado    = 0; }
     if (_spr_feijao_carregado)    { UnloadTexture(_spr_feijao);    _spr_feijao_carregado    = 0; }
     if (_spr_chocolate_carregado) { UnloadTexture(_spr_chocolate); _spr_chocolate_carregado = 0; }
+    if (_spr_agua_carregado)      { UnloadTexture(_spr_agua);      _spr_agua_carregado      = 0; }
+    if (_spr_legumes_carregado)   { UnloadTexture(_spr_legumes);   _spr_legumes_carregado   = 0; }
 }
 
 // retorna o sprite correspondente ao nome do ingrediente, ou NULL se nao houver
@@ -410,6 +430,8 @@ static const Texture2D* _sprite_para_ingrediente(const char *nome) {
     if (_spr_sapato_carregado    && strstr(nome, "Sapato")    != NULL) return &_spr_sapato;
     if (_spr_feijao_carregado    && strstr(nome, "Feijao")    != NULL) return &_spr_feijao;
     if (_spr_chocolate_carregado && strstr(nome, "Chocolate") != NULL) return &_spr_chocolate;
+    if (_spr_agua_carregado      && strstr(nome, "Agua")      != NULL) return &_spr_agua;
+    if (_spr_legumes_carregado   && strstr(nome, "Legumes")   != NULL) return &_spr_legumes;
     return NULL;
 }
 

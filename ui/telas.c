@@ -28,6 +28,8 @@
 typedef struct {
     Texture2D bg_jurados;
     int bg_carregado;
+    Texture2D bg_receitas;
+    int bg_receitas_carregado;
     Texture2D jurado_ariano;
     Texture2D jurado_clarice;
     Texture2D jurado_chico;
@@ -120,6 +122,12 @@ void telas_carregar_sprites(void) {
         telas_estado.tela_inicial_carregada = 1;
     }
 
+    telas_estado.bg_receitas = LoadTexture("sprites/fundos/fundo_receitas.png");
+    if (telas_estado.bg_receitas.id != 0) {
+        SetTextureFilter(telas_estado.bg_receitas, TEXTURE_FILTER_BILINEAR);
+        telas_estado.bg_receitas_carregado = 1;
+    }
+
     telas_estado.bg_jurados = LoadTexture("sprites/jurados/jurados_nota.png");
     if (telas_estado.bg_jurados.id != 0) {
         SetTextureFilter(telas_estado.bg_jurados, TEXTURE_FILTER_BILINEAR);
@@ -152,6 +160,10 @@ void telas_limpar(void) {
     if (telas_estado.tela_inicial_carregada) {
         UnloadTexture(telas_estado.tela_inicial);
         telas_estado.tela_inicial_carregada = 0;
+    }
+    if (telas_estado.bg_receitas_carregado) {
+        UnloadTexture(telas_estado.bg_receitas);
+        telas_estado.bg_receitas_carregado = 0;
     }
     if (telas_estado.bg_carregado) {
         UnloadTexture(telas_estado.bg_jurados);
@@ -304,6 +316,16 @@ void tela_menu(void) {
 void tela_receitas(Receita *lista) {
     ClearBackground(COR_FUNDO);
     desenhar_cabecalho();
+
+    if (telas_estado.bg_receitas_carregado) {
+        DrawTexturePro(
+            telas_estado.bg_receitas,
+            (Rectangle){0, 0, (float)telas_estado.bg_receitas.width, (float)telas_estado.bg_receitas.height},
+            (Rectangle){0, 0, 800, 600},
+            (Vector2){0, 0},
+            0.0f,
+            WHITE);
+    }
 
     // painel de madeira (simulado)
     DrawRectangleRounded((Rectangle){30, 70, 460, 470}, 0.05f, 8, (Color){210, 170, 100, 255});

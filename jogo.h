@@ -26,6 +26,7 @@ typedef enum {
     TELA_MENU,
     TELA_RECEITAS,
     TELA_INGREDIENTES,
+    TELA_FINAL_INTRO,
     TELA_CATCHER,
     TELA_ORDENACAO,       // insertion sort animado dos ingredientes coletados
     TELA_PILHA,           // execucao da receita (cozinhar)

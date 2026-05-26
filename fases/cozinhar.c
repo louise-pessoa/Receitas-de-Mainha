@@ -61,7 +61,10 @@ static void montar_grid(void) {
     // Verifica se o passo atual tem ingrediente vazio (passo especial como forno)
     if (!pilha_vazia(cozinhar.pilha) && cozinhar.pilha->dado.ingrediente[0] == '\0') {
         // Passo especial - mostra um botão para o tipo de passo
-        const char *nome_especial = "Forno";  // poderia ser parametrizável
+        const char *nome_especial =
+            (cozinhar.receita != NULL && strcmp(cozinhar.receita->nome, "Pirão de Carne") == 0)
+                ? "Finalizar"
+                : "Forno";  // poderia ser parametrizavel
         
         strncpy(cozinhar.grid[0].nome, nome_especial,
                 sizeof(cozinhar.grid[0].nome) - 1);
@@ -71,13 +74,17 @@ static void montar_grid(void) {
         
         float w = 130;
         float h = 70;
-        float gx = 30 + 2 * (w + 14);  // centralizar
+        float gx = (LARG - w) / 2.0f;
         float gy = 410;
         cozinhar.grid[0].area = (Rectangle){ gx, gy, w, h };
         // tentar carregar sprite do forno
         char path[256] = {0};
         // mapeamento explicito
-        snprintf(path, sizeof(path), "sprites/receitas/travessa_forno.png");
+        if (cozinhar.receita != NULL && strcmp(cozinhar.receita->nome, "Pirão de Carne") == 0) {
+            snprintf(path, sizeof(path), "sprites/receitas/pirao/pirao_pronto.png");
+        } else {
+            snprintf(path, sizeof(path), "sprites/receitas/travessa_forno.png");
+        }
         cozinhar.grid[0].sprite = LoadTexture(path);
         if (cozinhar.grid[0].sprite.id != 0) {
             SetTextureFilter(cozinhar.grid[0].sprite, TEXTURE_FILTER_BILINEAR);

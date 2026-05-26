@@ -34,6 +34,8 @@ typedef struct {
     int jurados_carregados;
     Texture2D tela_inicial;
     int tela_inicial_carregada;
+    Texture2D final_img[3];
+    int final_img_carregada[3];
 } EstadoTelas;
 
 static EstadoTelas telas_estado = {0};
@@ -131,6 +133,18 @@ void telas_carregar_sprites(void) {
     if (telas_estado.jurado_clarice.id) SetTextureFilter(telas_estado.jurado_clarice, TEXTURE_FILTER_BILINEAR);
     if (telas_estado.jurado_chico.id)   SetTextureFilter(telas_estado.jurado_chico, TEXTURE_FILTER_BILINEAR);
     telas_estado.jurados_carregados = (telas_estado.jurado_ariano.id != 0) || (telas_estado.jurado_clarice.id != 0) || (telas_estado.jurado_chico.id != 0);
+    // carregar imagens finais (opcionais)
+    const char *finais[3] = { "sprites/final/final_1.png", "sprites/final/final_2.png", "sprites/final/final_3.png" };
+    for (int i = 0; i < 3; i++) {
+        telas_estado.final_img[i] = LoadTexture(finais[i]);
+        telas_estado.final_img_carregada[i] = (telas_estado.final_img[i].id != 0);
+        if (telas_estado.final_img_carregada[i]) {
+            SetTextureFilter(telas_estado.final_img[i], TEXTURE_FILTER_BILINEAR);
+            printf("[TELAS] final_%d carregada: id=%u (%s)\n", i+1, telas_estado.final_img[i].id, finais[i]);
+        } else {
+            printf("[TELAS] falha ao carregar final_%d (%s)\n", i+1, finais[i]);
+        }
+    }
 }
 
 // descarrega texturas das telas
@@ -148,6 +162,13 @@ void telas_limpar(void) {
     if (telas_estado.jurado_chico.id)   { UnloadTexture(telas_estado.jurado_chico);   telas_estado.jurado_chico.id = 0; }
     telas_estado.jurados_carregados = 0;
 
+    for (int i = 0; i < 3; i++) {
+        if (telas_estado.final_img_carregada[i]) {
+            UnloadTexture(telas_estado.final_img[i]);
+            telas_estado.final_img_carregada[i] = 0;
+        }
+    }
+
     // limpar cache de sprites
     for (int i = 0; i < TELAS_SPRITE_CACHE; i++) {
         if (sprite_cache[i].carregado) {
@@ -155,6 +176,27 @@ void telas_limpar(void) {
             sprite_cache[i].carregado = 0;
         }
     }
+}
+
+// desenha a imagem de introducao final (indice 0..2). Se nao existir a imagem, desenha fundo simples.
+void tela_final_intro_draw(int indice) {
+    if (indice < 0) indice = 0;
+    if (indice > 2) indice = 2;
+    ClearBackground(COR_FUNDO);
+    if (telas_estado.final_img_carregada[indice]) {
+        Texture2D t = telas_estado.final_img[indice];
+        DrawTexturePro(t,
+            (Rectangle){0, 0, (float)t.width, (float)t.height},
+            (Rectangle){0, 0, 800, 600},
+            (Vector2){0,0}, 0.0f, WHITE);
+    } else {
+        // fallback: mostra nome do slide
+        char buf[64];
+        snprintf(buf, sizeof(buf), "Introducao %d", indice + 1);
+        int tw = medir_txt(buf, 36);
+        txt(buf, (800 - tw) / 2, 260, 36, COR_TEXTO);
+    }
+    // footer hint removed per UX request
 }
 
 // ==========================================

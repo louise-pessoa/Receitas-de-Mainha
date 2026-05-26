@@ -890,8 +890,6 @@ static void desenhar_tela_fim(void) {
              260, 295, 22, WHITE);
     txt(TextFormat("Erros (item errado): %d", catcher.erros_distrator),
              260, 325, 20, (Color){255, 200, 200, 255});
-    txt(TextFormat("Ingredientes perdidos: %d", catcher.perdidos),
-             260, 350, 20, (Color){255, 200, 200, 255});
 
     txt("[ENTER] Voltar ao menu  |  [R] Jogar de novo",
              180, 470, 20, (Color){255, 230, 120, 255});

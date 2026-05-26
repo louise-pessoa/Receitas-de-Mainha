@@ -11,6 +11,7 @@
 #include "fases/coleta.h"
 #include "fases/ordenacao.h"
 #include "fases/cozinhar.h"
+#include <unistd.h>
 
 
 #define LARG_VIRTUAL 800
@@ -28,6 +29,9 @@ static Music musica_voltei_recife = {0};
 static Music musica_meu_esquema = {0};
 static TipoMusica musica_ativa = MUSICA_NENHUMA;
 static int musicas_carregadas = 0;
+static int musica_a_praieira_ok = 0;
+static int musica_voltei_recife_ok = 0;
+static int musica_meu_esquema_ok = 0;
 
 static void alternar_fullscreen(void) {
     int monitor = GetCurrentMonitor();
@@ -110,33 +114,45 @@ static void disparar_jurados(void) {
 
 static void carregar_musicas(void) {
     if (musicas_carregadas) return;
+    // Load only existing music files to avoid invalid internal pointers
+    if (access("musicas/a_praieira.mp3", F_OK) == 0) {
+        musica_a_praieira = LoadMusicStream("musicas/a_praieira.mp3");
+        musica_a_praieira.looping = true;
+        SetMusicVolume(musica_a_praieira, 0.55f);
+        musica_a_praieira_ok = 1;
+    }
+    if (access("musicas/voltei_recife.mp3", F_OK) == 0) {
+        musica_voltei_recife = LoadMusicStream("musicas/voltei_recife.mp3");
+        musica_voltei_recife.looping = true;
+        SetMusicVolume(musica_voltei_recife, 0.55f);
+        musica_voltei_recife_ok = 1;
+    }
+    if (access("musicas/meu_esquema.mp3", F_OK) == 0) {
+        musica_meu_esquema = LoadMusicStream("musicas/meu_esquema.mp3");
+        musica_meu_esquema.looping = true;
+        SetMusicVolume(musica_meu_esquema, 0.55f);
+        musica_meu_esquema_ok = 1;
+    }
 
-    musica_a_praieira = LoadMusicStream("musicas/a_praieira.mp3");
-    musica_voltei_recife = LoadMusicStream("musicas/voltei_recife.mp3");
-    musica_meu_esquema = LoadMusicStream("musicas/meu_esquema.mp3");
-
-    musica_a_praieira.looping = true;
-    musica_voltei_recife.looping = true;
-    musica_meu_esquema.looping = true;
-
-    SetMusicVolume(musica_a_praieira, 0.55f);
-    SetMusicVolume(musica_voltei_recife, 0.55f);
-    SetMusicVolume(musica_meu_esquema, 0.55f);
-
-    musicas_carregadas = 1;
+    musicas_carregadas = (musica_a_praieira_ok || musica_voltei_recife_ok || musica_meu_esquema_ok);
 }
 
 static void liberar_musicas(void) {
     if (!musicas_carregadas) return;
 
-    StopMusicStream(musica_a_praieira);
-    StopMusicStream(musica_voltei_recife);
-    StopMusicStream(musica_meu_esquema);
-    UnloadMusicStream(musica_a_praieira);
-    UnloadMusicStream(musica_voltei_recife);
-    UnloadMusicStream(musica_meu_esquema);
+    // Pare apenas a música que estiver ativa para evitar asserts internos
+    if (musica_ativa == MUSICA_PRAIEIRA && musica_a_praieira_ok) StopMusicStream(musica_a_praieira);
+    else if (musica_ativa == MUSICA_VOLTEI_RECIFE && musica_voltei_recife_ok) StopMusicStream(musica_voltei_recife);
+    else if (musica_ativa == MUSICA_MEU_ESQUEMA && musica_meu_esquema_ok) StopMusicStream(musica_meu_esquema);
+
+    // Descarregar apenas se o arquivo existir (carregamento pode ter falhado)
+    if (access("musicas/a_praieira.mp3", F_OK) == 0) UnloadMusicStream(musica_a_praieira);
+    if (access("musicas/voltei_recife.mp3", F_OK) == 0) UnloadMusicStream(musica_voltei_recife);
+    if (access("musicas/meu_esquema.mp3", F_OK) == 0) UnloadMusicStream(musica_meu_esquema);
+
     musicas_carregadas = 0;
     musica_ativa = MUSICA_NENHUMA;
+    musica_a_praieira_ok = musica_voltei_recife_ok = musica_meu_esquema_ok = 0;
 }
 
 static TipoMusica musica_para_tela(void) {
@@ -157,6 +173,10 @@ static TipoMusica musica_para_tela(void) {
     }
 }
 
+// índice atual do slideshow de introdução (0..2)
+static int intro_idx_global = 0;
+static int intro_block_until_release = 0;
+
 static void atualizar_musica(void) {
     if (!musicas_carregadas) return;
 
@@ -172,9 +192,9 @@ static void atualizar_musica(void) {
         else if (musica_ativa == MUSICA_MEU_ESQUEMA) PlayMusicStream(musica_meu_esquema);
     }
 
-    if (musica_ativa == MUSICA_PRAIEIRA) UpdateMusicStream(musica_a_praieira);
-    else if (musica_ativa == MUSICA_VOLTEI_RECIFE) UpdateMusicStream(musica_voltei_recife);
-    else if (musica_ativa == MUSICA_MEU_ESQUEMA) UpdateMusicStream(musica_meu_esquema);
+    if (musica_ativa == MUSICA_PRAIEIRA && musica_a_praieira_ok) UpdateMusicStream(musica_a_praieira);
+    else if (musica_ativa == MUSICA_VOLTEI_RECIFE && musica_voltei_recife_ok) UpdateMusicStream(musica_voltei_recife);
+    else if (musica_ativa == MUSICA_MEU_ESQUEMA && musica_meu_esquema_ok) UpdateMusicStream(musica_meu_esquema);
 }
 
 int main(void) {
@@ -281,13 +301,23 @@ int main(void) {
                                 break;
                             }
                         }
-                        
-                        catcher_iniciar(receita_selecionada);
-                        tela_atual = TELA_CATCHER;
+                        // Se for a fase final (Pirão), mostra a introducao em slides
+                        if (strcmp(receita_selecionada->nome, "Pirão de Carne") == 0) {
+                            intro_idx_global = 0; // garante que o primeiro slide seja mostrado
+                            // bloqueia avanço por Enter caso a tecla já esteja sendo segurada
+                            intro_block_until_release = IsKeyDown(KEY_ENTER) ? 1 : 0;
+                            tela_atual = TELA_FINAL_INTRO;
+                        } else {
+                            catcher_iniciar(receita_selecionada);
+                            tela_atual = TELA_CATCHER;
+                        }
                     }
                 }
                 if (IsKeyPressed(KEY_B)) tela_atual = TELA_RECEITAS;
                 break;
+
+            case TELA_FINAL_INTRO:
+                break; // input/logic handled above in the main loop
 
             case TELA_CATCHER:
                 if (catcher.terminou) {
@@ -372,6 +402,23 @@ int main(void) {
             case TELA_INGREDIENTES:
                 tela_ingredientes(receita_selecionada);
                 break;
+            case TELA_FINAL_INTRO: {
+                // draw current slide; manage advance with Enter
+                tela_final_intro_draw(intro_idx_global);
+                // if we blocked input on entry, wait until Enter is released
+                if (intro_block_until_release) {
+                    if (!IsKeyDown(KEY_ENTER)) intro_block_until_release = 0;
+                } else if (IsKeyPressed(KEY_ENTER) && !IsKeyDown(KEY_LEFT_ALT)) {
+                    intro_idx_global++;
+                    if (intro_idx_global >= 3) {
+                        intro_idx_global = 0;
+                        // start catcher after intro
+                        catcher_iniciar(receita_selecionada);
+                        tela_atual = TELA_CATCHER;
+                    }
+                }
+                break;
+            }
             case TELA_CATCHER:
                 tela_catcher();
                 break;

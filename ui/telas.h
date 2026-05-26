@@ -15,6 +15,9 @@ void tela_receitas(Receita *lista);
 // tela de ingredientes de uma receita
 void tela_ingredientes(Receita *receita);
 
+// desenha a tela de introducao final (indice 0..2)
+void tela_final_intro_draw(int indice);
+
 // tela de cozinhar (pilha de passos)
 void tela_pilha(const char *passo_atual, int num_passo, int total_passos, double tempo);
 

@@ -80,7 +80,7 @@ void integrar_modulos(void) {
     // === ingredientes do Bolo de Rolo (ordem de uso: farinha, acucar, ovo, fermento, manteiga, goiabada) ===
     Receita *bolo = buscar_receita(receitas_disponiveis, "Bolo de Rolo");
     inserir_ingrediente(bolo, "Farinha");
-    inserir_ingrediente(bolo, "Açúcar");
+    inserir_ingrediente(bolo, "Acucar");
     inserir_ingrediente(bolo, "Ovo");
     inserir_ingrediente(bolo, "Fermento");
     inserir_ingrediente(bolo, "Manteiga");
@@ -90,11 +90,11 @@ void integrar_modulos(void) {
 
     // tapioca
     tapioca->passos = push_passo(tapioca->passos,
-        "Hidrate a tapioca peneirando", "Tapioca granulada", "SSSS", "sprites/receitas/tapioca/frigideira_vazia.png");
+        "Peneire a massa da tapioca", "Tapioca granulada", "ADAD", "sprites/receitas/tapioca/frigideira_vazia.png");
     tapioca->passos = push_passo(tapioca->passos,
-        "Adicione o coco ralado", "Coco ralado", "ADAD", "sprites/receitas/tapioca/frigideira_tapioca.png");
+        "Adicione o coco ralado", "Coco ralado", "KOKO", "sprites/receitas/tapioca/frigideira_tapioca.png");
     tapioca->passos = push_passo(tapioca->passos,
-        "Adicione o queijo", "Queijo coalho", "QUEIJO", "sprites/receitas/tapioca/frigideira_coco.png");
+        "Adicione o queijo", "Queijo coalho", "UEIO", "sprites/receitas/tapioca/frigideira_coco.png");
     tapioca->passos = push_passo(tapioca->passos,
         "Derreta a manteiga por cima", "Manteiga", "MNTG", "sprites/receitas/tapioca/frigideira_queijo.png");
 
@@ -105,19 +105,19 @@ void integrar_modulos(void) {
 
     // escondidinho
     escondidinho->passos = push_passo(escondidinho->passos,
-        "Corte a carne de sol", "Carne de sol", "WSWS", "sprites/receitas/escondidinho/tabua_carne.png");
+        "Corte a carne de sol", "Carne de sol", "CRT", "sprites/receitas/escondidinho/tabua_carne.png");
     escondidinho->passos = push_passo(escondidinho->passos,
         "Descasque a macaxeira", "Macaxeira", "CASCA", "sprites/receitas/escondidinho/macaxeira_tabua.png");
     escondidinho->passos = push_passo(escondidinho->passos,
-        "Corte a cebola", "Cebola", "QWER", "sprites/receitas/escondidinho/tabua_cebola.png");
+        "Corte a cebola", "Cebola", "CBLA", "sprites/receitas/escondidinho/tabua_cebola.png");
     escondidinho->passos = push_passo(escondidinho->passos,
-        "Misture macaxeira com manteiga", "Manteiga", "ADAD", "sprites/receitas/escondidinho/macaxeira_cozida.png");
+        "Misture macaxeira com manteiga", "Manteiga", "MNTG", "sprites/receitas/escondidinho/macaxeira_cozida.png");
     escondidinho->passos = push_passo(escondidinho->passos,
         "Coloque a carne na travessa", "Carne de sol", "TRAVESSA", "sprites/receitas/escondidinho/travessa_vazia.png");
     escondidinho->passos = push_passo(escondidinho->passos,
-        "Coloque a macaxeira", "Macaxeira", "DDD", "sprites/receitas/escondidinho/travessa_carne.png");
+        "Coloque a macaxeira", "Macaxeira", "XXX", "sprites/receitas/escondidinho/travessa_carne.png");
     escondidinho->passos = push_passo(escondidinho->passos,
-        "Coloque o queijo coalho", "Queijo coalho", "CCC", "sprites/receitas/escondidinho/travessa_macaxeira.png");
+        "Coloque o queijo coalho", "Queijo coalho", "UEIOC", "sprites/receitas/escondidinho/travessa_macaxeira.png");
     escondidinho->passos = push_passo(escondidinho->passos,
         "Leve ao forno", "", "FFF", "sprites/receitas/escondidinho/travessa_queijo.png");
 
@@ -128,19 +128,17 @@ void integrar_modulos(void) {
 
     // bolo de rolo
     bolo->passos = push_passo(bolo->passos,
-        "misture todos os ingredientes", "", "WASDWASDW", "sprites/receitas/bolo_de_rolo/ingredientes_bolo_rolo.png");
+        "Misture todos os ingredientes", "Misturar", "WASDWASDW", "sprites/receitas/bolo_de_rolo/ingredientes_bolo_rolo.png");
     bolo->passos = push_passo(bolo->passos,
-        "coloque a mistura numa travessa e leve ao forno", "", "FORN", "sprites/receitas/bolo_de_rolo/mistura_bolo_rolo.png");
+        "Coloque a mistura numa travessa e leve ao forno", "Forno", "FFF", "sprites/receitas/bolo_de_rolo/mistura_bolo_rolo.png");
     bolo->passos = push_passo(bolo->passos,
-        "coloque a massa num papel manteiga", "", "PAPE", "sprites/receitas/bolo_de_rolo/travessa_bolo_forno.png");
+        "Coloque a massa num papel manteiga", "Papel manteiga", "PPMNTG", "sprites/receitas/bolo_de_rolo/travessa_bolo_forno.png");
     bolo->passos = push_passo(bolo->passos,
-        "adicione a goiabada", "", "GOIA", "sprites/receitas/bolo_de_rolo/massa_bolo_rolo.png");
+        "Adicione a goiabada", "Goiabada", "GOIA", "sprites/receitas/bolo_de_rolo/massa_bolo_rolo.png");
     bolo->passos = push_passo(bolo->passos,
-        "agora enrole essa massa", "", "ENRLR", "sprites/receitas/bolo_de_rolo/goiabada_bolo.png");
+        "Agora enrole essa massa", "Enrolar", "ENRLR", "sprites/receitas/bolo_de_rolo/goiabada_bolo.png");
     bolo->passos = push_passo(bolo->passos,
-        "agora adicione açúcar para enfeitar", "", "ACUC", "sprites/receitas/bolo_de_rolo/bolo_sem_acucar.png");
-    bolo->passos = push_passo(bolo->passos,
-        "Empratar", "", "EMPR", "sprites/receitas/bolo_de_rolo/bolo_rolo_pronto.png");
+        "Agora adicione açúcar para enfeitar", "Acucar", "ACUC", "sprites/receitas/bolo_de_rolo/bolo_sem_acucar.png");
 
     strncpy(bolo->img_inicio, "sprites/receitas/bolo_de_rolo/ingredientes_bolo_rolo.png", sizeof(bolo->img_inicio) - 1);
     bolo->img_inicio[sizeof(bolo->img_inicio) - 1] = '\0';
@@ -158,13 +156,13 @@ void integrar_modulos(void) {
 
     // === passos do Pirão de Carne (6 passos) ===
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Corte a carne", "Carne", "CCCC", "sprites/receitas/pirao/tabua_carne_crua.png");
+        "Corte a carne", "Carne", "CRT", "sprites/receitas/pirao/tabua_carne_crua.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Corte os legumes", "Legumes", "LLLL", "sprites/receitas/pirao/legumes_inteiros_pirao.png");
+        "Corte os legumes", "Legumes", "CRBC", "sprites/receitas/pirao/legumes_inteiros_pirao.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Ferva a agua com legumes", "Agua", "SSSS", "sprites/receitas/pirao/caldo_sem_carne_pirao.png");
+        "Ferva a agua com legumes", "Água", "SSSS", "sprites/receitas/pirao/caldo_sem_carne_pirao.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Agora que ja esta bom, retire a carne e os legumes", "", "RRRR", "sprites/receitas/pirao/caldo_legumes_pirao.png");
+        "Agora que já esta bom, retire a carne e os legumes", "", "RRRR", "sprites/receitas/pirao/caldo_legumes_pirao.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
         "Adicione farinha ao caldo para engrossar", "Farinha de mandioca", "FFFF", "sprites/receitas/pirao/caldo_sem_carne_pirao.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,

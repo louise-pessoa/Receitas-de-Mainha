@@ -331,7 +331,7 @@ void tela_receitas(Receita *lista) {
     DrawRectangleRounded((Rectangle){30, 70, 460, 470}, 0.05f, 8, (Color){210, 170, 100, 255});
     DrawRectangleRounded((Rectangle){38, 78, 444, 454}, 0.05f, 8, (Color){255, 248, 220, 255});
 
-    txt("RECEITAS DISPONIVEIS", 60, 90, 22, COR_TEXTO);
+    txt("RECEITAS DISPONÍVEIS", 60, 90, 22, COR_TEXTO);
 
     // mensagem de bloqueio temporaria
     static float timer_bloqueio = 0.0f;
@@ -347,8 +347,8 @@ void tela_receitas(Receita *lista) {
         while (aux != NULL && i < 8) {
             Rectangle card = {50, y, 420, 48};
             int bloqueada = !aux->desbloqueada;
-            int eh_sel    = (!bloqueada && receita_selecionada == aux);
-            int hovered   = CheckCollisionPointRec(mouse, card);
+            int eh_sel = (!bloqueada && receita_selecionada == aux);
+            int hovered = CheckCollisionPointRec(mouse, card);
 
             // borda amarela se selecionado
             if (eh_sel)
@@ -370,7 +370,7 @@ void tela_receitas(Receita *lista) {
 
             // nome e dificuldade
             Color cor_txt = bloqueada ? (Color){180, 180, 180, 255} : WHITE;
-            txt(TextFormat("[%d] %s", i + 1, aux->nome), 70, y + 8, 20, cor_txt);
+            txt(TextFormat("%s", aux->nome), 70, y + 8, 20, cor_txt);
             txt(TextFormat("Dif: %d", aux->dificuldade), 370, y + 8, 18, cor_txt);
 
             if (bloqueada) {
@@ -419,7 +419,6 @@ void tela_receitas(Receita *lista) {
                     tela_atual = TELA_INGREDIENTES;
                 }
             }
-
             aux = aux->prox;
             y += 56;
             i++;
@@ -428,19 +427,17 @@ void tela_receitas(Receita *lista) {
         // mensagem de bloqueio no topo do painel
         if (timer_bloqueio > 0.0f) {
             DrawRectangleRounded((Rectangle){38, 78, 444, 36}, 0.2f, 8, (Color){180, 30, 30, 230});
-            txt("Complete as 3 receitas primeiro para desbloquear o Pirao!", 48, 88, 13, WHITE);
+            txt("Complete as 3 receitas primeiro para desbloquear o Pirão!", 48, 88, 13, WHITE);
         }
     }
 
     // lado direito - vovo
     DrawRectangleRounded((Rectangle){510, 70, 260, 470}, 0.05f, 8, (Color){255, 235, 180, 255});
-    txt("Escolha uma", 530, 100, 20, COR_TEXTO);
-    txt("receita para", 530, 125, 20, COR_TEXTO);
-    txt("cozinhar!", 530, 150, 20, COR_TEXTO);
+    txt("Escolha uma receita", 530, 100, 20, COR_TEXTO);
+    txt("receita para cozinhar", 530, 125, 20, COR_TEXTO);
 
     if (receita_selecionada != NULL) {
-        DrawRectangleRounded((Rectangle){520, 200, 240, 110}, 0.2f, 8, COR_VERDE);
-        txt("Selecionada:", 535, 210, 16, WHITE);
+        txt("Selecionada:", 535, 210, 16, COR_TEXTO);
         // tentar desenhar sprite do nome da receita
         Texture2D rtex = obter_sprite_telas(receita_selecionada->nome);
         if (rtex.id != 0) {
@@ -451,24 +448,14 @@ void tela_receitas(Receita *lista) {
             float ty = 200 + (110 - rtex.height*scale)/2.0f;
             DrawTextureEx(rtex, (Vector2){tx, ty}, 0.0f, scale, WHITE);
         } else {
-            txt(receita_selecionada->nome, 535, 235, 18, WHITE);
+            txt(receita_selecionada->nome, 535, 235, 18, COR_VERMELHO);
         }
-        txt(TextFormat("Dif: %d | %d min",
-                            receita_selecionada->dificuldade,
-                            receita_selecionada->tempo),
-                 535, 262, 14, WHITE);
-        txt("[ENTER] Continuar", 535, 285, 14, COR_AMARELO);
+        txt(TextFormat("Dif: %d", receita_selecionada->dificuldade), 535, 262, 14, COR_TEXTO);
     } else {
         txt("(nenhuma selecionada)", 530, 215, 16, GRAY);
     }
 
-    // instrucoes
-    txt("[Setas] Navegar", 530, 380, 16, COR_TEXTO);
-    txt("[1-3] Selecionar", 530, 400, 16, COR_TEXTO);
-    txt("[ENTER] Continuar", 530, 420, 16, COR_TEXTO);
-    txt("[1] Menu", 530, 440, 16, COR_TEXTO);
-
-    desenhar_rodape("[Setas/1-3] Selecionar  |  [ENTER] ou Clique para continuar");
+    desenhar_rodape("[ENTER] ou Clique para continuar");
 }
 
 // ==========================================

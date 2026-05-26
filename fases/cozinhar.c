@@ -44,6 +44,32 @@ static int char_para_keycode(char c) {
     return -1;
 }
 
+static void desenhar_textura_cover(Texture2D tex, Rectangle dst) {
+    if (tex.width <= 0 || tex.height <= 0) return;
+
+    float dst_ratio = dst.width / dst.height;
+    float tex_ratio = (float)tex.width / (float)tex.height;
+    Rectangle src = {0, 0, (float)tex.width, (float)tex.height};
+
+    if (tex_ratio > dst_ratio) {
+        float new_w = (float)tex.height * dst_ratio;
+        src.x = ((float)tex.width - new_w) / 2.0f;
+        src.width = new_w;
+    } else if (tex_ratio < dst_ratio) {
+        float new_h = (float)tex.width / dst_ratio;
+        src.y = ((float)tex.height - new_h) / 2.0f;
+        src.height = new_h;
+    }
+
+    DrawTexturePro(tex, src, dst, (Vector2){0, 0}, 0.0f, WHITE);
+}
+
+static int passo_bolo_mistura(void) {
+    return cozinhar.receita != NULL &&
+           strcmp(cozinhar.receita->nome, "Bolo de Rolo") == 0 &&
+           cozinhar.passo_idx == 0;
+}
+
 // ==========================================
 // INICIALIZACAO
 // ==========================================
@@ -94,6 +120,74 @@ static void montar_grid(void) {
         return;
     }
     
+    if (cozinhar.receita != NULL &&
+        strcmp(cozinhar.receita->nome, "Bolo de Rolo") == 0 &&
+        cozinhar.passo_idx == 1) {
+        strncpy(cozinhar.grid[0].nome, "Forno",
+                sizeof(cozinhar.grid[0].nome) - 1);
+        cozinhar.grid[0].nome[sizeof(cozinhar.grid[0].nome) - 1] = '\0';
+        cozinhar.grid[0].destacado = 1;
+        cozinhar.grid[0].usado = 0;
+
+        float w = 130;
+        float h = 70;
+        float gx = (LARG - w) / 2.0f;
+        float gy = 410;
+        cozinhar.grid[0].area = (Rectangle){ gx, gy, w, h };
+        cozinhar.grid[0].sprite_carregado = 0;
+
+        char path[256] = {0};
+        snprintf(path, sizeof(path), "sprites/receitas/travessa_forno.png");
+        cozinhar.grid[0].sprite = LoadTexture(path);
+        if (cozinhar.grid[0].sprite.id != 0) {
+            SetTextureFilter(cozinhar.grid[0].sprite, TEXTURE_FILTER_BILINEAR);
+            cozinhar.grid[0].sprite_carregado = 1;
+        }
+
+        cozinhar.n_grid = 1;
+        return;
+    }
+
+    if (cozinhar.receita != NULL &&
+        strcmp(cozinhar.receita->nome, "Bolo de Rolo") == 0 &&
+        cozinhar.passo_idx == 2) {
+        strncpy(cozinhar.grid[0].nome, "Papel manteiga",
+                sizeof(cozinhar.grid[0].nome) - 1);
+        cozinhar.grid[0].nome[sizeof(cozinhar.grid[0].nome) - 1] = '\0';
+        cozinhar.grid[0].destacado = 1;
+        cozinhar.grid[0].usado = 0;
+
+        float w = 160;
+        float h = 70;
+        float gx = (LARG - w) / 2.0f;
+        float gy = 410;
+        cozinhar.grid[0].area = (Rectangle){ gx, gy, w, h };
+        cozinhar.grid[0].sprite_carregado = 0;
+
+        cozinhar.n_grid = 1;
+        return;
+    }
+
+    if (cozinhar.receita != NULL &&
+        strcmp(cozinhar.receita->nome, "Bolo de Rolo") == 0 &&
+        cozinhar.passo_idx == 4) {
+        strncpy(cozinhar.grid[0].nome, "Enrolar",
+                sizeof(cozinhar.grid[0].nome) - 1);
+        cozinhar.grid[0].nome[sizeof(cozinhar.grid[0].nome) - 1] = '\0';
+        cozinhar.grid[0].destacado = 1;
+        cozinhar.grid[0].usado = 0;
+
+        float w = 150;
+        float h = 70;
+        float gx = (LARG - w) / 2.0f;
+        float gy = 410;
+        cozinhar.grid[0].area = (Rectangle){ gx, gy, w, h };
+        cozinhar.grid[0].sprite_carregado = 0;
+
+        cozinhar.n_grid = 1;
+        return;
+    }
+
     int total = r->n_ingredientes < COZ_MAX_ING_GRID ? r->n_ingredientes : COZ_MAX_ING_GRID;
     for (int i = 0; i < total; i++) {
         strncpy(cozinhar.grid[i].nome, r->ingredientes[i],
@@ -335,6 +429,29 @@ static void fase_clicar(void) {
     if (!IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) return;
 
     Passo *p = &cozinhar.pilha->dado;
+
+    if (passo_bolo_mistura()) {
+        Vector2 m = GetMousePosition();
+        for (int k = 0; k < cozinhar.n_grid; k++) {
+            if (CheckCollisionPointRec(m, cozinhar.grid[k].area)) {
+                cozinhar.grid[k].usado = 1;
+                break;
+            }
+        }
+
+        int completos = 1;
+        for (int k = 0; k < cozinhar.n_grid; k++) {
+            if (!cozinhar.grid[k].usado) {
+                completos = 0;
+                break;
+            }
+        }
+        if (completos) {
+            cozinhar.fase = COZ_FASE_TECLAS;
+            cozinhar.pos_tecla = 0;
+        }
+        return;
+    }
     
     // Se é um passo especial (ingrediente vazio), qualquer clique no botão avança
     if (p->ingrediente[0] == '\0') {
@@ -488,24 +605,19 @@ static void desenhar_empratar(void) {
         tex = cozinhar.textura_frigideira_pronta; tem_tex = 1;
     }
     if (tem_tex && tex.width > 0 && tex.height > 0) {
-        float max_altura = (float)(ALT - 100);
-        float escala_altura = max_altura / (float)tex.height;
-        float escala_largura = (float)(LARG - 40) / (float)tex.width;
-        float escala = (escala_altura < escala_largura) ? escala_altura : escala_largura;
-        float largura = (float)tex.width * escala;
-        float altura = (float)tex.height * escala;
-        float x = ((float)LARG - largura) / 2.0f;
-        float y = 80;
-        DrawTextureEx(tex, (Vector2){x, y}, 0, escala, WHITE);
+        Rectangle dst = {0, 0, (float)LARG, (float)ALT};
+        desenhar_textura_cover(tex, dst);
     }
     
-    // desenha botão EMPRATAR no topo
-    Rectangle btn_empratar = {300, 10, 200, 40};
-    DrawRectangleRec(btn_empratar, COR_VERDE_COZ);
+    if (cozinhar.receita == NULL || strcmp(cozinhar.receita->nome, "Bolo de Rolo") != 0) {
+        // desenha botão EMPRATAR no topo
+        Rectangle btn_empratar = {300, 10, 200, 40};
+        DrawRectangleRec(btn_empratar, COR_VERDE_COZ);
         DrawRectangleRoundedLines(btn_empratar, 0.1f, 10, 2.0f, COR_AMA_COZ);
-    
-    int txt_width = medir_txt("EMPRATAR", 24);
-    txt("EMPRATAR", 400 - txt_width/2, 18, 24, WHITE);
+
+        int txt_width = medir_txt("EMPRATAR", 24);
+        txt("EMPRATAR", 400 - txt_width/2, 18, 24, WHITE);
+    }
 }
 
 // ==========================================
@@ -678,18 +790,8 @@ static void desenhar_imagem_passo(void) {
     // Mostra imagem inicial no primeiro passo
     if (cozinhar.passo_idx == 0 && cozinhar.textura_inicio_carregada) {
         Texture2D tex = cozinhar.textura_inicio;
-
-        float max_altura = ALT - 100 - 80;
-        float escala_altura = max_altura / tex.height;
-        float max_largura = LARG;
-        float escala_largura = max_largura / tex.width;
-        float escala = escala_altura < escala_largura ? escala_altura : escala_largura;
-
-        float largura = tex.width * escala;
-        float altura = tex.height * escala;
-        float x = (LARG - largura) / 2;
-        float y = 80;
-        DrawTextureEx(tex, (Vector2){x, y}, 0, escala, WHITE);
+        Rectangle dst = {0, 0, (float)LARG, (float)ALT};
+        desenhar_textura_cover(tex, dst);
         return;
     }
 
@@ -698,45 +800,26 @@ static void desenhar_imagem_passo(void) {
     
     if (cozinhar.texturas_carregadas[cozinhar.passo_idx]) {
         Texture2D tex = cozinhar.texturas_passos[cozinhar.passo_idx];
-        
-        // calcula escala para ocupar quase toda a tela mantendo aspecto ratio
-        // deixa espaço de ~100px no topo e ~80px na base para elementos da UI
-        float max_altura = ALT - 100 - 80;  // 420px disponíveis
-        float escala_altura = max_altura / tex.height;
-        float max_largura = LARG;
-        float escala_largura = max_largura / tex.width;
-        float escala = escala_altura < escala_largura ? escala_altura : escala_largura;
-        
-        float largura = tex.width * escala;
-        float altura = tex.height * escala;
-        float x = (LARG - largura) / 2;
-        float y = 80;  // começa logo após o cabeçalho
-        DrawTextureEx(tex, (Vector2){x, y}, 0, escala, WHITE);
+        Rectangle dst = {0, 0, (float)LARG, (float)ALT};
+        desenhar_textura_cover(tex, dst);
     }
 }
 
 static void desenhar_fim(void) {
     // imagem pronta ocupa a tela toda
-    if (cozinhar.venceu && cozinhar.textura_pronta_carregada) {
+    if (cozinhar.venceu && cozinhar.textura_pronta_carregada &&
+        (cozinhar.receita == NULL || strcmp(cozinhar.receita->nome, "Bolo de Rolo") != 0)) {
         Texture2D tex_pronta = cozinhar.textura_pronta;
-        float escala_h = (float)ALT / (float)tex_pronta.height;
-        float escala_w = (float)LARG / (float)tex_pronta.width;
-        float escala = (escala_h < escala_w) ? escala_h : escala_w;
-        float largura = (float)tex_pronta.width  * escala;
-        float altura  = (float)tex_pronta.height * escala;
-        float x = ((float)LARG - largura) / 2.0f;
-        float y = ((float)ALT  - altura)  / 2.0f;
-        DrawTextureEx(tex_pronta, (Vector2){x, y}, 0, escala, WHITE);
+        Rectangle dst = {0, 0, (float)LARG, (float)ALT};
+        desenhar_textura_cover(tex_pronta, dst);
     }
 
     // sprite mainha vitoria no canto inferior esquerdo (acima da barra)
     if (cozinhar.textura_mainha_vitoria_carregada) {
         Texture2D tex = cozinhar.textura_mainha_vitoria;
-        // Desenha grande e centralizada na tela de fim
-        float base_h = (float)ALT * 0.6f;
-        float sc = 1.0f;
-        if (tex.height > 0) sc = base_h / (float)tex.height;
-        if (sc > 1.0f) sc = 1.0f;
+        float scale_w = (float)LARG / (float)tex.width;
+        float scale_h = (float)ALT / (float)tex.height;
+        float sc = (scale_w < scale_h) ? scale_w : scale_h;
         float larg = tex.width  * sc;
         float alt  = tex.height * sc;
         Rectangle src = (Rectangle){0.0f, 0.0f, (float)tex.width, (float)tex.height};

@@ -54,8 +54,8 @@ void integrar_modulos(void) {
 
     // === cria as 3 receitas iniciais + Pirão como desbloqueável ===
     receitas_disponiveis = inserir_receita(receitas_disponiveis, "Tapioca",      2, 15, 50);
-    receitas_disponiveis = inserir_receita(receitas_disponiveis, "Escondidinho", 4, 40, 80);
-    receitas_disponiveis = inserir_receita(receitas_disponiveis, "Bolo de Rolo", 5, 60, 100);
+    receitas_disponiveis = inserir_receita(receitas_disponiveis, "Bolo de Rolo", 4, 60, 100);
+    receitas_disponiveis = inserir_receita(receitas_disponiveis, "Escondidinho", 5, 40, 80);
     receitas_disponiveis = inserir_receita(receitas_disponiveis, "Pirão de Carne", 6, 80, 150);
     
     // Pirão de Carne começa bloqueado

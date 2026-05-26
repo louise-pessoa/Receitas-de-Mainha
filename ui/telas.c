@@ -476,7 +476,14 @@ void tela_receitas(Receita *lista) {
 // ==========================================
 void tela_ingredientes(Receita *receita) {
     ClearBackground(COR_FUNDO);
-    desenhar_cabecalho();
+
+    if (telas_estado.bg_receitas_carregado) {
+        Texture2D t = telas_estado.bg_receitas;
+        DrawTexturePro(t,
+            (Rectangle){0, 0, (float)t.width, (float)t.height},
+            (Rectangle){0, 0, 800, 600},
+            (Vector2){0, 0}, 0.0f, WHITE);
+    }
 
     if (receita == NULL) {
         txt("Nenhuma receita selecionada.", 220, 280, 24, COR_VERMELHO);
@@ -487,48 +494,36 @@ void tela_ingredientes(Receita *receita) {
     }
 
     // nome da receita
-    DrawRectangleRounded((Rectangle){50, 75, 700, 50}, 0.3f, 8, COR_LARANJA);
-    // tentar desenhar sprite do nome da receita
-    Texture2D rtex2 = obter_sprite_telas(receita->nome);
-    if (rtex2.id != 0) {
-        float rw = 600;
-        float rh = 40;
-        float scale = fminf(rw / rtex2.width, rh / rtex2.height);
-        float tx = (800 - rtex2.width*scale)/2.0f;
-        float ty = 85 - rtex2.height*scale/2.0f;
-        DrawTextureEx(rtex2, (Vector2){tx, ty}, 0.0f, scale, WHITE);
-    } else {
-        int tw = medir_txt(receita->nome, 28);
-        txt(receita->nome, (800 - tw)/2, 85, 28, WHITE);
-    }
+    int card_x = 50;
+    int card_y = 40;
+    int card_w = 700;
+    int card_h = 50;
+    // card sem preenchimento (transparente)
+    int tw = medir_txt(receita->nome, 40);
+    txt(receita->nome, (800 - tw)/2, card_y + 40, 40, COR_TEXTO);
 
     // balao de instrucao
-    DrawRectangleRounded((Rectangle){100, 140, 600, 110}, 0.1f, 8, WHITE);
-    DrawRectangleRoundedLines((Rectangle){100, 140, 600, 110}, 0.1f, 8, 2.0f, COR_AZUL);
-    txt("Memorize os ingredientes abaixo!", 120, 155, 20, COR_VERDE);
-    txt("Eles vao cair do ceu em 25 segundos, use [<-][->] para", 120, 182, 17, COR_TEXTO);
-    txt("mover a cesta e coletar apenas os certos. Errados custam pontos!", 120, 207, 17, COR_VERMELHO);
+    txt("Memorize os ingredientes abaixo!", 120, 145, 28, COR_VERMELHO);
+    txt("Eles vão cair do céu em 25 segundos, use <- e -> ou A e D para", 120, 185, 17, COR_TEXTO);
+    txt("mover a cesta e coletar apenas os ingredientes listados.", 120, 210, 17, COR_TEXTO);
+    txt("Deixar passar os certos depois do tempo custa pontos!", 120, 237, 17, COR_TEXTO);
 
     // lista de ingredientes
-    txt("Ingredientes:", 50, 270, 22, COR_TEXTO);
+    int lista_x = 150;
+    txt("Ingredientes:", lista_x, 270, 22, COR_TEXTO);
     if (receita->n_ingredientes == 0) {
-        txt("(nenhum ingrediente cadastrado)", 70, 305, 18, GRAY);
+        txt("(nenhum ingrediente cadastrado)", lista_x + 20, 305, 18, GRAY);
     } else {
         Color cores[] = {COR_VERMELHO, COR_VERDE, COR_AZUL, COR_LARANJA};
         int y = 305;
         for (int i = 0; i < receita->n_ingredientes && i < 8; i++) {
-            DrawCircle(65, y + 10, 14, cores[i % 4]);
-            txt(TextFormat("%d", i + 1), 60, y + 3, 16, WHITE);
+            DrawCircle(lista_x + 15, y + 10, 14, cores[i % 4]);
+            txt(TextFormat("%d", i + 1), lista_x + 10, y + 3, 16, WHITE);
             // desenha apenas o nome do ingrediente (sprites removidos nesta tela)
-            txt(receita->ingredientes[i], 85, y, 20, COR_TEXTO);
+            txt(receita->ingredientes[i], lista_x + 35, y, 20, COR_TEXTO);
             y += 30;
         }
     }
-
-    // dica
-    DrawRectangleRounded((Rectangle){50, 480, 700, 60}, 0.3f, 8, COR_AMARELO);
-    txt("Aperte [ENTER] para entrar no minigame da cesta!",
-             80, 498, 22, COR_TEXTO);
 
     desenhar_rodape("[ENTER] Ir para o catcher  |  [2] Voltar para receitas");
 }

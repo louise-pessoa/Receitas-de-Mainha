@@ -89,57 +89,46 @@ void integrar_modulos(void) {
 
     // tapioca
     tapioca->passos = push_passo(tapioca->passos,
-        "Hidrate a tapioca peneirando", "Tapioca granulada", "SSSS", "sprites/receitas/tapioca/frigideira_vazia.png");
+        "Hidrate a tapioca peneirando", "Tapioca granulada", "SSSS", "sprites/receitas/frigideira_vazia.png");
     tapioca->passos = push_passo(tapioca->passos,
-        "Adicione o coco ralado", "Coco ralado", "ADAD", "sprites/receitas/tapioca/frigideira_tapioca.png");
+        "Adicione o coco ralado", "Coco ralado", "ADAD", "sprites/receitas/frigideira_tapioca.png");
     tapioca->passos = push_passo(tapioca->passos,
-        "Adicione o queijo", "Queijo coalho", "QUEIJO", "sprites/receitas/tapioca/frigideira_coco.png");
+        "Adicione o queijo", "Queijo coalho", "QUEIJO", "sprites/receitas/frigideira_coco.png");
     tapioca->passos = push_passo(tapioca->passos,
-        "Derreta a manteiga por cima", "Manteiga", "MNTG", "sprites/receitas/tapioca/frigideira_queijo.png");
+        "Derreta a manteiga por cima", "Manteiga", "MNTG", "sprites/receitas/frigideira_queijo.png");
 
-    strncpy(tapioca->img_inicio, "sprites/receitas/tapioca/frigideira_vazia.png", sizeof(tapioca->img_inicio) - 1);
+    strncpy(tapioca->img_inicio, "sprites/receitas/frigideira_vazia.png", sizeof(tapioca->img_inicio) - 1);
     tapioca->img_inicio[sizeof(tapioca->img_inicio) - 1] = '\0';
-    strncpy(tapioca->img_receita_pronta, "sprites/receitas/tapioca/tapioca_pronta.png", sizeof(tapioca->img_receita_pronta) - 1);
+    strncpy(tapioca->img_receita_pronta, "sprites/receitas/tapioca_pronta.png", sizeof(tapioca->img_receita_pronta) - 1);
     tapioca->img_receita_pronta[sizeof(tapioca->img_receita_pronta) - 1] = '\0';
 
     // escondidinho
     escondidinho->passos = push_passo(escondidinho->passos,
-        "Corte a carne de sol", "Carne de sol", "WSWS", "sprites/receitas/escondidinho/tabua_carne.png");
+        "Corte a carne de sol", "Carne de sol", "WSWS", "sprites/receitas/tabua_carne.png");
     escondidinho->passos = push_passo(escondidinho->passos,
-        "Descasque a macaxeira", "Macaxeira", "CASCA", "sprites/receitas/escondidinho/macaxeira_tabua.png");
+        "Descasque a macaxeira", "Macaxeira", "CASCA", "sprites/receitas/macaxeira_tabua.png");
     escondidinho->passos = push_passo(escondidinho->passos,
-        "Corte a cebola", "Cebola", "QWER", "sprites/receitas/escondidinho/tabua_cebola.png");
+        "Corte a cebola", "Cebola", "QWER", "sprites/receitas/tabua_cebola.png");
     escondidinho->passos = push_passo(escondidinho->passos,
-        "Misture macaxeira com manteiga", "Manteiga", "ADAD", "sprites/receitas/escondidinho/macaxeira_cozida.png");
+        "Misture macaxeira com manteiga", "Manteiga", "ADAD", "sprites/receitas/macaxeira_cozida.png");
     escondidinho->passos = push_passo(escondidinho->passos,
-        "Coloque a carne na travessa", "Carne de sol", "TRAVESSA", "sprites/receitas/escondidinho/travessa_vazia.png");
+        "Coloque a carne na travessa", "Carne de sol", "TRAVESSA", "sprites/receitas/travessa_vazia.png");
     escondidinho->passos = push_passo(escondidinho->passos,
-        "Coloque a macaxeira", "Macaxeira", "DDD", "sprites/receitas/escondidinho/travessa_carne.png");
+        "Coloque a macaxeira", "Macaxeira", "DDD", "sprites/receitas/travessa_carne.png");
     escondidinho->passos = push_passo(escondidinho->passos,
-        "Coloque o queijo coalho", "Queijo coalho", "CCC", "sprites/receitas/escondidinho/travessa_macaxeira.png");
+        "Coloque o queijo coalho", "Queijo coalho", "CCC", "sprites/receitas/travessa_macaxeira.png");
     escondidinho->passos = push_passo(escondidinho->passos,
-        "Leve ao forno", "", "FFF", "sprites/receitas/escondidinho/travessa_queijo.png");
+        "Leve ao forno", "", "FFF", "sprites/receitas/travessa_queijo.png");
 
-    strncpy(escondidinho->img_inicio, "sprites/receitas/escondidinho/tabua_carne.png", sizeof(escondidinho->img_inicio) - 1);
+    strncpy(escondidinho->img_inicio, "sprites/receitas/tabua_carne.png", sizeof(escondidinho->img_inicio) - 1);
     escondidinho->img_inicio[sizeof(escondidinho->img_inicio) - 1] = '\0';
-    strncpy(escondidinho->img_receita_pronta, "sprites/receitas/escondidinho/escondidinho_pronto.png", sizeof(escondidinho->img_receita_pronta) - 1);
+    strncpy(escondidinho->img_receita_pronta, "sprites/receitas/escondidinho_pronto.png", sizeof(escondidinho->img_receita_pronta) - 1);
     escondidinho->img_receita_pronta[sizeof(escondidinho->img_receita_pronta) - 1] = '\0';
 
     // bolo de rolo
     bolo->passos = push_passo(bolo->passos,
         "Bata manteiga com acucar", "Manteiga", "WASDW", "sprites/receitas/bolo_de_rolo/ingredientes_bolo_rolo.png");
     bolo->passos = push_passo(bolo->passos,
-<<<<<<< HEAD
-        "Adicione o acucar e bata", "Acucar", "ASDF", "sprites/receitas/bolo_de_rolo/massa_bolo_rolo.png");
-    bolo->passos = push_passo(bolo->passos,
-        "Acrescente os ovos um a um", "Ovos", "MNTG", "sprites/receitas/bolo_de_rolo/massa_bolo_rolo.png");
-    bolo->passos = push_passo(bolo->passos,
-        "Misture a farinha de trigo", "Farinha de trigo", "QWERTY", "sprites/receitas/bolo_de_rolo/massa_bolo_rolo.png");
-    bolo->passos = push_passo(bolo->passos,
-        "Espalhe a goiabada e enrole", "Goiabada", "DDDD", "sprites/receitas/bolo_de_rolo/goiabada_bolo.png");
-    bolo->passos = push_passo(bolo->passos,
-        "Leve ao forno", "", "FFF", "sprites/receitas/bolo_de_rolo/enrolando_bolo.png");
-=======
         "Adicione o acucar e bata", "Acucar", "ASDF", "sprites/receitas/bolo_de_rolo/mistura_bolo_rolo.png");
     bolo->passos = push_passo(bolo->passos,
         "Acrescente os ovos um a um", "Ovos", "MNTG", "sprites/receitas/bolo_de_rolo/travessa_bolo_forno.png");
@@ -149,7 +138,6 @@ void integrar_modulos(void) {
         "Espalhe a goiabada e enrole", "Goiabada", "DDDD", "sprites/receitas/bolo_de_rolo/enrolando_bolo.png");
     bolo->passos = push_passo(bolo->passos,
         "Leve ao forno", "", "FFF", "sprites/receitas/bolo_de_rolo/travessa_bolo_forno.png");
->>>>>>> 1924ff8ea0c14510da5db5acd93a8a44697755bf
 
     strncpy(bolo->img_inicio, "sprites/receitas/bolo_de_rolo/ingredientes_bolo_rolo.png", sizeof(bolo->img_inicio) - 1);
     bolo->img_inicio[sizeof(bolo->img_inicio) - 1] = '\0';

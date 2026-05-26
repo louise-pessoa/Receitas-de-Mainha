@@ -152,13 +152,15 @@ void integrar_modulos(void) {
     inserir_ingrediente(pirao_carne, "Manteiga");
     inserir_ingrediente(pirao_carne, "Alho");
 
-    // === passos do Pirão de Carne (7 passos) ===
+    // === passos do Pirão de Carne (8 passos) ===
     pirao_carne->passos = push_passo(pirao_carne->passos,
         "Corte a carne em pedacos", "Carne", "CCCC", "sprites/receitas/pirao/tabua_carne_crua.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
         "Desfie a carne cortada", "Carne", "DDDD", "sprites/receitas/pirao/tabua_carne_cortada.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Aqueca o caldo na panela", "Caldo de carne", "SSSS", "sprites/receitas/pirao/caldo_sem_carne_pirao.png");
+        "Corte os legumes", "Legumes", "LLLL", "sprites/receitas/pirao/legumes_inteiros_pirao.png");
+    pirao_carne->passos = push_passo(pirao_carne->passos,
+        "Aqueca o caldo na panela", "Caldo de carne", "SSSS", "sprites/receitas/pirao/legumes_cortados_pirao.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
         "Adicione a carne ao caldo", "Carne", "AAAA", "sprites/receitas/pirao/caldo_com_carne_pirao.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,

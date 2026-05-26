@@ -129,6 +129,7 @@ void integrar_modulos(void) {
     bolo->passos = push_passo(bolo->passos,
         "Bata manteiga com acucar", "Manteiga", "WASDW", "sprites/receitas/bolo_de_rolo/ingredientes_bolo_rolo.png");
     bolo->passos = push_passo(bolo->passos,
+<<<<<<< HEAD
         "Adicione o acucar e bata", "Acucar", "ASDF", "sprites/receitas/bolo_de_rolo/massa_bolo_rolo.png");
     bolo->passos = push_passo(bolo->passos,
         "Acrescente os ovos um a um", "Ovos", "MNTG", "sprites/receitas/bolo_de_rolo/massa_bolo_rolo.png");
@@ -138,6 +139,17 @@ void integrar_modulos(void) {
         "Espalhe a goiabada e enrole", "Goiabada", "DDDD", "sprites/receitas/bolo_de_rolo/goiabada_bolo.png");
     bolo->passos = push_passo(bolo->passos,
         "Leve ao forno", "", "FFF", "sprites/receitas/bolo_de_rolo/enrolando_bolo.png");
+=======
+        "Adicione o acucar e bata", "Acucar", "ASDF", "sprites/receitas/bolo_de_rolo/mistura_bolo_rolo.png");
+    bolo->passos = push_passo(bolo->passos,
+        "Acrescente os ovos um a um", "Ovos", "MNTG", "sprites/receitas/bolo_de_rolo/travessa_bolo_forno.png");
+    bolo->passos = push_passo(bolo->passos,
+        "Misture a farinha de trigo", "Farinha de trigo", "QWERTY", "sprites/receitas/bolo_de_rolo/massa_bolo_rolo.png");
+    bolo->passos = push_passo(bolo->passos,
+        "Espalhe a goiabada e enrole", "Goiabada", "DDDD", "sprites/receitas/bolo_de_rolo/enrolando_bolo.png");
+    bolo->passos = push_passo(bolo->passos,
+        "Leve ao forno", "", "FFF", "sprites/receitas/bolo_de_rolo/travessa_bolo_forno.png");
+>>>>>>> 1924ff8ea0c14510da5db5acd93a8a44697755bf
 
     strncpy(bolo->img_inicio, "sprites/receitas/bolo_de_rolo/ingredientes_bolo_rolo.png", sizeof(bolo->img_inicio) - 1);
     bolo->img_inicio[sizeof(bolo->img_inicio) - 1] = '\0';
@@ -152,24 +164,26 @@ void integrar_modulos(void) {
     inserir_ingrediente(pirao_carne, "Manteiga");
     inserir_ingrediente(pirao_carne, "Alho");
 
-    // === passos do Pirão de Carne (6 passos) ===
+    // === passos do Pirão de Carne (7 passos) ===
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Desfie a carne", "Carne", "DDDD", "sprites/receitas/prato_carne.png");
+        "Desfie a carne", "Carne", "DDDD", "sprites/receitas/pirao/tabua_carne_crua.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Aqueca o caldo", "Caldo de carne", "SSSS", "sprites/receitas/prato_caldo.png");
+        "Aqueca o caldo", "Caldo de carne", "SSSS", "sprites/receitas/pirao/tabua_carne_cortada.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Adicione a carne ao caldo", "Carne", "AAAA", "sprites/receitas/prato_carne_caldo.png");
+        "Adicione a carne ao caldo", "Carne", "AAAA", "sprites/receitas/pirao/caldo_com_carne_pirao.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Derreta manteiga e frite alho", "Manteiga", "MMMM", "sprites/receitas/prato_alho.png");
+        "Derreta manteiga e frite alho", "Manteiga", "MMMM", "sprites/receitas/pirao/caldo_legumes_pirao.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Despeje o refogado na panela", "Alho", "RRRR", "sprites/receitas/prato_refogado.png");
+        "Despeje o refogado na panela", "Alho", "RRRR", "sprites/receitas/pirao/caldo_sem_carne_pirao.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Adicione a farinha de mandioca", "Farinha de mandioca", "FFFF", "sprites/receitas/prato_pirao.png");
+        "Adicione a farinha de mandioca", "Farinha de mandioca", "FFFF", "sprites/receitas/pirao/caldo_farinha_pirao.png");
+    pirao_carne->passos = push_passo(pirao_carne->passos,
+        "Pirao pronto", "", "PPPP", "sprites/receitas/pirao/pirao_pronto.png");
 
     // Define imagens de inicio e pronta do Pirão
-    strncpy(pirao_carne->img_inicio, "sprites/receitas/pirao_ingredientes_mesa.png", sizeof(pirao_carne->img_inicio) - 1);
+    strncpy(pirao_carne->img_inicio, "sprites/receitas/pirao/tabua_carne_crua.png", sizeof(pirao_carne->img_inicio) - 1);
     pirao_carne->img_inicio[sizeof(pirao_carne->img_inicio) - 1] = '\0';
-    strncpy(pirao_carne->img_receita_pronta, "sprites/receitas/pirao_completo.png", sizeof(pirao_carne->img_receita_pronta) - 1);
+    strncpy(pirao_carne->img_receita_pronta, "sprites/receitas/pirao/pirao_pronto.png", sizeof(pirao_carne->img_receita_pronta) - 1);
     pirao_carne->img_receita_pronta[sizeof(pirao_carne->img_receita_pronta) - 1] = '\0';
 
     printf("[SISTEMA] Modulos integrados. 3 receitas + 1 desbloque\u00e1vel (Pir\u00e3o de Carne).\n");

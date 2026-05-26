@@ -92,7 +92,7 @@ void ordenacao_iniciar(Receita *receita, int *ordem_coleta, int n_coletados) {
     ordenacao.intervalo = 0.55f;
 
     // carrega textura de fundo
-    ordenacao.bg_ordenar = LoadTexture("sprites/fundos/bg_ordenar.png");
+    ordenacao.bg_ordenar = LoadTexture("sprites/fundos/bg_coletar.png");
     if (ordenacao.bg_ordenar.id != 0) {
         SetTextureFilter(ordenacao.bg_ordenar, TEXTURE_FILTER_BILINEAR);
         ordenacao.bg_carregado = 1;
@@ -172,18 +172,7 @@ void tela_ordenacao(void) {
         ClearBackground(COR_FUNDO_ORD);
     }
 
-    // cabecalho
-    DrawRectangle(0, 0, 800, 60, COR_AZUL_ORD);
-    DrawRectangle(0, 55, 800, 5, COR_AMARELO_ORD);
-    if (!ordenacao.concluido) {
-        const char *hdr = "ORGANIZANDO...";
-        int htw = medir_txt(hdr, 28);
-        txt(hdr, (800 - htw) / 2, 16, 28, WHITE);
-    } else {
-        const char *hdr_done = "Tudo organizado pra receita!";
-        int htw = medir_txt(hdr_done, 24);
-        txt(hdr_done, (800 - htw) / 2, 16, 24, WHITE);
-    }
+    // cabecalho removido
 
     // subtitulo pós-ordenacao (apenas quando concluido)
     // sem subtitulo pós-ordenacao por request
@@ -260,23 +249,35 @@ void tela_ordenacao(void) {
     }
 
     if (!ordenacao.concluido) {
-        // durante a ordenacao, removemos legenda/indicadores para focar apenas
-        // nos cartões que se movem. Nada extra é desenhado aqui.
+        int card_x = 80;
+        int card_y = 120;
+        int card_w = 640;
+        int card_h = 60;
+        int titulo_tam = 28;
+        const char *titulo = "ORDENANDO...";
+        int tw_titulo = medir_txt(titulo, titulo_tam);
+
+        DrawRectangleRounded((Rectangle){card_x, card_y, card_w, card_h}, 0.3f, 8,
+                             COR_VERDE_ORD);
+        txt(titulo, card_x + (card_w - tw_titulo) / 2, card_y + 16, titulo_tam, WHITE);
     } else {
         DrawRectangleRounded((Rectangle){80, 380, 640, 110}, 0.3f, 8,
-                             COR_VERDE_ORD);
-        txt("ORDENADO!", 320, 395, 32, WHITE);
-        txt("Agora voce ja sabe a ordem de uso dos ingredientes.",
-                 130, 440, 18, WHITE);
-        txt("[ENTER] Comecar a cozinhar", 250, 465, 20, COR_AMARELO_ORD);
+                     COR_VERDE_ORD);
+        int card_x = 80;
+        int card_y = 380;
+        int card_w = 640;
+        int titulo_tam = 32;
+        const char *titulo = "ORDENADO!";
+        int tw_titulo = medir_txt(titulo, titulo_tam);
+        txt(titulo, card_x + (card_w - tw_titulo) / 2, card_y + 18, titulo_tam, WHITE);
+
+        int msg_tam = 18;
+        const char *msg = "Agora voce ja sabe a ordem de uso dos ingredientes.";
+        int tw_msg = medir_txt(msg, msg_tam);
+        txt(msg, card_x + (card_w - tw_msg) / 2, card_y + 62, msg_tam, WHITE);
     }
 
-    // rodape
-    DrawRectangle(0, 560, 800, 40, (Color){30, 60, 140, 255});
-    txt(ordenacao.concluido ?
-             "[ENTER] Cozinhar  |  [ESC] Menu" :
-             "Aguarde a ordenacao terminar...",
-             220, 570, 20, COR_AMARELO_ORD);
+    // rodape removido
 }
 
 int ordenacao_terminou(void) {

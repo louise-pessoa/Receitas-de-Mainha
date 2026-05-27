@@ -162,7 +162,7 @@ void integrar_modulos(void) {
         "Adicione os legumes, a carne e a água à panela para ferver e pegar pressão",
         "", "SSSS", "sprites/receitas/pirao/legumes_carne_cortados.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Agora que está bom, retire os legumes e a carne", "", "", "");
+        "Agora que está bom, retire os legumes e a carne", "", "", "sprites/receitas/pirao/caldo_legumes_pirao.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
         "Adicione farinha ao caldo para engrossar", "Farinha de mandioca", "FFFF", "sprites/receitas/pirao/caldo_sem_carne_pirao.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,

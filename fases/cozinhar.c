@@ -140,10 +140,12 @@ static void montar_grid(void) {
         const char *nome_especial = "Forno";
         int carregar_sprite = 1;
         if (cozinhar.receita != NULL && strcmp(cozinhar.receita->nome, "Pirão de Carne") == 0) {
-            // Para o Pirão, se o passo atual for a ação 'Agora que está bom, retire os legumes e a carne'
-            // mostramos o botão 'Peneirar' sem sprite. Para o passo final mostramos o sprite pronto.
-            if (strcmp(cozinhar.pilha->dado.acao, "Agora que está bom, retire os legumes e a carne") == 0) {
-                nome_especial = "Peneirar";
+            // Pirão: passo 3 = "Tirar", ultimo passo = "Servir" (sem sprite)
+            if (cozinhar.passo_idx == 3) {
+                nome_especial = "Tirar";
+                carregar_sprite = 0;
+            } else if (cozinhar.passo_idx == cozinhar.n_passos - 1) {
+                nome_especial = "Servir";
                 carregar_sprite = 0;
             } else {
                 nome_especial = "Finalizar";
@@ -569,13 +571,15 @@ static void fase_clicar(void) {
         return;
     }
 
-    // Se é um passo especial (ingrediente vazio), qualquer clique no botão avança
+    // Se é um passo especial (ingrediente vazio)
     if (p->ingrediente[0] == '\0') {
-        // clique com mouse
-        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-            Vector2 m = GetMousePosition();
-            if (cozinhar.n_grid > 0 && CheckCollisionPointRec(m, cozinhar.grid[0].area)) {
-                // conclui o passo imediatamente
+        Vector2 m = GetMousePosition();
+        if (cozinhar.n_grid > 0 && CheckCollisionPointRec(m, cozinhar.grid[0].area)) {
+            if (cozinhar.receita != NULL &&
+                strcmp(cozinhar.receita->nome, "Pirão de Carne") == 0 &&
+                (cozinhar.passo_idx == 3 || cozinhar.passo_idx == cozinhar.n_passos - 1)) {
+                // Pirão: passo 3 = "Tirar", ultimo passo = "Empratar"
+                // Avança direto no clique
                 cozinhar.pilha = pop_passo(cozinhar.pilha);
                 cozinhar.passo_idx++;
                 if (pilha_vazia(cozinhar.pilha)) {
@@ -589,23 +593,10 @@ static void fase_clicar(void) {
                 cozinhar.pos_tecla = 0;
                 montar_grid();
                 marcar_destacado();
+            } else {
+                cozinhar.fase = COZ_FASE_TECLAS;
+                cozinhar.pos_tecla = 0;
             }
-        }
-        // fallback por Enter
-        if (IsKeyPressed(KEY_ENTER)) {
-            cozinhar.pilha = pop_passo(cozinhar.pilha);
-            cozinhar.passo_idx++;
-            if (pilha_vazia(cozinhar.pilha)) {
-                cozinhar.venceu = 1;
-                cozinhar.terminou = 1;
-                cozinhar.fase = COZ_FASE_FIM;
-                estado.pontuacao = cozinhar.pontos;
-                return;
-            }
-            cozinhar.fase = COZ_FASE_CLICAR;
-            cozinhar.pos_tecla = 0;
-            montar_grid();
-            marcar_destacado();
         }
         return;
     }
@@ -760,8 +751,6 @@ static void desenhar_empratar(void) {
     int tem_tex = 0;
     if (cozinhar.textura_pronta_carregada) {
         tex = cozinhar.textura_pronta; tem_tex = 1;
-    } else if (cozinhar.textura_frigideira_pronta_carregada) {
-        tex = cozinhar.textura_frigideira_pronta; tem_tex = 1;
     }
     if (tem_tex && tex.width > 0 && tex.height > 0) {
         Rectangle dst = {0, 0, (float)LARG, (float)ALT};

@@ -20,7 +20,7 @@ ResultadoJurados avaliar_com_jurados(EstadoJogo estado)
                     estado.tempo_extra == 0);
 
     /* Ariano: generoso, valoriza esforca */
-    resultado.nota_ariano = 5.0f + acerto * 4.0f;
+    resultado.nota_ariano = 6.5f + acerto * 3.0f;
     if (estado.erro_passo == 0) resultado.nota_ariano += 0.5f;
     if (resultado.nota_ariano > 10.0f) resultado.nota_ariano = 10.0f;
     if (perfeito)
@@ -37,10 +37,10 @@ ResultadoJurados avaliar_com_jurados(EstadoJogo estado)
                 sizeof(resultado.comentario_ariano) - 1);
 
     /* Clarice: exigente, so aceita precisao */
-    resultado.nota_clarice = acerto * 7.0f;
-    resultado.nota_clarice -= estado.erro_passo * 0.8f;
-    resultado.nota_clarice -= estado.tempo_extra * 0.3f;
-    if (resultado.nota_clarice < 0.0f) resultado.nota_clarice = 0.0f;
+    resultado.nota_clarice = 4.0f + acerto * 5.0f;
+    resultado.nota_clarice -= estado.erro_passo * 0.3f;
+    resultado.nota_clarice -= estado.tempo_extra * 0.15f;
+    if (resultado.nota_clarice < 3.0f) resultado.nota_clarice = 3.0f;
     if (perfeito) resultado.nota_clarice = 9.5f;
     if (resultado.nota_clarice > 10.0f) resultado.nota_clarice = 10.0f;
     if (perfeito)
@@ -62,19 +62,19 @@ ResultadoJurados avaliar_com_jurados(EstadoJogo estado)
         strncpy(resultado.comentario_chico,
                 "Zum zum zum! Perfeito como o mangue beat — sem erro, sem frescura!",
                 sizeof(resultado.comentario_chico) - 1);
-    } else if (acerto >= 0.8f && estado.erro_passo == 0) {
-        resultado.nota_chico = 7.0f + acerto * 2.0f;
+    } else if (acerto >= 0.7f) {
+        resultado.nota_chico = 7.0f + acerto * 2.5f;
         if (resultado.nota_chico > 10.0f) resultado.nota_chico = 10.0f;
         strncpy(resultado.comentario_chico,
                 "Caranguejos com cerebro! Quase la, bora repetir com mais forca!",
                 sizeof(resultado.comentario_chico) - 1);
-    } else if (acerto >= 0.5f) {
-        resultado.nota_chico = 4.0f + acerto * 2.0f;
+    } else if (acerto >= 0.4f) {
+        resultado.nota_chico = 5.5f + acerto * 2.0f;
         strncpy(resultado.comentario_chico,
                 "No meio do caminho tinha um erro... mas a vibe tava boa!",
                 sizeof(resultado.comentario_chico) - 1);
     } else {
-        resultado.nota_chico = acerto * 3.0f;
+        resultado.nota_chico = 4.0f + acerto * 2.0f;
         strncpy(resultado.comentario_chico,
                 "Da lama ao caos — voltou mais ao caos do que ao prato!",
                 sizeof(resultado.comentario_chico) - 1);

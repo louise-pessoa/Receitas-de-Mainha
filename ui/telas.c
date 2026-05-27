@@ -438,18 +438,7 @@ void tela_receitas(Receita *lista) {
 
     if (receita_selecionada != NULL) {
         txt("Selecionada:", 535, 210, 16, COR_TEXTO);
-        // tentar desenhar sprite do nome da receita
-        Texture2D rtex = obter_sprite_telas(receita_selecionada->nome);
-        if (rtex.id != 0) {
-            float rw = 200;
-            float rh = 70;
-            float scale = fminf(rw / rtex.width, rh / rtex.height) * 1.25f;
-            float tx = 520 + (240 - rtex.width*scale)/2.0f;
-            float ty = 200 + (110 - rtex.height*scale)/2.0f;
-            DrawTextureEx(rtex, (Vector2){tx, ty}, 0.0f, scale, WHITE);
-        } else {
-            txt(receita_selecionada->nome, 535, 235, 18, COR_VERMELHO);
-        }
+        txt(receita_selecionada->nome, 535, 235, 18, COR_TEXTO);
         txt(TextFormat("Dif: %d", receita_selecionada->dificuldade), 535, 262, 14, COR_TEXTO);
     } else {
         txt("(nenhuma selecionada)", 530, 215, 16, GRAY);

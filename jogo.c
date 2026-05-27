@@ -77,13 +77,14 @@ void integrar_modulos(void) {
     inserir_ingrediente(escondidinho, "Manteiga");
     inserir_ingrediente(escondidinho, "Queijo coalho");
 
-    // === ingredientes do Bolo de Rolo (ordem de uso: farinha, acucar, ovo, fermento, manteiga, goiabada) ===
+    // === ingredientes do Bolo de Rolo (ordem de uso: farinha, acucar, ovo, fermento, manteiga, goiabada, leite) ===
     Receita *bolo = buscar_receita(receitas_disponiveis, "Bolo de Rolo");
     inserir_ingrediente(bolo, "Farinha");
     inserir_ingrediente(bolo, "Acucar");
     inserir_ingrediente(bolo, "Ovo");
     inserir_ingrediente(bolo, "Fermento");
     inserir_ingrediente(bolo, "Manteiga");
+    inserir_ingrediente(bolo, "Leite");
     inserir_ingrediente(bolo, "Goiabada");
 
     // === passos jogaveis (push em ordem de execucao: passo 1 primeiro) ===
@@ -147,12 +148,10 @@ void integrar_modulos(void) {
 
     // === ingredientes do Pirão de Carne (desbloqueavel - final do jogo no Marco Zero) ===
     Receita *pirao_carne = buscar_receita(receitas_disponiveis, "Pirão de Carne");
-    inserir_ingrediente(pirao_carne, "Agua");
-    inserir_ingrediente(pirao_carne, "Legumes");
     inserir_ingrediente(pirao_carne, "Carne");
+    inserir_ingrediente(pirao_carne, "Legumes");
+    inserir_ingrediente(pirao_carne, "Agua");
     inserir_ingrediente(pirao_carne, "Farinha de mandioca");
-    inserir_ingrediente(pirao_carne, "Manteiga");
-    inserir_ingrediente(pirao_carne, "Alho");
 
     // === passos do Pirão de Carne (6 passos) ===
     pirao_carne->passos = push_passo(pirao_carne->passos,
@@ -160,7 +159,8 @@ void integrar_modulos(void) {
     pirao_carne->passos = push_passo(pirao_carne->passos,
         "Corte os legumes", "Legumes", "CRBC", "sprites/receitas/pirao/legumes_inteiros_pirao.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Ferva a agua com legumes", "Água", "SSSS", "sprites/receitas/pirao/caldo_sem_carne_pirao.png");
+        "Adicione os legumes, a carne e a água à panela para ferver e pegar pressão",
+        "", "SSSS", "sprites/receitas/pirao/legumes_carne_cortados.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
         "Agora que já esta bom, retire a carne e os legumes", "", "RRRR", "sprites/receitas/pirao/caldo_legumes_pirao.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,

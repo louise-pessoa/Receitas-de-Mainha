@@ -70,6 +70,18 @@ static int passo_bolo_mistura(void) {
            cozinhar.passo_idx == 0;
 }
 
+static int passo_pirao_pressao(void) {
+    return cozinhar.receita != NULL &&
+           strcmp(cozinhar.receita->nome, "Pirão de Carne") == 0 &&
+           cozinhar.passo_idx == 2;
+}
+
+static int ingrediente_pirao_pressao(const char *nome) {
+    return strcmp(nome, "Carne") == 0 ||
+           strcmp(nome, "Legumes") == 0 ||
+           strcmp(nome, "Agua") == 0;
+}
+
 // ==========================================
 // INICIALIZACAO
 // ==========================================
@@ -85,11 +97,49 @@ static void montar_grid(void) {
     Receita *r = cozinhar.receita;
     
     // Verifica se o passo atual tem ingrediente vazio (passo especial como forno)
+    if (cozinhar.receita != NULL &&
+        strcmp(cozinhar.receita->nome, "Pirão de Carne") == 0 &&
+        cozinhar.passo_idx == 2) {
+        const char *nomes[] = {"Carne", "Legumes", "Agua"};
+        const char *paths[] = {
+            "sprites/coleta/carne.png",
+            "sprites/coleta/legumes.png",
+            "sprites/coleta/agua.png"
+        };
+        int total = 3;
+        float w = 130;
+        float h = 70;
+        float gap = 14;
+        float start_x = (LARG - (total * w + (total - 1) * gap)) / 2.0f;
+        float gy = 410;
+
+        for (int i = 0; i < total; i++) {
+            strncpy(cozinhar.grid[i].nome, nomes[i],
+                    sizeof(cozinhar.grid[i].nome) - 1);
+            cozinhar.grid[i].nome[sizeof(cozinhar.grid[i].nome) - 1] = '\0';
+            cozinhar.grid[i].destacado = 0;
+            cozinhar.grid[i].usado = 0;
+            cozinhar.grid[i].sprite_carregado = 0;
+
+            float gx = start_x + i * (w + gap);
+            cozinhar.grid[i].area = (Rectangle){ gx, gy, w, h };
+
+            cozinhar.grid[i].sprite = LoadTexture(paths[i]);
+            if (cozinhar.grid[i].sprite.id != 0) {
+                SetTextureFilter(cozinhar.grid[i].sprite, TEXTURE_FILTER_BILINEAR);
+                cozinhar.grid[i].sprite_carregado = 1;
+            }
+        }
+
+        cozinhar.n_grid = total;
+        return;
+    }
+
     if (!pilha_vazia(cozinhar.pilha) && cozinhar.pilha->dado.ingrediente[0] == '\0') {
         // Passo especial - mostra um botão para o tipo de passo
         const char *nome_especial =
             (cozinhar.receita != NULL && strcmp(cozinhar.receita->nome, "Pirão de Carne") == 0)
-                ? "Finalizar"
+                ? (cozinhar.passo_idx == 3 ? "Tirar" : "Finalizar")
                 : "Forno";  // poderia ser parametrizavel
         
         strncpy(cozinhar.grid[0].nome, nome_especial,
@@ -107,14 +157,18 @@ static void montar_grid(void) {
         char path[256] = {0};
         // mapeamento explicito
         if (cozinhar.receita != NULL && strcmp(cozinhar.receita->nome, "Pirão de Carne") == 0) {
-            snprintf(path, sizeof(path), "sprites/receitas/pirao/pirao_pronto.png");
+            if (cozinhar.passo_idx == cozinhar.n_passos - 1) {
+                snprintf(path, sizeof(path), "sprites/receitas/pirao/pirao_pronto.png");
+            }
         } else {
             snprintf(path, sizeof(path), "sprites/receitas/travessa_forno.png");
         }
-        cozinhar.grid[0].sprite = LoadTexture(path);
-        if (cozinhar.grid[0].sprite.id != 0) {
-            SetTextureFilter(cozinhar.grid[0].sprite, TEXTURE_FILTER_BILINEAR);
-            cozinhar.grid[0].sprite_carregado = 1;
+        if (path[0] != '\0') {
+            cozinhar.grid[0].sprite = LoadTexture(path);
+            if (cozinhar.grid[0].sprite.id != 0) {
+                SetTextureFilter(cozinhar.grid[0].sprite, TEXTURE_FILTER_BILINEAR);
+                cozinhar.grid[0].sprite_carregado = 1;
+            }
         }
         cozinhar.n_grid = 1;
         return;
@@ -188,7 +242,8 @@ static void montar_grid(void) {
         return;
     }
 
-    int total = r->n_ingredientes < COZ_MAX_ING_GRID ? r->n_ingredientes : COZ_MAX_ING_GRID;
+    int total = r->n_ingredientes;
+    if (total > COZ_MAX_ING_GRID) total = COZ_MAX_ING_GRID;
     for (int i = 0; i < total; i++) {
         strncpy(cozinhar.grid[i].nome, r->ingredientes[i],
                 sizeof(cozinhar.grid[i].nome) - 1);
@@ -220,6 +275,7 @@ static void montar_grid(void) {
         else if (strcasecmp(cozinhar.grid[i].nome, "Farinha de trigo") == 0) snprintf(path, sizeof(path), "sprites/coleta/farinha.png");
         else if (strcasecmp(cozinhar.grid[i].nome, "Queijo coalho") == 0) snprintf(path, sizeof(path), "sprites/coleta/queijo.png");
         else if (strcasecmp(cozinhar.grid[i].nome, "Ovos") == 0) snprintf(path, sizeof(path), "sprites/coleta/ovo.png");
+        else if (strcasecmp(cozinhar.grid[i].nome, "Leite") == 0) snprintf(path, sizeof(path), "sprites/coleta/leite.png");
         else {
             // fallback: lowercase + underscore
             char namebuf[128] = {0};
@@ -242,6 +298,31 @@ static void montar_grid(void) {
         }
     }
     cozinhar.n_grid = total;
+
+    if (passo_bolo_mistura()) {
+        int leite_idx = -1;
+        for (int i = 0; i < total; i++) {
+            if (strcasecmp(cozinhar.grid[i].nome, "Leite") == 0) {
+                leite_idx = i;
+                break;
+            }
+        }
+        if (leite_idx == -1 && total > 0) {
+            int idx = total - 1;
+            strncpy(cozinhar.grid[idx].nome, "Leite",
+                    sizeof(cozinhar.grid[idx].nome) - 1);
+            cozinhar.grid[idx].nome[sizeof(cozinhar.grid[idx].nome) - 1] = '\0';
+            cozinhar.grid[idx].sprite_carregado = 0;
+
+            char path[256] = {0};
+            snprintf(path, sizeof(path), "sprites/coleta/leite.png");
+            cozinhar.grid[idx].sprite = LoadTexture(path);
+            if (cozinhar.grid[idx].sprite.id != 0) {
+                SetTextureFilter(cozinhar.grid[idx].sprite, TEXTURE_FILTER_BILINEAR);
+                cozinhar.grid[idx].sprite_carregado = 1;
+            }
+        }
+    }
 }
 
 static void marcar_destacado(void) {
@@ -453,6 +534,37 @@ static void fase_clicar(void) {
         return;
     }
     
+    if (passo_pirao_pressao()) {
+        Vector2 m = GetMousePosition();
+        for (int k = 0; k < cozinhar.n_grid; k++) {
+            if (CheckCollisionPointRec(m, cozinhar.grid[k].area)) {
+                if (ingrediente_pirao_pressao(cozinhar.grid[k].nome)) {
+                    cozinhar.grid[k].usado = 1;
+                } else {
+                    cozinhar.erros++;
+                    cozinhar.pontos -= 2;
+                    if (cozinhar.pontos < 0) cozinhar.pontos = 0;
+                    estado.erro_passo++;
+                    ativar_feedback_erro();
+                }
+                break;
+            }
+        }
+
+        int completos = 1;
+        for (int k = 0; k < cozinhar.n_grid; k++) {
+            if (ingrediente_pirao_pressao(cozinhar.grid[k].nome) && !cozinhar.grid[k].usado) {
+                completos = 0;
+                break;
+            }
+        }
+        if (completos) {
+            cozinhar.fase = COZ_FASE_TECLAS;
+            cozinhar.pos_tecla = 0;
+        }
+        return;
+    }
+
     // Se é um passo especial (ingrediente vazio), qualquer clique no botão avança
     if (p->ingrediente[0] == '\0') {
         Vector2 m = GetMousePosition();
@@ -570,10 +682,19 @@ static void fase_empratar(void) {
     // verifica clique no botão EMPRATAR
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         Vector2 mouse = GetMousePosition();
-        // botão no topo: 300-500, 10-50
-        if (mouse.x >= 300 && mouse.x <= 500 && mouse.y >= 10 && mouse.y <= 50) {
-            cozinhar.terminou = 1;
-            cozinhar.fase = COZ_FASE_FIM;
+        if (cozinhar.receita != NULL &&
+            strcmp(cozinhar.receita->nome, "Pirão de Carne") == 0) {
+            Rectangle btn_entregar = {200, 10, 400, 40};
+            if (CheckCollisionPointRec(mouse, btn_entregar)) {
+                cozinhar.terminou = 1;
+                cozinhar.fase = COZ_FASE_FIM;
+            }
+        } else {
+            // botão no topo: 300-500, 10-50
+            if (mouse.x >= 300 && mouse.x <= 500 && mouse.y >= 10 && mouse.y <= 50) {
+                cozinhar.terminou = 1;
+                cozinhar.fase = COZ_FASE_FIM;
+            }
         }
     }
     
@@ -610,13 +731,24 @@ static void desenhar_empratar(void) {
     }
     
     if (cozinhar.receita == NULL || strcmp(cozinhar.receita->nome, "Bolo de Rolo") != 0) {
-        // desenha botão EMPRATAR no topo
-        Rectangle btn_empratar = {300, 10, 200, 40};
-        DrawRectangleRec(btn_empratar, COR_VERDE_COZ);
-        DrawRectangleRoundedLines(btn_empratar, 0.1f, 10, 2.0f, COR_AMA_COZ);
+        if (cozinhar.receita != NULL &&
+            strcmp(cozinhar.receita->nome, "Pirão de Carne") == 0) {
+            // botão superior para entregar aos jurados
+            Rectangle btn_entregar = {200, 10, 400, 40};
+            DrawRectangleRec(btn_entregar, COR_VERDE_COZ);
+            DrawRectangleRoundedLines(btn_entregar, 0.1f, 10, 2.0f, COR_AMA_COZ);
 
-        int txt_width = medir_txt("EMPRATAR", 24);
-        txt("EMPRATAR", 400 - txt_width/2, 18, 24, WHITE);
+            int txt_width = medir_txt("Entregar aos jurados", 22);
+            txt("Entregar aos jurados", 400 - txt_width/2, 19, 22, WHITE);
+        } else {
+            // desenha botão EMPRATAR no topo
+            Rectangle btn_empratar = {300, 10, 200, 40};
+            DrawRectangleRec(btn_empratar, COR_VERDE_COZ);
+            DrawRectangleRoundedLines(btn_empratar, 0.1f, 10, 2.0f, COR_AMA_COZ);
+
+            int txt_width = medir_txt("EMPRATAR", 24);
+            txt("EMPRATAR", 400 - txt_width/2, 18, 24, WHITE);
+        }
     }
 }
 
@@ -808,7 +940,10 @@ static void desenhar_imagem_passo(void) {
 static void desenhar_fim(void) {
     // imagem pronta ocupa a tela toda
     if (cozinhar.venceu && cozinhar.textura_pronta_carregada &&
-        (cozinhar.receita == NULL || strcmp(cozinhar.receita->nome, "Bolo de Rolo") != 0)) {
+        (cozinhar.receita == NULL ||
+         (strcmp(cozinhar.receita->nome, "Bolo de Rolo") != 0 &&
+          strcmp(cozinhar.receita->nome, "Tapioca") != 0 &&
+          strcmp(cozinhar.receita->nome, "Escondidinho") != 0))) {
         Texture2D tex_pronta = cozinhar.textura_pronta;
         Rectangle dst = {0, 0, (float)LARG, (float)ALT};
         desenhar_textura_cover(tex_pronta, dst);

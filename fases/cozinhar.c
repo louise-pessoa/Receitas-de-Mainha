@@ -87,11 +87,20 @@ static void montar_grid(void) {
     // Verifica se o passo atual tem ingrediente vazio (passo especial como forno)
     if (!pilha_vazia(cozinhar.pilha) && cozinhar.pilha->dado.ingrediente[0] == '\0') {
         // Passo especial - mostra um botão para o tipo de passo
-        const char *nome_especial =
-            (cozinhar.receita != NULL && strcmp(cozinhar.receita->nome, "Pirão de Carne") == 0)
-                ? "Finalizar"
-                : "Forno";  // poderia ser parametrizavel
-        
+        const char *nome_especial = "Forno";
+        int carregar_sprite = 1;
+        if (cozinhar.receita != NULL && strcmp(cozinhar.receita->nome, "Pirão de Carne") == 0) {
+            // Para o Pirão, se o passo atual for a ação 'Agora que está bom, retire os legumes e a carne'
+            // mostramos o botão 'Peneirar' sem sprite. Para o passo final mostramos o sprite pronto.
+            if (strcmp(cozinhar.pilha->dado.acao, "Agora que está bom, retire os legumes e a carne") == 0) {
+                nome_especial = "Peneirar";
+                carregar_sprite = 0;
+            } else {
+                nome_especial = "Finalizar";
+                carregar_sprite = 1;
+            }
+        }
+
         strncpy(cozinhar.grid[0].nome, nome_especial,
                 sizeof(cozinhar.grid[0].nome) - 1);
         cozinhar.grid[0].nome[sizeof(cozinhar.grid[0].nome) - 1] = '\0';
@@ -105,16 +114,20 @@ static void montar_grid(void) {
         cozinhar.grid[0].area = (Rectangle){ gx, gy, w, h };
         // tentar carregar sprite do forno
         char path[256] = {0};
-        // mapeamento explicito
-        if (cozinhar.receita != NULL && strcmp(cozinhar.receita->nome, "Pirão de Carne") == 0) {
-            snprintf(path, sizeof(path), "sprites/receitas/pirao/pirao_pronto.png");
+        // mapeamento explicito: carrega sprite apenas quando solicitado
+        if (carregar_sprite) {
+            if (cozinhar.receita != NULL && strcmp(cozinhar.receita->nome, "Pirão de Carne") == 0) {
+                snprintf(path, sizeof(path), "sprites/receitas/pirao/pirao_pronto.png");
+            } else {
+                snprintf(path, sizeof(path), "sprites/receitas/travessa_forno.png");
+            }
+            cozinhar.grid[0].sprite = LoadTexture(path);
+            if (cozinhar.grid[0].sprite.id != 0) {
+                SetTextureFilter(cozinhar.grid[0].sprite, TEXTURE_FILTER_BILINEAR);
+                cozinhar.grid[0].sprite_carregado = 1;
+            }
         } else {
-            snprintf(path, sizeof(path), "sprites/receitas/travessa_forno.png");
-        }
-        cozinhar.grid[0].sprite = LoadTexture(path);
-        if (cozinhar.grid[0].sprite.id != 0) {
-            SetTextureFilter(cozinhar.grid[0].sprite, TEXTURE_FILTER_BILINEAR);
-            cozinhar.grid[0].sprite_carregado = 1;
+            cozinhar.grid[0].sprite_carregado = 0;
         }
         cozinhar.n_grid = 1;
         return;
@@ -311,13 +324,7 @@ void cozinhar_iniciar(Receita *receita) {
         }
     }
 
-    // carrega textura frigideira pronta (para empratar)
-    Texture2D tex_frigideira = LoadTexture("sprites/receitas/frigideira_vazia.png");
-    if (tex_frigideira.id != 0) {
-        cozinhar.textura_frigideira_pronta = tex_frigideira;
-        SetTextureFilter(cozinhar.textura_frigideira_pronta, TEXTURE_FILTER_BILINEAR);
-        cozinhar.textura_frigideira_pronta_carregada = 1;
-    }
+    // (removida) textura de frigideira para empratar não é mais usada
 
     // carrega textura da receita pronta
     if (receita->img_receita_pronta[0] != '\0') {
@@ -377,6 +384,7 @@ void cozinhar_iniciar(Receita *receita) {
         SetTextureFilter(cozinhar.textura_mainha_vitoria, TEXTURE_FILTER_BILINEAR);
         cozinhar.textura_mainha_vitoria_carregada = 1;
     }
+    cozinhar.mostrando_mainha_vitoria = 0;
 
     montar_grid();
     cozinhar.passo_idx = 0;
@@ -453,12 +461,43 @@ static void fase_clicar(void) {
         return;
     }
     
-    // Se é um passo especial (ingrediente vazio), qualquer clique no botão avança
+    // Se é um passo especial (ingrediente vazio), clique no botão conclui o passo
     if (p->ingrediente[0] == '\0') {
-        Vector2 m = GetMousePosition();
-        if (cozinhar.n_grid > 0 && CheckCollisionPointRec(m, cozinhar.grid[0].area)) {
-            cozinhar.fase = COZ_FASE_TECLAS;
+        // clique com mouse
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            Vector2 m = GetMousePosition();
+            if (cozinhar.n_grid > 0 && CheckCollisionPointRec(m, cozinhar.grid[0].area)) {
+                // conclui o passo imediatamente
+                cozinhar.pilha = pop_passo(cozinhar.pilha);
+                cozinhar.passo_idx++;
+                if (pilha_vazia(cozinhar.pilha)) {
+                    cozinhar.venceu = 1;
+                    cozinhar.terminou = 1;
+                    cozinhar.fase = COZ_FASE_FIM;
+                    estado.pontuacao = cozinhar.pontos;
+                    return;
+                }
+                cozinhar.fase = COZ_FASE_CLICAR;
+                cozinhar.pos_tecla = 0;
+                montar_grid();
+                marcar_destacado();
+            }
+        }
+        // fallback por Enter
+        if (IsKeyPressed(KEY_ENTER)) {
+            cozinhar.pilha = pop_passo(cozinhar.pilha);
+            cozinhar.passo_idx++;
+            if (pilha_vazia(cozinhar.pilha)) {
+                cozinhar.venceu = 1;
+                cozinhar.terminou = 1;
+                cozinhar.fase = COZ_FASE_FIM;
+                estado.pontuacao = cozinhar.pontos;
+                return;
+            }
+            cozinhar.fase = COZ_FASE_CLICAR;
             cozinhar.pos_tecla = 0;
+            montar_grid();
+            marcar_destacado();
         }
         return;
     }
@@ -542,12 +581,15 @@ static void fase_feedback(void) {
             // pop: remove passo concluido do topo da pilha
             cozinhar.pilha = pop_passo(cozinhar.pilha);
             cozinhar.passo_idx++;
-            if (pilha_vazia(cozinhar.pilha)) {
-                cozinhar.venceu = 1;
-                cozinhar.fase = COZ_FASE_EMPRATAR;
-                estado.pontuacao = cozinhar.pontos;
-                return;
-            }
+                    if (pilha_vazia(cozinhar.pilha)) {
+                        cozinhar.venceu = 1;
+                        cozinhar.terminou = 1;
+                        cozinhar.fase = COZ_FASE_FIM;
+                        // inicia delay para mostrar mainha de vitória após exibir imagem pronta
+                        cozinhar.mostrando_mainha_vitoria = 0;
+                        estado.pontuacao = cozinhar.pontos;
+                        return;
+                    }
         } else {
             // Ativa sticker de erro (mainha brava)
             cozinhar.mostrando_mainha_brava = 1;
@@ -563,62 +605,7 @@ static void fase_feedback(void) {
     }
 }
 
-// ==========================================
-// FASE EMPRATAR
-// ==========================================
-static void fase_empratar(void) {
-    // verifica clique no botão EMPRATAR
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-        Vector2 mouse = GetMousePosition();
-        // botão no topo: 300-500, 10-50
-        if (mouse.x >= 300 && mouse.x <= 500 && mouse.y >= 10 && mouse.y <= 50) {
-            cozinhar.terminou = 1;
-            cozinhar.fase = COZ_FASE_FIM;
-        }
-    }
-    
-    // fallback: ENTER também funciona
-    if (IsKeyPressed(KEY_ENTER)) {
-        cozinhar.terminou = 1;
-        cozinhar.fase = COZ_FASE_FIM;
-    }
-}
-
-static void desenhar_empratar(void) {
-    ClearBackground(COR_FUNDO_COZ);
-
-    // carrega sob demanda se ainda nao carregou
-    if (!cozinhar.textura_pronta_carregada &&
-        cozinhar.receita && cozinhar.receita->img_receita_pronta[0] != '\0') {
-        cozinhar.textura_pronta = LoadTexture(cozinhar.receita->img_receita_pronta);
-        printf("[EMPRATAR] carregando '%s' id=%u\n",
-               cozinhar.receita->img_receita_pronta, cozinhar.textura_pronta.id);
-        if (cozinhar.textura_pronta.id != 0)
-            cozinhar.textura_pronta_carregada = 1;
-    }
-
-    Texture2D tex = {0};
-    int tem_tex = 0;
-    if (cozinhar.textura_pronta_carregada) {
-        tex = cozinhar.textura_pronta; tem_tex = 1;
-    } else if (cozinhar.textura_frigideira_pronta_carregada) {
-        tex = cozinhar.textura_frigideira_pronta; tem_tex = 1;
-    }
-    if (tem_tex && tex.width > 0 && tex.height > 0) {
-        Rectangle dst = {0, 0, (float)LARG, (float)ALT};
-        desenhar_textura_cover(tex, dst);
-    }
-    
-    if (cozinhar.receita == NULL || strcmp(cozinhar.receita->nome, "Bolo de Rolo") != 0) {
-        // desenha botão EMPRATAR no topo
-        Rectangle btn_empratar = {300, 10, 200, 40};
-        DrawRectangleRec(btn_empratar, COR_VERDE_COZ);
-        DrawRectangleRoundedLines(btn_empratar, 0.1f, 10, 2.0f, COR_AMA_COZ);
-
-        int txt_width = medir_txt("EMPRATAR", 24);
-        txt("EMPRATAR", 400 - txt_width/2, 18, 24, WHITE);
-    }
-}
+// (removida) Fase Empratar e desenho associado
 
 // ==========================================
 // DESENHO - FIM
@@ -807,15 +794,14 @@ static void desenhar_imagem_passo(void) {
 
 static void desenhar_fim(void) {
     // imagem pronta ocupa a tela toda
-    if (cozinhar.venceu && cozinhar.textura_pronta_carregada &&
-        (cozinhar.receita == NULL || strcmp(cozinhar.receita->nome, "Bolo de Rolo") != 0)) {
+    if (cozinhar.venceu && cozinhar.textura_pronta_carregada) {
         Texture2D tex_pronta = cozinhar.textura_pronta;
         Rectangle dst = {0, 0, (float)LARG, (float)ALT};
         desenhar_textura_cover(tex_pronta, dst);
     }
 
     // sprite mainha vitoria no canto inferior esquerdo (acima da barra)
-    if (cozinhar.textura_mainha_vitoria_carregada) {
+    if (cozinhar.textura_mainha_vitoria_carregada && cozinhar.mostrando_mainha_vitoria) {
         Texture2D tex = cozinhar.textura_mainha_vitoria;
         float scale_w = (float)LARG / (float)tex.width;
         float scale_h = (float)ALT / (float)tex.height;
@@ -928,6 +914,7 @@ void tela_cozinhar(void) {
             cozinhar.mostrando_mainha_brava = 0;
         }
     }
+    // victory mainha shown only on Enter press (handled below)
 
     // Sincroniza pontos_anterior sem ativar reações automáticas aqui
     cozinhar.pontos_anterior = cozinhar.pontos;
@@ -936,18 +923,17 @@ void tela_cozinhar(void) {
         switch (cozinhar.fase) {
             case COZ_FASE_CLICAR:    fase_clicar();    break;
             case COZ_FASE_TECLAS:    fase_teclas();    break;
-            case COZ_FASE_FEEDBACK:  fase_feedback();  break;
-            case COZ_FASE_EMPRATAR:  fase_empratar();  break;
+                case COZ_FASE_FEEDBACK:  fase_feedback();  break;
             default: break;
         }
     }
 
-    if (cozinhar.fase == COZ_FASE_EMPRATAR) {
-        desenhar_empratar();
-        return;
-    }
 
     if (cozinhar.fase == COZ_FASE_FIM) {
+        // Se Enter pressionado na tela final, mostra a mainha_vitoria
+        if (IsKeyPressed(KEY_ENTER)) {
+            cozinhar.mostrando_mainha_vitoria = 1;
+        }
         ClearBackground(COR_FUNDO_COZ);
         desenhar_fim();
         return;
@@ -992,11 +978,7 @@ void cozinhar_limpar(void) {
         cozinhar.textura_inicio_carregada = 0;
     }
     
-    // libera textura frigideira pronta
-    if (cozinhar.textura_frigideira_pronta_carregada) {
-        UnloadTexture(cozinhar.textura_frigideira_pronta);
-        cozinhar.textura_frigideira_pronta_carregada = 0;
-    }
+    // (removida) textura de frigideira pronta não utilizada
     
     // libera textura mainha neutra
     if (cozinhar.textura_mainha_carregada) {

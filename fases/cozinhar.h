@@ -11,8 +11,8 @@ typedef enum {
     COZ_FASE_CLICAR,    // jogador precisa clicar o ingrediente correto
     COZ_FASE_TECLAS,    // jogador precisa digitar a sequencia de teclas
     COZ_FASE_FEEDBACK,  // exibe feedback rapido entre passos
-    COZ_FASE_EMPRATAR,  // mostra frigideira pronta com botao empratar
     COZ_FASE_FIM        // todos os passos concluidos (ou desistiu)
+    
 } CozFase;
 
 typedef struct {
@@ -57,8 +57,6 @@ typedef struct {
     // Cache de texturas para os passos
     Texture2D *texturas_passos;   // array de texturas dos passos
     int *texturas_carregadas;     // array de flags se textura foi carregada
-    Texture2D textura_frigideira_pronta; // textura frigideira_pronta para empratar
-    int textura_frigideira_pronta_carregada;
     Texture2D textura_pronta;     // textura da receita pronta
     int textura_pronta_carregada; // flag se foi carregada
     
@@ -81,6 +79,7 @@ typedef struct {
     // Sprite de vitória (mainha vitória)
     Texture2D textura_mainha_vitoria;
     int textura_mainha_vitoria_carregada;
+    int mostrando_mainha_vitoria;  // flag para desenhar a mainha vitória ao pressionar Enter
 } EstadoCozinhar;
 
 extern EstadoCozinhar cozinhar;

@@ -129,7 +129,7 @@ void integrar_modulos(void) {
 
     // bolo de rolo
     bolo->passos = push_passo(bolo->passos,
-        "Misture todos os ingredientes", "Misturar", "WASDWASDW", "sprites/receitas/bolo_de_rolo/ingredientes_bolo_rolo.png");
+        "Misture todos os ingredientes", "todos os ingredientes", "WASDWASDW", "sprites/receitas/bolo_de_rolo/ingredientes_bolo_rolo.png");
     bolo->passos = push_passo(bolo->passos,
         "Coloque a mistura numa travessa e leve ao forno", "Forno", "FFF", "sprites/receitas/bolo_de_rolo/mistura_bolo_rolo.png");
     bolo->passos = push_passo(bolo->passos,
@@ -162,11 +162,11 @@ void integrar_modulos(void) {
         "Adicione os legumes, a carne e a água à panela para ferver e pegar pressão",
         "", "SSSS", "sprites/receitas/pirao/legumes_carne_cortados.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Agora que já esta bom, retire a carne e os legumes", "", "RRRR", "sprites/receitas/pirao/caldo_legumes_pirao.png");
+        "Agora que está bom, retire os legumes e a carne", "", "", "");
     pirao_carne->passos = push_passo(pirao_carne->passos,
         "Adicione farinha ao caldo para engrossar", "Farinha de mandioca", "FFFF", "sprites/receitas/pirao/caldo_sem_carne_pirao.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Empratar", "", "EMPR", "sprites/receitas/pirao/caldo_farinha_pirao.png");
+        "Servir", "", "", "sprites/receitas/pirao/caldo_farinha_pirao.png");
 
     // Define imagens de inicio e pronta do Pirão
     strncpy(pirao_carne->img_inicio, "sprites/receitas/pirao/tabua_carne_crua.png", sizeof(pirao_carne->img_inicio) - 1);

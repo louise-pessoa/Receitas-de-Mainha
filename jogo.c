@@ -154,19 +154,26 @@ void integrar_modulos(void) {
     inserir_ingrediente(pirao_carne, "Manteiga");
     inserir_ingrediente(pirao_carne, "Alho");
 
-    // === passos do Pirão de Carne (6 passos) ===
+    // === passos do Pirão de Carne ===
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Corte a carne", "Carne", "CRT", "sprites/receitas/pirao/tabua_carne_crua.png");
+        "Corte a carne", "Carne", "CRTC", "sprites/receitas/pirao/tabua_carne_crua.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Corte os legumes", "Legumes", "CRBC", "sprites/receitas/pirao/legumes_inteiros_pirao.png");
+        "Corte os legumes", "Legumes", "CRTL", "sprites/receitas/pirao/legumes_inteiros_pirao.png");
+    // Coloca pra ferver: 5 sub-passos (um clique por ingrediente)
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Ferva a agua com legumes", "Agua", "SSSS", "sprites/receitas/pirao/caldo_sem_carne_pirao.png");
+        "Adicione a agua na panela", "Agua", "AGUA", "sprites/receitas/pirao/caldo_sem_carne_pirao.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Agora que está bom, retire os legumes e a carne", "", "", "");
+        "Adicione a manteiga", "Manteiga", "MNTG", "sprites/receitas/pirao/caldo_sem_carne_pirao.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Adicione farinha ao caldo para engrossar", "Farinha de mandioca", "FFFF", "sprites/receitas/pirao/caldo_sem_carne_pirao.png");
+        "Adicione o alho", "Alho", "ALHO", "sprites/receitas/pirao/caldo_sem_carne_pirao.png");
     pirao_carne->passos = push_passo(pirao_carne->passos,
-        "Servir", "", "", "sprites/receitas/pirao/caldo_farinha_pirao.png");
+        "Adicione os legumes", "Legumes", "LGMS", "sprites/receitas/pirao/caldo_legumes_pirao.png");
+    pirao_carne->passos = push_passo(pirao_carne->passos,
+        "Adicione a carne para ferver", "Carne", "FERV", "sprites/receitas/pirao/caldo_com_carne_pirao.png");
+    pirao_carne->passos = push_passo(pirao_carne->passos,
+        "Deixa so o caldo (tira os legumes e a carne)", "", "", "sprites/receitas/pirao/caldo_sem_carne_pirao.png");
+    pirao_carne->passos = push_passo(pirao_carne->passos,
+        "Engrossa com farinha", "Farinha de mandioca", "FRNH", "sprites/receitas/pirao/caldo_farinha_pirao.png");
 
     // Define imagens de inicio e pronta do Pirão
     strncpy(pirao_carne->img_inicio, "sprites/receitas/pirao/tabua_carne_crua.png", sizeof(pirao_carne->img_inicio) - 1);

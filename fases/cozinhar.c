@@ -92,7 +92,8 @@ static void montar_grid(void) {
         if (cozinhar.receita != NULL && strcmp(cozinhar.receita->nome, "Pirão de Carne") == 0) {
             // Para o Pirão, se o passo atual for a ação 'Agora que está bom, retire os legumes e a carne'
             // mostramos o botão 'Peneirar' sem sprite. Para o passo final mostramos o sprite pronto.
-            if (strcmp(cozinhar.pilha->dado.acao, "Agora que está bom, retire os legumes e a carne") == 0) {
+            if (strstr(cozinhar.pilha->dado.acao, "caldo") != NULL ||
+                strstr(cozinhar.pilha->dado.acao, "retire") != NULL) {
                 nome_especial = "Peneirar";
                 carregar_sprite = 0;
             } else {

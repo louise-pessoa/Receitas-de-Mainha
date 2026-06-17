@@ -130,13 +130,13 @@ static void avancar_um_passo(void) {
     }
 
     if (ordenacao.j > 0 &&
-        ordenacao.itens[ordenacao.j - 1].ordem_correta >
-        ordenacao.itens[ordenacao.j].ordem_correta) {
-        // troca
-        ItemOrdenacao tmp = ordenacao.itens[ordenacao.j - 1];
+        ordenacao.itens[ordenacao.j].ordem_correta <
+        ordenacao.itens[ordenacao.j - 1].ordem_correta) {
+        // troca (aux = vetor[j-1]; vetor[j-1] = vetor[j]; vetor[j] = aux;)
+        ItemOrdenacao aux = ordenacao.itens[ordenacao.j - 1];
         ordenacao.itens[ordenacao.j - 1] = ordenacao.itens[ordenacao.j];
-        ordenacao.itens[ordenacao.j] = tmp;
-        ordenacao.j--;
+        ordenacao.itens[ordenacao.j] = aux;
+        --ordenacao.j;
     } else {
         // proxima iteracao externa
         ordenacao.i++;
